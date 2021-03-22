@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Signup Page initial</title>
+{% endblock %}
+
+{% block body %}
+<header class="mdc-top-app-bar">
+    <div class="mdc-top-app-bar__row">
+      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+        <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Open navigation menu" disabled>room_service</button>
+        <!-- <img src="../static/images/delivery image.jpeg" id="botton-icon"> -->
+        <span class="mdc-top-app-bar__title">Zomato</span>
+      </section>
+      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+        <a href={{ url_for('index')}} id="anchor-link-nodesign">
+            <div class="mdc-touch-target-wrapper">
+                <button class="mdc-button mdc-button--raised">
+                <span class="mdc-button__ripple"></span>
+                <span class="mdc-button__label">Back to Home</span>
+                <!-- <span class="mdc-button__touch"></span> -->
+                </button>
+            </div>    
+        </a>
+      </section>
+    </div>
+  </header>
+  
+  <!-- <div class="bkg-img-home"></div> -->
+  <main class="mdc-top-app-bar--fixed-adjust">
+      <centre>
+          <div class="container">
+              <div class="row justify-content-center">
+                  <!-- <div class="col-3"></div> -->
+                  <centre>
+                  <div class="col mx-auto">
+                      <centre>
+
+                          <h1>Which Category do you belong?</h1>
+                        </centre>
+                  </div>
+                </centre>
+              </div>
+              <div class="row">
+                  <!-- <div class="col-3"></div> -->
+                  <div class="col-4">
+                    <a href={{ url_for('customerSignup')}} id="anchor-link-nodesign">
+                        <div class="mdc-touch-target-wrapper">
+                            <button class="mdc-button mdc-button--raised">
+                            <span class="mdc-button__ripple"></span>
+                            <span class="mdc-button__label">Customer</span>
+                            <!-- <span class="mdc-button__touch"></span> -->
+                            </button>
+                        </div>    
+                    </a>
+                  </div>
+                  <div class="col-4">
+                    <a href={{ url_for('restaurantSignup')}} id="anchor-link-nodesign">
+                        <div class="mdc-touch-target-wrapper">
+                            <button class="mdc-button mdc-button--raised">
+                            <span class="mdc-button__ripple"></span>
+                            <span class="mdc-button__label">Restaurant</span>
+                            <!-- <span class="mdc-button__touch"></span> -->
+                            </button>
+                        </div>    
+                    </a>
+                  </div>
+                  <div class="col-4">
+                    <a href={{ url_for('deliveryAgentSignup')}} id="anchor-link-nodesign">
+                        <div class="mdc-touch-target-wrapper">
+                            <button class="mdc-button mdc-button--raised">
+                            <span class="mdc-button__ripple"></span>
+                            <span class="mdc-button__label">Delivery Agent</span>
+                            <!-- <span class="mdc-button__touch"></span> -->
+                            </button>
+                        </div>    
+                    </a>
+                  </div>
+              </div>
+          </div>
+      </centre>
+</main>
+{% endblock %}
