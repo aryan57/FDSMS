@@ -10,6 +10,8 @@ cred = credentials.Certificate('fbAdminConfig.json')
 firebase = firebase_admin.initialize_app(cred)
 pb = pyrebase.initialize_app(json.load(open('fbConfig.json')))
 
+# this is a comment
+
 JWT_GLOBAL =""
 
 def check_token(f):
