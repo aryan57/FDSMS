@@ -2,6 +2,7 @@
 
 {% block head %}
 <title>Customer Signup</title>
+<link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/textFields.css')}}>
 {% endblock %}
 
 {% block body %}
@@ -48,5 +49,8 @@
         </div>
       </div>
     </centre>
-</main>
+    <script>
+      const textField = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field'));
+    </script>
+  </main>
 {% endblock %}
