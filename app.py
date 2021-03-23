@@ -1,7 +1,8 @@
 from flask import Flask, render_template, url_for 
 
 app = Flask(__name__)
-app.config["CACHE_TYPE"] = "null"
+app.config['DEBUG'] = True
+app.config['TEMPLATES_AUTO_RELOAD']=True
 
 @app.route('/')
 def index():
