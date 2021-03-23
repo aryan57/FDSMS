@@ -1,0 +1,11 @@
+.gender-form{
+    padding-bottom: 1rem!important;
+    /* margin-bottom: 0.5rem!important; */
+    background-color: #f7da8b;
+}
+
+#inputImage{
+    width: 100%;
+    /* padding-top: 0.5rem!important; */
+    margin-top: 0.5rem!important;
+}

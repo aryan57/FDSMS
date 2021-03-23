@@ -1,3 +1,11 @@
 .mdc-text-field{
     width: 100%;
 }
+
+.mdc-text-field--outlined.mdc-text-field--with-leading-icon{
+    padding-right: max(0px, var(--mdc-shape-small, 0px));
+}
+
+.row{
+    margin-top: 0.5rem!important;
+}

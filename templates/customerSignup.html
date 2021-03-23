@@ -3,6 +3,7 @@
 {% block head %}
 <title>Customer Signup</title>
 <link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/textField.css')}}>
+<link rel="stylesheet" type="text/css" href ={{ url_for('static', filename='css/signupCSS.css')}}>
 {% endblock %}
 
 {% block body %}
@@ -64,16 +65,18 @@
               <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">male</i>
               <span class="mdc-notched-outline">
                 <span class="mdc-notched-outline__leading"></span>
-                <span class="mdc-notched-outline__notch">
-                  <span class="mdc-floating-label" id="my-label-id">Gender</span>
-                </span>
                 <span class="mdc-notched-outline__trailing"></span>
               </span>
-              <input type="gender" class="mdc-text-field__input" aria-labelledby="my-label-id">
+              <select class="form-select gender-form form-select-lg mb-3" aria-label="Default select example">
+                <option selected>Gender</option>
+                <option value="1">Male</option>
+                <option value="2">Female</option>
+                <option value="3">Other</option>
+              </select>         
             </label>
           </div>
           <div class="col-6 align-self-center">
-            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-3">
+            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-4">
               <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">phone</i>
               <span class="mdc-notched-outline">
                 <span class="mdc-notched-outline__leading"></span>
@@ -86,10 +89,48 @@
             </label>
           </div>
         </div>
+        <div class="row justify-content-center">
+          <div class="col-6 align-self-center">
+            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-5">
+              <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">insert_photo</i>
+              <span class="mdc-notched-outline">
+                <span class="mdc-notched-outline__leading"></span>
+                <span class="mdc-notched-outline__trailing"></span>
+              </span>
+              <input type="file" id="inputImage" Name="Profile Photo">
+            </label>
+          </div>
+          <div class="col-6 align-self-center">
+            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-5">
+              <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">home</i>
+              <span class="mdc-notched-outline">
+                <span class="mdc-notched-outline__leading"></span>
+                <span class="mdc-notched-outline__trailing"></span>
+              </span>
+              <select class="form-select gender-form form-select-lg mb-2" aria-label="Default select example">
+                <option selected>Area</option>
+                <option value="1">Delhi</option>
+                <option value="2">Other</option>
+              </select>   
+            </label>
+          </div>
+        </div>
+        <div class="row justify-content-center">
+          <div class="col-2 align-self-center">
+            <button class="mdc-button mdc-button--raised">
+              <span class="mdc-button__label">Submit</span>
+            </button>
+          </div>
+        </div>
       </div>
     </centre>
     <script>
-      const textField = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field'));
+      const textField = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-1'));
+      const textField1 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-2'));
+      const textField3 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-4'));
+      const textField4 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-5'));
+      const helperText = new mdc.textFieldHelperText.MDCTextFieldHelperText(document.querySelector('.mdc-text-field-helper-text'));
+
       // const textField1 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field'));
       // const textField = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field'));
     </script>
