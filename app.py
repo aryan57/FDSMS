@@ -40,6 +40,9 @@ def userinfo():
 def signup():
     email = request.form['email']
     password = request.form['password']
+    gender = request.form['gender']
+    area = request.form['area']
+    # photo = request.form['photo']
     # confirmPassword = request.form['confirmPassword']
     mobile = request.form['mobile']
     dob = request.form['dob']
