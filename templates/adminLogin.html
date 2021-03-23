@@ -5,8 +5,16 @@
 {% endblock %}
 
 {% block body %}
-Welcome to admin login page blah blah blah<br>
-HI this is the new file
-Welcome to admin login page blah blah blah blah
-Help me help you
+  <header class="mdc-top-app-bar">
+    <div class="mdc-top-app-bar__row">
+      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+        <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Open navigation menu" disabled>room_service</button>
+        <!-- <img src="../static/images/delivery image.jpeg" id="botton-icon"> -->
+        <span class="mdc-top-app-bar__title">Zomato</span>
+      </section>
+      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+        <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Go Back" onclick="history.back()">arrow_back</button>
+      </section>
+    </div>
+  </header>
 {% endblock %}
