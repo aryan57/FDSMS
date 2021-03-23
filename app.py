@@ -1,6 +1,6 @@
 import firebase_admin
 import pyrebase
-from firebase_admin import credentials, auth
+from firebase_admin import credentials, auth, firestore
 import json
 from flask import Flask, render_template, url_for, request 
 from functools import wraps
@@ -14,6 +14,7 @@ app.config['TEMPLATES_AUTO_RELOAD']=True
 cred = credentials.Certificate('fbAdminConfig.json')
 firebase = firebase_admin.initialize_app(cred)
 pb = pyrebase.initialize_app(json.load(open('fbConfig.json')))
+db = firestore.client()
 
 JWT_GLOBAL =""
 
@@ -39,7 +40,7 @@ def userinfo():
 def signup():
     email = request.form['email']
     password = request.form['password']
-    confirmPassword = request.form['confirmPassword']
+    # confirmPassword = request.form['confirmPassword']
     mobile = request.form['mobile']
     dob = request.form['dob']
     name = request.form['name']
@@ -50,6 +51,13 @@ def signup():
             email=email,
             password=password
         )
+        json_data = {
+            "name" : name,
+            "dob" : dob,
+            "mobile" : mobile,
+            "email" : email
+        }
+        db.collection("customers").document(user.uid).set(json_data)
         return {'message': f'Successfully created user {user.uid}'},200
     except:
         return {'message': 'Error creating user'},400
