@@ -2,6 +2,8 @@
 
 {% block head %}
 <title>Login page</title>
+<link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/textField.css')}}>
+<link rel="stylesheet" type="text/css" href ={{ url_for('static', filename='css/signupCSS.css')}}>
 {% endblock %}
 
 {% block body %}
@@ -17,4 +19,74 @@
       </section>
     </div>
   </header>
+  <main class="mdc-top-app-bar--fixed-adjust">
+      <div class='container'>
+        <div class="row justify-content-center">
+            <div class="col-md-auto align-self-center">
+              <h1>Login</h1>
+            </div>
+          </div>
+                <div class='row justify-content-center'>
+                    <div class='col-6 align-self-center'>
+                        <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-3">
+                            <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">account_circle</i>
+                            <span class="mdc-notched-outline">
+                              <span class="mdc-notched-outline__leading"></span>
+                              <span class="mdc-notched-outline__trailing"></span>
+                            </span>
+                            <select class="form-select gender-form form-select-lg mb-3" aria-label="Default select example">
+                              <option selected>Category</option>
+                              <option value="1">Customer</option>
+                              <option value="2">Restaurant</option>
+                              <option value="3">Delivery Agent</option>
+                            </select>         
+                          </label>
+                    </div>
+                </div>
+                <div class='row justify-content-center'>
+                    <div class='col-6 align-self-center'>
+                        <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-5">
+                            <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">alternate_email</i>
+                            <span class="mdc-notched-outline">
+                              <span class="mdc-notched-outline__leading"></span>
+                              <span class="mdc-notched-outline__notch">
+                                <span class="mdc-floating-label" id="my-label-id">Email Id</span>
+                              </span>
+                              <span class="mdc-notched-outline__trailing"></span>
+                            </span>
+                            <input type="email" class="mdc-text-field__input" aria-labelledby="my-label-id">
+                          </label>
+                    </div>
+                </div>
+                <div class='row justify-content-center'>
+                    <div class='col-6 align-self-center'>
+                        <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-6">
+                            <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">password</i>
+                            <span class="mdc-notched-outline">
+                              <span class="mdc-notched-outline__leading"></span>
+                              <span class="mdc-notched-outline__notch">
+                                <span class="mdc-floating-label" id="my-label-id">Password</span>
+                              </span>
+                              <span class="mdc-notched-outline__trailing"></span>
+                            </span>
+                            <input type="password" class="mdc-text-field__input" aria-labelledby="my-label-id">
+                          </label>
+                    </div>
+                </div>
+                <div class='row justify-content-center'>
+                    <div class='col-md-auto align-self-center'>
+                        <button class="mdc-button mdc-button--raised">
+                            <span class="mdc-button__label">Login</span>
+                          </button>
+                    </div>
+                    <div class='col-md-auto align-self-center'>
+                        <a href={{url_for('signup')}}>
+                            <button class="mdc-button mdc-button--raised">
+                                <span class="mdc-button__label">Signup</span>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+      </div>
+</main>
 {% endblock %}
