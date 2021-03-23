@@ -10,53 +10,53 @@
 {% block body %}
 
 <header class="mdc-top-app-bar">
-    <div class="mdc-top-app-bar__row">
-      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-        <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Open navigation menu" disabled>room_service</button>
-        <!-- <img src="../static/images/delivery image.jpeg" id="botton-icon"> -->
-        <span class="mdc-top-app-bar__title">Zomato</span>
-      </section>
-      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-        <a href={{ url_for('signup')}} id="anchor-link-nodesign">
-            <div class="mdc-touch-target-wrapper">
-                <button class="mdc-button mdc-button--raised">
-                <span class="mdc-button__ripple"></span>
-                <span class="mdc-button__label">Signup</span>
-                <!-- <span class="mdc-button__touch"></span> -->
-                </button>
-            </div>    
-        </a>
-        <button class="mdc-button" disabled>
+  <div class="mdc-top-app-bar__row">
+    <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+      <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Open navigation menu" disabled>room_service</button>
+      <!-- <img src="../static/images/delivery image.jpeg" id="botton-icon"> -->
+      <span class="mdc-top-app-bar__title">Zomato</span>
+    </section>
+    <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+      <a href={{ url_for('signup')}} id="anchor-link-nodesign">
+        <div class="mdc-touch-target-wrapper">
+          <button class="mdc-button mdc-button--raised">
             <span class="mdc-button__ripple"></span>
-            <span class="mdc-button__label">         </span>
-         </button>   
-        <a href={{ url_for('login')}} id="anchor-link-nodesign">
-            <div class="mdc-touch-target-wrapper">
-                <button class="mdc-button mdc-button--raised">
-                <span class="mdc-button__ripple"></span>
-                <span class="mdc-button__label">Login</span>
-                <!-- <span class="mdc-button__touch"></span> -->
-                </button>
-            </div>  
-        </a>
-        <button class="mdc-button" disabled>
+            <span class="mdc-button__label">Signup</span>
+            <!-- <span class="mdc-button__touch"></span> -->
+          </button>
+        </div>    
+      </a>
+      <button class="mdc-button" disabled>
+        <span class="mdc-button__ripple"></span>
+        <span class="mdc-button__label">         </span>
+      </button>   
+      <a href={{ url_for('login')}} id="anchor-link-nodesign">
+        <div class="mdc-touch-target-wrapper">
+          <button class="mdc-button mdc-button--raised">
             <span class="mdc-button__ripple"></span>
-            <span class="mdc-button__label">         </span>
-         </button>  
-         <a href={{ url_for('adminLogin')}} id="anchor-link-nodesign">
-            <div class="mdc-touch-target-wrapper">
-                <button class="mdc-button mdc-button--raised">
-                <span class="mdc-button__ripple"></span>
-                <span class="mdc-button__label">Admin Login</span>
-                <!-- <span class="mdc-button__touch"></span> -->
-                </button>
-            </div>  
-         </a> 
-      </section>
-    </div>
-  </header>
-  
-  <div class="bkg-img-home"></div>
-  <main class="mdc-top-app-bar--fixed-adjust">
+            <span class="mdc-button__label">Login</span>
+            <!-- <span class="mdc-button__touch"></span> -->
+          </button>
+        </div>  
+      </a>
+      <button class="mdc-button" disabled>
+        <span class="mdc-button__ripple"></span>
+        <span class="mdc-button__label">         </span>
+      </button>  
+      <a href={{ url_for('adminLogin')}} id="anchor-link-nodesign">
+        <div class="mdc-touch-target-wrapper">
+          <button class="mdc-button mdc-button--raised">
+            <span class="mdc-button__ripple"></span>
+            <span class="mdc-button__label">Admin Login</span>
+            <!-- <span class="mdc-button__touch"></span> -->
+          </button>
+        </div>  
+      </a> 
+    </section>
+  </div>
+</header>
+
+<main class="mdc-top-app-bar--fixed-adjust">
 </main>
+<div class="bkg-img-home"></div>
 {% endblock %}
