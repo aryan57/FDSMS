@@ -2,7 +2,7 @@
 
 {% block head %}
 <title>Customer Signup</title>
-<link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/textFields.css')}}>
+<link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/textField.css')}}>
 {% endblock %}
 
 {% block body %}
@@ -31,11 +31,9 @@
         </div>
 
         <div class="row justify-content-center">
-          <div class="col align-self-center">
-            <span class="material-icons ">
-                perm_identity
-            </span>            
-            <label class="mdc-text-field mdc-text-field--outlined">
+          <div class="col align-self-center">          
+            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-1">
+              <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">perm_identity</i>
               <span class="mdc-notched-outline">
                 <span class="mdc-notched-outline__leading"></span>
                 <span class="mdc-notched-outline__notch">
@@ -47,10 +45,53 @@
             </label>
           </div>
         </div>
+        <div class="row justify-content-center" >
+          <div class="col-3 align-self-center">
+            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-2">
+              <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">calendar_today</i>
+              <span class="mdc-notched-outline">
+                <span class="mdc-notched-outline__leading"></span>
+                <span class="mdc-notched-outline__notch">
+                  <span class="mdc-floating-label" id="my-label-id">DoB</span>
+                </span>
+                <span class="mdc-notched-outline__trailing"></span>
+              </span>
+              <input type="text" class="mdc-text-field__input" aria-labelledby="my-label-id">
+            </label>
+          </div>
+          <div class="col-3 align-self-center">
+            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-3">
+              <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">male</i>
+              <span class="mdc-notched-outline">
+                <span class="mdc-notched-outline__leading"></span>
+                <span class="mdc-notched-outline__notch">
+                  <span class="mdc-floating-label" id="my-label-id">Gender</span>
+                </span>
+                <span class="mdc-notched-outline__trailing"></span>
+              </span>
+              <input type="gender" class="mdc-text-field__input" aria-labelledby="my-label-id">
+            </label>
+          </div>
+          <div class="col-6 align-self-center">
+            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-3">
+              <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">phone</i>
+              <span class="mdc-notched-outline">
+                <span class="mdc-notched-outline__leading"></span>
+                <span class="mdc-notched-outline__notch">
+                  <span class="mdc-floating-label" id="my-label-id">Mobile Number</span>
+                </span>
+                <span class="mdc-notched-outline__trailing"></span>
+              </span>
+              <input type="gender" class="mdc-text-field__input" aria-labelledby="my-label-id">
+            </label>
+          </div>
+        </div>
       </div>
     </centre>
     <script>
       const textField = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field'));
+      // const textField1 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field'));
+      // const textField = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field'));
     </script>
   </main>
 {% endblock %}
