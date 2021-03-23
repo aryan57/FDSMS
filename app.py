@@ -35,10 +35,14 @@ def check_token(f):
 def userinfo():
     return {'data': users}, 200
 
-@app.route('/api/signup')
+@app.route('/api/signup', methods=['POST','GET'])
 def signup():
-    email = request.form.get('email')
-    password = request.form.get('password')
+    email = request.form['email']
+    password = request.form['password']
+    confirmPassword = request.form['confirmPassword']
+    mobile = request.form['mobile']
+    dob = request.form['dob']
+    name = request.form['name']
     if email is None or password is None:
         return {'message': 'Error missing email or password'},400
     try:
