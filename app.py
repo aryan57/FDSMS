@@ -5,6 +5,8 @@ import json
 from flask import Flask, render_template, url_for, request 
 from functools import wraps
 
+# this is a comment
+
 app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['TEMPLATES_AUTO_RELOAD']=True
@@ -64,8 +66,10 @@ def index():
     return render_template('index.html')
 
 @app.route('/signup')
-def signup():
+def signUp():
     return render_template('signup.html')
+
+
 
 @app.route('/login')
 def login():
