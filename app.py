@@ -55,7 +55,7 @@ def deliveryAgentsignup():
     dob = request.form['dob']
     name = request.form['name']
     local_file_path = request.form['local_file_path']
-    message="Fail"
+    session['sign_message']="Fail"
     print(name)
 
     try:
@@ -64,7 +64,7 @@ def deliveryAgentsignup():
             password=password
         )
     except:
-        message="error creating user in firebase"
+        session['sign_message']="error creating user in firebase"
         return redirect(url_for('deliveryAgentSignup', message=message))
     try:
         json_data = {
@@ -76,18 +76,19 @@ def deliveryAgentsignup():
         print(name,dob,email,mobile)
         db.collection("customers").document(user.uid).set(json_data)
     except:
-        message="error adding user text data in firestore"
+        session['sign_message']="error adding user text data in firestore"
         return redirect(url_for('deliveryAgentSignup'))
     try:
 
         local_file_path="/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/static/sample_pictures/a.jpg"
-        storage_file_path = "customerProfilePics/"+user.uid+".jpg"
+        storage_file_path = "deliveryProfilePics/"+user.uid+".jpg"
         blob = bucket.blob(storage_file_path)
         blob.upload_from_filename(local_file_path)
         message="Success"
+        session['sign_message']="Success"
         return redirect(url_for('login'))
     except:
-        message="error uploading photo in firebase storage"
+        session['sign_message']="error uploading photo in firebase storage"
         return redirect(url_for('deliveryAgentSignup'))
 
     
@@ -157,7 +158,7 @@ def token():
 
         # user = pyrebase_pb.auth().get_account_info(jwt)
         # print(user)
-        
+
         session['token_jwt']=jwt
         return {'token': jwt}, 200
     except:
