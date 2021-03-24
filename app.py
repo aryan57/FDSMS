@@ -60,20 +60,6 @@ def deliveryAgentsignup():
     local_file_path = request.form['local_file_path']
     message="Fail"
     print(name)
-    if email is None or password is None:
-        message="email or password is not provided"
-        return redirect(url_for('deliveryAgentSignup', message=message))
-
-    if mobile is None:
-        mobile = ""
-    if dob is None:
-        dob = ""
-    if name is None:
-        name = ""
-    if gender is None:
-        gender = ""
-    if area is None:
-        area = ""
 
     try:
         user = auth.create_user(
@@ -121,21 +107,6 @@ def signup():
     name = request.form['name']
     local_file_path = request.form['local_file_path']
     message="Fail"
-
-    if email is None or password is None:
-        session['sign_message']="email or password is not provided"
-        return redirect(url_for('customerSignup'))
-
-    if mobile is None:
-        mobile = ""
-    if dob is None:
-        dob = ""
-    if name is None:
-        name = ""
-    if gender is None:
-        gender = ""
-    if area is None:
-        area = ""
 
     try:
         user = auth.create_user(
