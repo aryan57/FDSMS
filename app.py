@@ -2,7 +2,7 @@ import firebase_admin
 import pyrebase
 from firebase_admin import credentials, auth, firestore
 import json
-from flask import Flask, render_template, url_for, request 
+from flask import Flask, render_template, url_for, request, redirect 
 from functools import wraps
 
 # this is a comment
@@ -36,7 +36,7 @@ def check_token(f):
 def userinfo():
     return {'data': users}, 200
 
-@app.route('/api/signup', methods=['POST','GET'])
+@app.route('/signup/api', methods=['POST','GET'])
 def signup():
     email = request.form['email']
     password = request.form['password']
@@ -61,9 +61,11 @@ def signup():
             "email" : email
         }
         db.collection("customers").document(user.uid).set(json_data)
-        return {'message': f'Successfully created user {user.uid}'},200
+        message="Success"
+        return redirect(url_for('login', message=message))
     except:
-        return {'message': 'Error creating user'},400
+        message="Fail"
+        return redirect(url_for('customerSignup', message=message))
 
 @app.route('/api/token')
 def token():
@@ -78,25 +80,31 @@ def token():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    message="None"
+    return render_template('index.html', message=message)
 
-@app.route('/signup')
-def signUp():
-    return render_template('signup.html')
+@app.route('/Signup<message>')
+def signUp(message):
+    return render_template('signup.html', message=message)
 
 
 
-@app.route('/login')
-def login():
-    return render_template('login.html')
+@app.route('/login<message>')
+def login(message):
+    if message==None:
+        print("No Message Recieved")
+    else:
+        print(message)
+    # message=request.args['message']
+    return render_template('login.html', message=message)
 
 @app.route('/adminLogin')
 def adminLogin():
     return render_template('adminLogin.html')
 
-@app.route('/customerSignup')
-def customerSignup():
-    return render_template('customerSignup.html')
+@app.route('/customerSignup<message>')
+def customerSignup(message):
+    return render_template('customerSignup.html', message=message)
 
 @app.route('/restaurantSignup')
 def restaurantSignup():
