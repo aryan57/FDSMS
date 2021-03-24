@@ -1,20 +1,25 @@
 import firebase_admin
 import pyrebase
-from firebase_admin import credentials, auth, firestore
+from firebase_admin import credentials, auth, firestore, storage
 import json
 from flask import Flask, render_template, url_for, request, redirect 
 from functools import wraps
-
-# this is a comment
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['TEMPLATES_AUTO_RELOAD']=True
 
 cred = credentials.Certificate('fbAdminConfig.json')
-firebase = firebase_admin.initialize_app(cred)
-pb = pyrebase.initialize_app(json.load(open('fbConfig.json')))
+firebase = firebase_admin.initialize_app(cred,json.load(open('fbConfig.json')))
+pyrebase_pb = pyrebase.initialize_app(json.load(open('fbConfig.json')))
 db = firestore.client()
+bucket = storage.bucket()
+storage = pyrebase_pb.storage()
+
+
+# blob = bucket.blob('mearyan.jpg')
+# outfile='/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/pictures/a.jpg'
+# blob.upload_from_filename(outfile)
 
 JWT_GLOBAL =""
 
@@ -38,33 +43,62 @@ def userinfo():
 
 @app.route('/signup/api', methods=['POST','GET'])
 def signup():
+
     email = request.form['email']
     password = request.form['password']
     gender = request.form['gender']
     area = request.form['area']
-    # photo = request.form['photo']
-    # confirmPassword = request.form['confirmPassword']
     mobile = request.form['mobile']
     dob = request.form['dob']
     name = request.form['name']
+    local_file_path = request.form['local_file_path']
+    message="Fail"
+
     if email is None or password is None:
-        return {'message': 'Error missing email or password'},400
+        message="email or password is not provided"
+        return redirect(url_for('customerSignup', message=message))
+
+    if mobile is None:
+        mobile = ""
+    if dob is None:
+        dob = ""
+    if name is None:
+        name = ""
+    if gender is None:
+        gender = ""
+    if area is None:
+        area = ""
+
     try:
         user = auth.create_user(
             email=email,
             password=password
         )
+    except:
+        message="error creating user in firebase"
+        return redirect(url_for('customerSignup', message=message))
+    try:
         json_data = {
             "name" : name,
             "dob" : dob,
             "mobile" : mobile,
             "email" : email
         }
+        print(name,dob,email,mobile)
         db.collection("customers").document(user.uid).set(json_data)
+    except:
+        message="error adding user text data in firestore"
+        return redirect(url_for('customerSignup', message=message))
+    try:
+
+        # local_file_path = "/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/pictures/1.jpg"
+        # storage_file_path = "customerProfilePics/"+user.uid+"jpg"
+        # fbupload = storage.child(storage_file_path).put(local_file_path,user.uid)
+        # print(fbupload)
         message="Success"
         return redirect(url_for('login', message=message))
     except:
-        message="Fail"
+        message="error uploading photo in firebase storage"
         return redirect(url_for('customerSignup', message=message))
 
 @app.route('/api/token')
@@ -72,7 +106,7 @@ def token():
     email = request.form.get('email')
     password = request.form.get('password')
     try:
-        user = pb.auth().sign_in_with_email_and_password(email, password)
+        user = pyrebase_pb.auth().sign_in_with_email_and_password(email, password)
         JWT_GLOBAL =jwt = user['idToken']
         return {'token': jwt}, 200
     except:
