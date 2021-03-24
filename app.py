@@ -8,6 +8,8 @@ import datetime
 import requests
 from requests.exceptions import HTTPError
 from flask_session import Session
+import os
+import tempfile
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -54,9 +56,10 @@ def deliveryAgentsignup():
     mobile = request.form['mobile']
     dob = request.form['dob']
     name = request.form['name']
-    local_file_path = request.form['local_file_path']
+    local_file_path = request.files['local_file_path']
+    temp=tempfile.NamedTemporaryFile(delete=False)
+    local_file_path.save(temp.name)
     session['sign_message']="Fail"
-    print(name)
 
     try:
         user = auth.create_user(
@@ -73,19 +76,16 @@ def deliveryAgentsignup():
             "mobile" : mobile,
             "email" : email
         }
-        print(name,dob,email,mobile)
         db.collection("customers").document(user.uid).set(json_data)
     except:
         session['sign_message']="error adding user text data in firestore"
         return redirect(url_for('deliveryAgentSignup'))
     try:
-
-        local_file_path="/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/static/sample_pictures/a.jpg"
         storage_file_path = "deliveryProfilePics/"+user.uid+".jpg"
         blob = bucket.blob(storage_file_path)
-        blob.upload_from_filename(local_file_path)
-        message="Success"
-        session['sign_message']="Success"
+        blob.upload_from_filename(temp.name)
+        os.remove(temp.name)
+        session['sign_message']="Delivery Agent SignedUp. Please Login"
         return redirect(url_for('login'))
     except:
         session['sign_message']="error uploading photo in firebase storage"
@@ -103,7 +103,9 @@ def signup():
     mobile = request.form['mobile']
     dob = request.form['dob']
     name = request.form['name']
-    local_file_path = request.form['local_file_path']
+    local_file_path = request.files['local_file_path']
+    temp=tempfile.NamedTemporaryFile(delete=False)
+    local_file_path.save(temp.name)
     message="Fail"
 
     try:
@@ -121,18 +123,15 @@ def signup():
             "mobile" : mobile,
             "email" : email
         }
-        print(name,dob,email,mobile)
         db.collection("customers").document(user.uid).set(json_data)
     except:
         session['sign_message']="error adding user text data in firestore"
         return redirect(url_for('customerSignup'))
     try:
-
-        # local_file_path = "/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/pictures/1.jpg"
-        # storage_file_path = "customerProfilePics/"+user.uid+"jpg"
-        # fbupload = storage.child(storage_file_path).put(local_file_path,user.uid)
-        # print(fbupload)
-        session['sign_message']="Success"
+        storage_file_path = "customerProfilePics/"+user.uid+".jpg"
+        blob = bucket.blob(storage_file_path)
+        blob.upload_from_filename(temp.name)
+        session['sign_message']="Customer Signed Up. Please Login."
         return redirect(url_for('login'))
     except:
         session['sign_message']="error uploading photo in firebase storage"
@@ -192,11 +191,13 @@ def customerSignup():
 
 @app.route('/restaurantSignup')
 def restaurantSignup():
-    return render_template('restaurantSignup.html')
+    message=session['sign_message']
+    return render_template('restaurantSignup.html', message=message)
 
 @app.route('/deliveryAgentSignup')
 def deliveryAgentSignup():
-    return render_template('deliveryAgentSignup.html')
+    message=session['sign_message']
+    return render_template('deliveryAgentSignup.html', message=message)
 
 if __name__ == "__main__":
     # cache.init_app(app)
