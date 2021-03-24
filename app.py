@@ -4,6 +4,9 @@ from firebase_admin import credentials, auth, firestore, storage
 import json
 from flask import Flask, render_template, url_for, request, redirect 
 from functools import wraps
+import datetime
+import requests
+from requests.exceptions import HTTPError
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -14,14 +17,8 @@ firebase = firebase_admin.initialize_app(cred,json.load(open('fbConfig.json')))
 pyrebase_pb = pyrebase.initialize_app(json.load(open('fbConfig.json')))
 db = firestore.client()
 bucket = storage.bucket()
-storage = pyrebase_pb.storage()
+# storage = pyrebase_pb.storage()
 
-
-# blob = bucket.blob('mearyan.jpg')
-# outfile='/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/pictures/a.jpg'
-# blob.upload_from_filename(outfile)
-
-JWT_GLOBAL =""
 
 def check_token(f):
     @wraps(f)
@@ -91,23 +88,36 @@ def signup():
         return redirect(url_for('customerSignup', message=message))
     try:
 
-        # local_file_path = "/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/pictures/1.jpg"
-        # storage_file_path = "customerProfilePics/"+user.uid+"jpg"
-        # fbupload = storage.child(storage_file_path).put(local_file_path,user.uid)
-        # print(fbupload)
+        local_file_path="/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/static/sample_pictures/a.jpg"
+        storage_file_path = "customerProfilePics/"+user.uid+".jpg"
+        blob = bucket.blob(storage_file_path)
+        blob.upload_from_filename(local_file_path)
         message="Success"
         return redirect(url_for('login', message=message))
-    except:
+    except Exception as e:
         message="error uploading photo in firebase storage"
         return redirect(url_for('customerSignup', message=message))
+
+@app.route("/temp")
+def temp():
+    blob = bucket.blob("customerProfilePics/"+"YQ2pF5uHW7ZCvfpIzUD1sTcZL5n2"+".jpg")
+
+    str = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
+    print(str)
+    return str,200
 
 @app.route('/api/token')
 def token():
     email = request.form.get('email')
     password = request.form.get('password')
+    # email="aryanag65@gmail.com"
+    # password="88080ary"
     try:
         user = pyrebase_pb.auth().sign_in_with_email_and_password(email, password)
-        JWT_GLOBAL =jwt = user['idToken']
+        jwt = user['idToken']
+
+        # user = pyrebase_pb.auth().get_account_info(jwt)
+        # print(user)
         return {'token': jwt}, 200
     except:
         return {'message': 'There was an error logging in'},400
