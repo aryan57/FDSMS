@@ -48,8 +48,63 @@ def restaurantsignup():
 
 @app.route('/signup/delivery-agent', methods=['POST', 'GET'])
 def deliveryAgentsignup():
-    message="Testing delivery agent"
-    return redirect(url_for('signUp', message=message))
+    email = request.form['email']
+    password = request.form['password']
+    gender = request.form['gender']
+    area = request.form['area']
+    mobile = request.form['mobile']
+    dob = request.form['dob']
+    name = request.form['name']
+    local_file_path = request.form['local_file_path']
+    message="Fail"
+    print(name)
+    if email is None or password is None:
+        message="email or password is not provided"
+        return redirect(url_for('deliveryAgentSignup', message=message))
+
+    if mobile is None:
+        mobile = ""
+    if dob is None:
+        dob = ""
+    if name is None:
+        name = ""
+    if gender is None:
+        gender = ""
+    if area is None:
+        area = ""
+
+    try:
+        user = auth.create_user(
+            email=email,
+            password=password
+        )
+    except:
+        message="error creating user in firebase"
+        return redirect(url_for('deliveryAgentSignup', message=message))
+    try:
+        json_data = {
+            "name" : name,
+            "dob" : dob,
+            "mobile" : mobile,
+            "email" : email
+        }
+        print(name,dob,email,mobile)
+        db.collection("customers").document(user.uid).set(json_data)
+    except:
+        message="error adding user text data in firestore"
+        return redirect(url_for('deliveryAgentSignup', message=message))
+    try:
+
+        # local_file_path = "/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/pictures/1.jpg"
+        # storage_file_path = "customerProfilePics/"+user.uid+"jpg"
+        # fbupload = storage.child(storage_file_path).put(local_file_path,user.uid)
+        # print(fbupload)
+        message="Success"
+        return redirect(url_for('login', message=message))
+    except:
+        message="error uploading photo in firebase storage"
+        return redirect(url_for('deliveryAgentSignup', message=message))
+
     
 
 @app.route('/signup/api', methods=['POST','GET'])
