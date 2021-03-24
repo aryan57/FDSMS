@@ -260,6 +260,16 @@ def customerDashboard():
     user=session['session_user']
     return render_template('customerDashboard.html', user=user)
 
+@app.route('/restaurantDashboard')
+def restaurantDashboard():
+    user=session['session_user']
+    return render_template('restaurantDashboard.html', user=user)
+
+@app.route('/deliveryAgentDashboard')
+def deliveryAgentDashboard():
+    user=session['session_user']
+    return render_template('deliveryAgentDashboard.html', user=user)
+
 @app.route('/personalData')
 def personalData():
     user=session['session_user']

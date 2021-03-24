@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title> redirection from login</title>
+{% endblock %}
+
+
+{% block body %}
+<header class="mdc-top-app-bar">
+    <div class="mdc-top-app-bar__row">
+      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+        <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Open navigation menu" disabled>room_service</button>
+        <!-- <img src="../static/images/delivery image.jpeg" id="botton-icon"> -->
+        <span class="mdc-top-app-bar__title">Zomato</span>
+      </section>
+      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+        <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+          <span class="mdc-button__label">Logout</span>
+        </button>
+        <!-- <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Go Back" onclick="history.back()">arrow_back</button> -->
+      </section>
+    </div>
+  </header>
+  <main class="mdc-top-app-bar--fixed-adjust">
+    <div class='container'>
+      <div class='row justify-content-center'>
+        <div class='col-auto align-self-center'>
+          <h1>Welcome, {{ user['name'] }}</h1>
+        </div>
+      </div>
+      <div class='row justify-content-center'>
+        <div class='col-auto align-self-center'>
+          <h2>Delivery Agent</h2>
+        </div>
+      </div>
+      
+    </div>
+  </main>
+
+  {% endblock %}
