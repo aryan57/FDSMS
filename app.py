@@ -66,7 +66,8 @@ def restaurantsignup():
         json_data = {
             "name" : name,
             "email" : email,
-            "area" : area
+            "area" : area,
+            "type" : "Restaurant"
         }
         db.collection("restaurant").document(user.uid).set(json_data)
     except:
@@ -111,7 +112,8 @@ def deliveryAgentsignup():
             "mobile" : mobile,
             "email" : email,
             "gender" : gender,
-            "area" : area
+            "area" : area,
+            "type" : "DeliverAgent"
         }
         db.collection("deliveryAgent").document(user.uid).set(json_data)
     except:
@@ -162,7 +164,8 @@ def signup():
             "mobile" : mobile,
             "email" : email,
             "gender" : gender,
-            "area" : area
+            "area" : area,
+            "type" : "Customer"
         }
         db.collection("customers").document(user.uid).set(json_data)
     except:
