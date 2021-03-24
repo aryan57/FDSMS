@@ -28,13 +28,15 @@ bucket = storage.bucket()
 def check_token(f):
     @wraps(f)
     def wrap(*args,**kwargs):
-        if not request.headers.get('authorization'):
-            return {'message': 'No token provided'},400
+        if session['jwt_token']==None:
+            session['sign_message']="No Token Provided. Try Logging In."
+            return redirect(url_for('login'))
         try:
-            user = auth.verify_id_token(request.headers['authorization'])
+            user = auth.verify_id_token(session['jwt_token'])
             request.user = user
         except:
-            return {'message':'Invalid token provided.'},400
+            session['sign_message']="Invalid Token Provided. Trying Logging again."
+            return redirect(url_for('login'))
         return f(*args, **kwargs)
     return wrap
 
@@ -189,9 +191,8 @@ def temp():
     # blob = bucket.blob("customerProfilePics/"+"YQ2pF5uHW7ZCvfpIzUD1sTcZL5n2"+".jpg")
     blob = bucket.blob("customerProfilePics/"+"4DcnUZkcrdOeJKCY7mPIMq1RSzg2"+".jpg")
 
-    str = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
-    print(str)
-    return str,200
+    str1 = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
+    return str1,200
 
 @app.route('/api/token', methods=['POST','GET'])
 def token():
@@ -206,6 +207,8 @@ def token():
         json_data = db.collection(user_type).document(user["localId"]).get().to_dict()
         session['session_user']= json_data
         session['session_user']['user_type']=user_type
+        session['jwt_token']=user['idToken']
+        session['refresh_token']=user['refreshToken']
         if user_type=="customer" : 
             return redirect(url_for('customerDashboard'))
         elif user_type == "restaurant" : 
@@ -234,6 +237,7 @@ def signUp():
 @app.route('/login')
 def login():
     message=session['sign_message']
+    session['sign_message']="False"
     return render_template('login.html', message=message)
 
 @app.route('/adminLogin')
@@ -243,37 +247,53 @@ def adminLogin():
 @app.route('/customerSignup')
 def customerSignup():
     message=session['sign_message']
+    session['sign_message']="False"
     return render_template('customerSignup.html', message=message)
 
 @app.route('/restaurantSignup')
 def restaurantSignup():
     message=session['sign_message']
+    session['sign_message']="False"
     return render_template('restaurantSignup.html', message=message)
 
 @app.route('/deliveryAgentSignup')
+@check_token
 def deliveryAgentSignup():
     message=session['sign_message']
+    session['sign_message']="False"
     return render_template('deliveryAgentSignup.html', message=message)
 
 @app.route('/customerDashboard')
+@check_token
 def customerDashboard():
     user=session['session_user']
     return render_template('customerDashboard.html', user=user)
 
 @app.route('/restaurantDashboard')
+@check_token
 def restaurantDashboard():
     user=session['session_user']
     return render_template('restaurantDashboard.html', user=user)
 
 @app.route('/deliveryAgentDashboard')
+@check_token
 def deliveryAgentDashboard():
     user=session['session_user']
     return render_template('deliveryAgentDashboard.html', user=user)
 
 @app.route('/personalData')
+@check_token
 def personalData():
     user=session['session_user']
     return render_template('personalData.html', user=user)
+@app.route('/logout')
+@check_token
+def logout():
+    session['jwt_token']=None
+    session['session_user']=None
+    session['refresh_token']=None
+    session['sign_message']="Successfully Logged Out"
+    return redirect(url_for('login'))
 
 if __name__ == "__main__":
     # cache.init_app(app)
