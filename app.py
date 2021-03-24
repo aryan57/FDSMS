@@ -47,9 +47,13 @@ def userinfo():
 def restaurantsignup():
     email = request.form['email']
     password = request.form['password']
+    area = request.form['area']
     name = request.form['name']
-    local_file_path = request.form['local_file_path']
-    message = "Fail"
+    local_file_path = request.files['local_file_path']
+    temp=tempfile.NamedTemporaryFile(delete=False)
+    local_file_path.save(temp.name)
+    session['sign_message']="Fail"
+    
     try:
         user = auth.create_user(
             email=email,
@@ -57,30 +61,29 @@ def restaurantsignup():
         )
     except:
         session['sign_message']="error creating user in firebase"
-        return redirect(url_for('customerSignup'))
+        return redirect(url_for('restaurantSignup'))
     try:
         json_data = {
             "name" : name,
-            "email" : email
+            "email" : email,
+            "area" : area
         }
-        print(name,email)
-        db.collection("customers").document(user.uid).set(json_data)
+        db.collection("restaurant").document(user.uid).set(json_data)
     except:
         session['sign_message']="error adding user text data in firestore"
         return redirect(url_for('restaurantSignup'))
     try:
-
-        # local_file_path = "/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/pictures/1.jpg"
-        # storage_file_path = "customerProfilePics/"+user.uid+"jpg"
-        # fbupload = storage.child(storage_file_path).put(local_file_path,user.uid)
-        # print(fbupload)
-        session['sign_message']="Success"
+        storage_file_path = "restaurantProfilePics/"+user.uid+".jpg"
+        blob = bucket.blob(storage_file_path)
+        blob.upload_from_filename(temp.name)
+        os.remove(temp.name)
+        session['sign_message']="Restaurant SignedUp. Please Login"
         return redirect(url_for('login'))
     except:
         session['sign_message']="error uploading photo in firebase storage"
         return redirect(url_for('restaurantSignup'))
 
-@app.route('/signup/delivery-agent', methods=['POST', 'GET'])
+@app.route('/signup/deliveryAgent', methods=['POST', 'GET'])
 def deliveryAgentsignup():
     email = request.form['email']
     password = request.form['password']
@@ -107,9 +110,11 @@ def deliveryAgentsignup():
             "name" : name,
             "dob" : dob,
             "mobile" : mobile,
-            "email" : email
+            "email" : email,
+            "gender" : gender,
+            "area" : area
         }
-        db.collection("customers").document(user.uid).set(json_data)
+        db.collection("deliveryAgent").document(user.uid).set(json_data)
     except:
         session['sign_message']="error adding user text data in firestore"
         return redirect(url_for('deliveryAgentSignup'))
@@ -139,7 +144,6 @@ def signup():
     local_file_path = request.files['local_file_path']
     temp=tempfile.NamedTemporaryFile(delete=False)
     local_file_path.save(temp.name)
-    message="Fail"
 
     try:
         user = auth.create_user(
@@ -154,7 +158,9 @@ def signup():
             "name" : name,
             "dob" : dob,
             "mobile" : mobile,
-            "email" : email
+            "email" : email,
+            "gender" : gender,
+            "area" : area
         }
         db.collection("customers").document(user.uid).set(json_data)
     except:

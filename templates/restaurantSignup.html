@@ -37,7 +37,7 @@
           </div>
         </div>
         {% endif %}
-        <form action={{url_for('restaurantsignup')}} method="POST">
+        <form action={{url_for('restaurantsignup')}} method="POST" enctype="multipart/form-data">
           <div class="row justify-content-center">
             <div class="col align-self-center">          
               <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-1">
@@ -61,7 +61,7 @@
                   <span class="mdc-notched-outline__leading"></span>
                   <span class="mdc-notched-outline__trailing"></span>
                 </span>
-                <input type="file" id="inputImage" Name="Profile Photo" name="local_file_path">
+                <input type="file" id="inputImage" name="local_file_path" accept="image/*">
               </label>
             </div>
             <div class="col-6 align-self-center">
@@ -71,10 +71,10 @@
                   <span class="mdc-notched-outline__leading"></span>
                   <span class="mdc-notched-outline__trailing"></span>
                 </span>
-                <select class="form-select gender-form form-select-lg mb-2" aria-label="Default select example">
-                  <option selected>Area</option>
-                  <option value="1">Delhi</option>
-                  <option value="2">Other</option>
+                <select class="form-select gender-form form-select-lg mb-2" aria-label="Default select example" name="area">
+                  <option selected value="Delhi">Area</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Other">Other</option>
                 </select>   
               </label>
             </div>
@@ -90,7 +90,7 @@
                   </span>
                   <span class="mdc-notched-outline__trailing"></span>
                 </span>
-                <input type="email" class="mdc-text-field__input" aria-labelledby="my-label-id" name="email">
+                <input type="email" class="mdc-text-field__input" aria-labelledby="my-label-id" name="email" required>
               </label>
             </div>
           </div>
@@ -105,7 +105,7 @@
                   </span>
                   <span class="mdc-notched-outline__trailing"></span>
                 </span>
-                <input type="password" class="mdc-text-field__input" aria-labelledby="my-label-id" name="password">
+                <input type="password" class="mdc-text-field__input" aria-labelledby="my-label-id" name="password" required>
               </label>
             </div>
           </div>
