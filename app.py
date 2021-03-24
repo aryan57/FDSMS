@@ -189,10 +189,10 @@ def temp():
     print(str)
     return str,200
 
-@app.route('/api/token')
+@app.route('/api/token', methods=['POST','GET'])
 def token():
-    email = request.form.get('email')
-    password = request.form.get('password')
+    email = request.form['email']
+    password = request.form['password']
     # email="aryanag65@gmail.com"
     # password="88080ary"
     try:
