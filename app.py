@@ -113,7 +113,7 @@ def deliveryAgentsignup():
             "email" : email,
             "gender" : gender,
             "area" : area,
-            "type" : "DeliverAgent"
+            "type" : "DeliveryAgent"
         }
         db.collection("deliveryAgent").document(user.uid).set(json_data)
     except:
@@ -202,13 +202,19 @@ def token():
         user = pyrebase_pb.auth().sign_in_with_email_and_password(email, password)
         jwt = user['idToken']
 
-        # user = pyrebase_pb.auth().get_account_info(jwt)
-        # print(user)
-
-        session['token_jwt']=jwt
-        return {'token': jwt,"user":user}, 200
+        session['token_jwt'] = jwt
+        session['session_user']= user
+        if user['type']=="Customer" : 
+            return render_template('customerDashboard.html', user=session['session_usr'])
+        elif user['type'] == "Restaurant" : 
+            return render_template('restaurantDashboard.html', user=session['session_usr'])
+        elif user['type'] == "DeliveryAgent" :
+            return render_template('deliveryAgentDashboard.html', user=session['session_usr'])
+        elif user['type'] == "Management" :
+            return render_template('adminDashboard.html', user=session['session_usr'])
     except:
-        return {'message': 'There was an error logging in'},400
+        session['sign_message']="Please enter the correct credentials"
+        return redirect(url_for('login'))
 
 @app.route('/')
 def index():
