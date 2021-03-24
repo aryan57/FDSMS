@@ -32,3 +32,7 @@ body{
 .row{
     margin-top: 0.5rem!important;
 }
+
+.col-auto{
+    margin-top: 0.5rem!important;
+}

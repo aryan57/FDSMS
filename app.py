@@ -204,20 +204,16 @@ def token():
         # user2 = pyrebase_pb.auth().get_account_info(user['idToken'])
         user_type = db.collection('type').document(user["localId"]).get().to_dict()["type"]
         json_data = db.collection(user_type).document(user["localId"]).get().to_dict()
-
-        session['token_jwt'] = jwt
-        session['session_user']= user
-        if user['type']=="Customer" : 
-            return render_template('customerDashboard.html', user=session['session_usr'])
-        elif user['type'] == "Restaurant" : 
-            return render_template('restaurantDashboard.html', user=session['session_usr'])
-        elif user['type'] == "DeliveryAgent" :
-            return render_template('deliveryAgentDashboard.html', user=session['session_usr'])
-        elif user['type'] == "Management" :
-            return render_template('adminDashboard.html', user=session['session_usr'])
-        session['token_jwt']=user['idToken']
-
-        return {'token': user['idToken'],"refreshToken":user["refreshToken"],"uuid":user["localId"],"json_data":json_data,"user":user}, 200
+        session['session_user']= json_data
+        session['session_user']['user_type']=user_type
+        if user_type=="customer" : 
+            return redirect(url_for('customerDashboard'))
+        elif user_type == "restaurant" : 
+            return render_template('restaurantDashboard.html', user=session['session_user'])
+        elif user_type == "deliveryAgent" :
+            return render_template('deliveryAgentDashboard.html', user=session['session_user'])
+        elif user_type == "Management" :
+            return render_template('adminDashboard.html', user=session['session_user'])
 
     except:
         session['sign_message']="Please enter the correct credentials"
@@ -258,6 +254,16 @@ def restaurantSignup():
 def deliveryAgentSignup():
     message=session['sign_message']
     return render_template('deliveryAgentSignup.html', message=message)
+
+@app.route('/customerDashboard')
+def customerDashboard():
+    user=session['session_user']
+    return render_template('customerDashboard.html', user=user)
+
+@app.route('/personalData')
+def personalData():
+    user=session['session_user']
+    return render_template('personalData.html', user=user)
 
 if __name__ == "__main__":
     # cache.init_app(app)
