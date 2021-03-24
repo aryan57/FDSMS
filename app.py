@@ -1,3 +1,4 @@
+from os import name
 import firebase_admin
 import pyrebase
 from firebase_admin import credentials, auth, firestore, storage
@@ -44,8 +45,40 @@ def userinfo():
 
 @app.route('/signup/resturant', methods=['POST', 'GET'])
 def restaurantsignup():
-    message="Testing Restaurant"
-    return redirect(url_for('signUp', message=message))
+    email = request.form['email']
+    password = request.form['password']
+    name = request.form['name']
+    local_file_path = request.form['local_file_path']
+    message = "Fail"
+    try:
+        user = auth.create_user(
+            email=email,
+            password=password
+        )
+    except:
+        session['sign_message']="error creating user in firebase"
+        return redirect(url_for('customerSignup'))
+    try:
+        json_data = {
+            "name" : name,
+            "email" : email
+        }
+        print(name,email)
+        db.collection("customers").document(user.uid).set(json_data)
+    except:
+        session['sign_message']="error adding user text data in firestore"
+        return redirect(url_for('restaurantSignup'))
+    try:
+
+        # local_file_path = "/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/pictures/1.jpg"
+        # storage_file_path = "customerProfilePics/"+user.uid+"jpg"
+        # fbupload = storage.child(storage_file_path).put(local_file_path,user.uid)
+        # print(fbupload)
+        session['sign_message']="Success"
+        return redirect(url_for('login'))
+    except:
+        session['sign_message']="error uploading photo in firebase storage"
+        return redirect(url_for('restaurantSignup'))
 
 @app.route('/signup/delivery-agent', methods=['POST', 'GET'])
 def deliveryAgentsignup():
@@ -68,7 +101,7 @@ def deliveryAgentsignup():
         )
     except:
         session['sign_message']="error creating user in firebase"
-        return redirect(url_for('deliveryAgentSignup', message=message))
+        return redirect(url_for('deliveryAgentSignup'))
     try:
         json_data = {
             "name" : name,
@@ -91,7 +124,7 @@ def deliveryAgentsignup():
         session['sign_message']="error uploading photo in firebase storage"
         return redirect(url_for('deliveryAgentSignup'))
 
-    
+
 
 @app.route('/signup/api', methods=['POST','GET'])
 def signup():
