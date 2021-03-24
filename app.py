@@ -203,7 +203,7 @@ def token():
         # print(user)
 
         session['token_jwt']=jwt
-        return {'token': jwt}, 200
+        return {'token': jwt,"user":user}, 200
     except:
         return {'message': 'There was an error logging in'},400
 
