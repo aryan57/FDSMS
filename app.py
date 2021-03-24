@@ -67,9 +67,10 @@ def restaurantsignup():
             "name" : name,
             "email" : email,
             "area" : area,
-            "type" : "Restaurant"
         }
         db.collection("restaurant").document(user.uid).set(json_data)
+        db.collection("type").document(user.uid).set({"type" : "restaurant"})
+        
     except:
         session['sign_message']="error adding user text data in firestore"
         return redirect(url_for('restaurantSignup'))
@@ -113,9 +114,9 @@ def deliveryAgentsignup():
             "email" : email,
             "gender" : gender,
             "area" : area,
-            "type" : "DeliverAgent"
         }
         db.collection("deliveryAgent").document(user.uid).set(json_data)
+        db.collection("type").document(user.uid).set({"type" : "deliveryAgent"})
     except:
         session['sign_message']="error adding user text data in firestore"
         return redirect(url_for('deliveryAgentSignup'))
@@ -165,9 +166,9 @@ def signup():
             "email" : email,
             "gender" : gender,
             "area" : area,
-            "type" : "Customer"
         }
-        db.collection("customers").document(user.uid).set(json_data)
+        db.collection("customer").document(user.uid).set(json_data)
+        db.collection("type").document(user.uid).set({"type" : "customer"})
     except:
         session['sign_message']="error adding user text data in firestore"
         return redirect(url_for('customerSignup'))
@@ -186,7 +187,7 @@ def signup():
 @app.route("/temp")
 def temp():
     # blob = bucket.blob("customerProfilePics/"+"YQ2pF5uHW7ZCvfpIzUD1sTcZL5n2"+".jpg")
-    blob = bucket.blob("deliveryProfilePics/"+"qrygiKJkrfRrBC3rNXaXEc65vdS2"+".jpg")
+    blob = bucket.blob("customerProfilePics/"+"4DcnUZkcrdOeJKCY7mPIMq1RSzg2"+".jpg")
 
     str = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
     print(str)
@@ -200,13 +201,14 @@ def token():
     # password="88080ary"
     try:
         user = pyrebase_pb.auth().sign_in_with_email_and_password(email, password)
-        jwt = user['idToken']
+        # user2 = pyrebase_pb.auth().get_account_info(user['idToken'])
+        user_type = db.collection('type').document(user["localId"]).get().to_dict()["type"]
+        json_data = db.collection(user_type).document(user["localId"]).get().to_dict()
 
-        # user = pyrebase_pb.auth().get_account_info(jwt)
-        # print(user)
+        session['token_jwt']=user['idToken']
 
-        session['token_jwt']=jwt
-        return {'token': jwt,"user":user}, 200
+        return {'token': user['idToken'],"refreshToken":user["refreshToken"],"uuid":user["localId"],"json_data":json_data,"user":user}, 200
+
     except:
         return {'message': 'There was an error logging in'},400
 
