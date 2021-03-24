@@ -41,6 +41,17 @@ def check_token(f):
 def userinfo():
     return {'data': users}, 200
 
+@app.route('/signup/resturant', methods=['POST', 'GET'])
+def restaurantsignup():
+    message="Testing Restaurant"
+    return redirect(url_for('signUp', message=message))
+
+@app.route('/signup/delivery-agent', methods=['POST', 'GET'])
+def deliveryAgentsignup():
+    message="Testing delivery agent"
+    return redirect(url_for('signUp', message=message))
+    
+
 @app.route('/signup/api', methods=['POST','GET'])
 def signup():
 
