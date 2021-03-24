@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title> redirection from login</title>
+<title>Restaurant</title>
 {% endblock %}
 
 
@@ -14,9 +14,11 @@
         <span class="mdc-top-app-bar__title">Zomato</span>
       </section>
       <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-        <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-          <span class="mdc-button__label">Logout</span>
-        </button>
+        <a href={{url_for('logout')}} id="anchor-link-nodesign">
+          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+            <span class="mdc-button__label">Logout</span>
+          </button>
+        </a>
         <!-- <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Go Back" onclick="history.back()">arrow_back</button> -->
       </section>
     </div>

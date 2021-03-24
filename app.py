@@ -212,12 +212,11 @@ def token():
         if user_type=="customer" : 
             return redirect(url_for('customerDashboard'))
         elif user_type == "restaurant" : 
-            return render_template('restaurantDashboard.html', user=session['session_user'])
+            return redirect(url_for('restaurantDashboard'))
         elif user_type == "deliveryAgent" :
-            return render_template('deliveryAgentDashboard.html', user=session['session_user'])
+            return redirect(url_for('deliveryAgentDashboard'))
         elif user_type == "Management" :
-            return render_template('adminDashboard.html', user=session['session_user'])
-
+            return redirect(url_for('adminDashboard'))
     except:
         session['sign_message']="Please enter the correct credentials"
         return redirect(url_for('login'))
@@ -257,7 +256,6 @@ def restaurantSignup():
     return render_template('restaurantSignup.html', message=message)
 
 @app.route('/deliveryAgentSignup')
-@check_token
 def deliveryAgentSignup():
     message=session['sign_message']
     session['sign_message']="False"
