@@ -21,10 +21,14 @@ body{
     width: 10px;
 }
 
-#anchor-nodesign{
+#anchor-link-nodesign{
     text-decoration: none;
 }
 
 .bg-check{
     background-color: red;
+}
+
+.row{
+    margin-top: 0.5rem!important;
 }
