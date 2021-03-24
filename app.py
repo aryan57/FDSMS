@@ -55,7 +55,8 @@ def signup():
     message="Fail"
 
     if email is None or password is None:
-        redirect(url_for('customerSignup', message=message))
+        message="email or password is not provided"
+        return redirect(url_for('customerSignup', message=message))
 
     if mobile is None:
         mobile = ""
@@ -74,7 +75,8 @@ def signup():
             password=password
         )
     except:
-        redirect(url_for('customerSignup', message=message))
+        message="error creating user in firebase"
+        return redirect(url_for('customerSignup', message=message))
     try:
         json_data = {
             "name" : name,
@@ -85,17 +87,19 @@ def signup():
         print(name,dob,email,mobile)
         db.collection("customers").document(user.uid).set(json_data)
     except:
-        redirect(url_for('customerSignup', message=message))
+        message="error adding user text data in firestore"
+        return redirect(url_for('customerSignup', message=message))
     try:
 
-        local_file_path = "/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/pictures/1.jpg"
-        storage_file_path = "customerProfilePics/"+user.uid+"jpg"
-        fbupload = storage.child(storage_file_path).put(local_file_path,user.uid)
-        print(fbupload)
+        # local_file_path = "/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/pictures/1.jpg"
+        # storage_file_path = "customerProfilePics/"+user.uid+"jpg"
+        # fbupload = storage.child(storage_file_path).put(local_file_path,user.uid)
+        # print(fbupload)
         message="Success"
         return redirect(url_for('login', message=message))
     except:
-        redirect(url_for('customerSignup', message=message))
+        message="error uploading photo in firebase storage"
+        return redirect(url_for('customerSignup', message=message))
 
 @app.route('/api/token')
 def token():
