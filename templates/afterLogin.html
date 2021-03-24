@@ -17,6 +17,46 @@
     </div>
   </header>
   <main class="mdc-top-app-bar--fixed-adjust">
-      Hello World
+      <div class='container'>
+        <div class='row justify-content-center'>
+          <div class='col-auto align-self-center'>
+            <h1>Welcome, {{ name }}</h1>
+          </div>
+        </div>
+        <div class='row justify-content-center'>
+          <div class='col-auto align-self-center'>
+            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+              <span class="mdc-button__label">Personal Data</span>
+            </button>
+          </div>
+          <div class='col-auto align-self-center'>
+            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+              <span class="mdc-button__label">Recommended Restaurants</span>
+            </button>
+          </div>
+          <div class='col-auto align-self-center'>
+            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+              <span class="mdc-button__label">All Restaurants</span>
+            </button>
+          </div>
+        </div>
+        <div class='row justify-content-center'>
+          <div class='col-auto align-self-center'>
+            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+              <span class="mdc-button__label">Present Orders</span>
+            </button>
+          </div>
+          <div class='col-auto align-self-center'>
+            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+              <span class="mdc-button__label">Past Orders</span>
+            </button>
+          </div>
+          <div class='col-auto align-self-center'>
+            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+              <span class="mdc-button__label">Logout</span>
+            </button>
+          </div>
+        </div>
+      </div>
   </main>
 {% Endblock %}
