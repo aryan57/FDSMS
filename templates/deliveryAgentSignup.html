@@ -30,128 +30,136 @@
             <h1>Delivery Agent Signup</h1>
           </div>
         </div>
-
+        {% if message!="False" %}
         <div class="row justify-content-center">
-          <div class="col align-self-center">          
-            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-1">
-              <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">perm_identity</i>
-              <span class="mdc-notched-outline">
-                <span class="mdc-notched-outline__leading"></span>
-                <span class="mdc-notched-outline__notch">
-                  <span class="mdc-floating-label" id="my-label-id">Your Name</span>
+          <div class="col-auto align-self-center">
+            {{ message }}
+          </div>
+        </div>
+        {% endif %}
+        <form action={{url_for('deliveryAgentsignup')}} method="POST">
+          <div class="row justify-content-center">
+            <div class="col align-self-center">          
+              <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-1">
+                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">perm_identity</i>
+                <span class="mdc-notched-outline">
+                  <span class="mdc-notched-outline__leading"></span>
+                  <span class="mdc-notched-outline__notch">
+                    <span class="mdc-floating-label" id="my-label-id" required>Your Name</span>
+                  </span>
+                  <span class="mdc-notched-outline__trailing"></span>
                 </span>
-                <span class="mdc-notched-outline__trailing"></span>
-              </span>
-              <input type="text" class="mdc-text-field__input" aria-labelledby="my-label-id">
-            </label>
+                <input type="text" class="mdc-text-field__input" aria-labelledby="my-label-id" name="name" required>
+              </label>
+            </div>
           </div>
-        </div>
-        <div class="row justify-content-center" >
-          <div class="col-3 align-self-center">
-            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-2">
-              <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">calendar_today</i>
-              <span class="mdc-notched-outline">
-                <span class="mdc-notched-outline__leading"></span>
-                <!-- <span class="mdc-notched-outline__notch">
-                  <span class="mdc-floating-label" id="my-label-id">DoB</span>
-                </span> -->
-                <span class="mdc-notched-outline__trailing"></span>
-              </span>
-              <input type="date" class="mdc-text-field__input" aria-labelledby="my-label-id">
-            </label>
-          </div>
-          <div class="col-3 align-self-center">
-            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-3">
-              <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">male</i>
-              <span class="mdc-notched-outline">
-                <span class="mdc-notched-outline__leading"></span>
-                <span class="mdc-notched-outline__trailing"></span>
-              </span>
-              <select class="form-select gender-form form-select-lg mb-3" aria-label="Default select example">
-                <option selected>Gender</option>
-                <option value="1">Male</option>
-                <option value="2">Female</option>
-                <option value="3">Other</option>
-              </select>         
-            </label>
-          </div>
-          <div class="col-6 align-self-center">
-            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-4">
-              <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">phone</i>
-              <span class="mdc-notched-outline">
-                <span class="mdc-notched-outline__leading"></span>
-                <span class="mdc-notched-outline__notch">
-                  <span class="mdc-floating-label" id="my-label-id">Mobile Number</span>
+          <div class="row justify-content-center" >
+            <div class="col-3 align-self-center">
+              <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-2">
+                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">cake</i>
+                <span class="mdc-notched-outline">
+                  <span class="mdc-notched-outline__leading"></span>
+                  <!-- <span class="mdc-notched-outline__notch">
+                    <span class="mdc-floating-label" id="my-label-id">DoB</span>
+                  </span> -->
+                  <span class="mdc-notched-outline__trailing"></span>
                 </span>
-                <span class="mdc-notched-outline__trailing"></span>
-              </span>
-              <input type="text" class="mdc-text-field__input" aria-labelledby="my-label-id">
-            </label>
-          </div>
-        </div>
-        <div class="row justify-content-center">
-          <div class="col-6 align-self-center">
-            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon">
-              <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">insert_photo</i>
-              <span class="mdc-notched-outline">
-                <span class="mdc-notched-outline__leading"></span>
-                <span class="mdc-notched-outline__trailing"></span>
-              </span>
-              <input type="file" id="inputImage" Name="Profile Photo">
-            </label>
-          </div>
-          <div class="col-6 align-self-center">
-            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon">
-              <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">home</i>
-              <span class="mdc-notched-outline">
-                <span class="mdc-notched-outline__leading"></span>
-                <span class="mdc-notched-outline__trailing"></span>
-              </span>
-              <select class="form-select gender-form form-select-lg mb-2" aria-label="Default select example">
-                <option selected>Area</option>
-                <option value="1">Delhi</option>
-                <option value="2">Other</option>
-              </select>   
-            </label>
-          </div>
-        </div>
-        <div class="row justify-content-center">
-          <div class="col align-self-center">
-            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-5">
-              <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">alternate_email</i>
-              <span class="mdc-notched-outline">
-                <span class="mdc-notched-outline__leading"></span>
-                <span class="mdc-notched-outline__notch">
-                  <span class="mdc-floating-label" id="my-label-id">Email Id</span>
+                <input type="date" class="mdc-text-field__input" aria-labelledby="my-label-id" name="dob" required>
+              </label>
+            </div>
+            <div class="col-3 align-self-center">
+              <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-3">
+                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">male</i>
+                <span class="mdc-notched-outline">
+                  <span class="mdc-notched-outline__leading"></span>
+                  <span class="mdc-notched-outline__trailing"></span>
                 </span>
-                <span class="mdc-notched-outline__trailing"></span>
-              </span>
-              <input type="email" class="mdc-text-field__input" aria-labelledby="my-label-id">
-            </label>
-          </div>
-        </div>
-        <div class="row justify-content-center">
-          <div class="col align-self-center">
-            <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-6">
-              <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">password</i>
-              <span class="mdc-notched-outline">
-                <span class="mdc-notched-outline__leading"></span>
-                <span class="mdc-notched-outline__notch">
-                  <span class="mdc-floating-label" id="my-label-id">Password</span>
+                <select class="form-select gender-form form-select-lg mb-3" aria-label="Default select example" name="gender">
+                  <option selected value="Male">Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>         
+              </label>
+            </div>
+            <div class="col-6 align-self-center">
+              <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-4">
+                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">phone</i>
+                <span class="mdc-notched-outline">
+                  <span class="mdc-notched-outline__leading"></span>
+                  <span class="mdc-notched-outline__notch">
+                    <span class="mdc-floating-label" id="my-label-id">Mobile Number</span>
+                  </span>
+                  <span class="mdc-notched-outline__trailing"></span>
                 </span>
-                <span class="mdc-notched-outline__trailing"></span>
-              </span>
-              <input type="password" class="mdc-text-field__input" aria-labelledby="my-label-id">
-            </label>
+                <input type="text" class="mdc-text-field__input" aria-labelledby="my-label-id" name="mobile" required>
+              </label>
+            </div>
           </div>
-        </div>
-        <div class="row justify-content-center">
-          <div class="col-2 align-self-center">
-            <button class="mdc-button mdc-button--raised">
-              <span class="mdc-button__label">Submit</span>
-            </button>
+          <div class="row justify-content-center">
+            <div class="col-6 align-self-center">
+              <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon">
+                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">insert_photo</i>
+                <span class="mdc-notched-outline">
+                  <span class="mdc-notched-outline__leading"></span>
+                  <span class="mdc-notched-outline__trailing"></span>
+                </span>
+                <input type="file" id="inputImage" name="local_file_path">
+              </label>
+            </div>
+            <div class="col-6 align-self-center">
+              <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon">
+                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">home</i>
+                <span class="mdc-notched-outline">
+                  <span class="mdc-notched-outline__leading"></span>
+                  <span class="mdc-notched-outline__trailing"></span>
+                </span>
+                <select class="form-select gender-form form-select-lg mb-2" aria-label="Default select example" name="area" required>
+                  <option selected value="Delhi">Area</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Other">Other</option>
+                </select>   
+              </label>
+            </div>
           </div>
-        </div>
+          <div class="row justify-content-center">
+            <div class="col align-self-center">
+              <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-5">
+                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">alternate_email</i>
+                <span class="mdc-notched-outline">
+                  <span class="mdc-notched-outline__leading"></span>
+                  <span class="mdc-notched-outline__notch">
+                    <span class="mdc-floating-label" id="my-label-id">Email Id</span>
+                  </span>
+                  <span class="mdc-notched-outline__trailing"></span>
+                </span>
+                <input type="email" class="mdc-text-field__input" aria-labelledby="my-label-id" name="email" required>
+              </label>
+            </div>
+          </div>
+          <div class="row justify-content-center">
+            <div class="col align-self-center">
+              <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-6">
+                <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">password</i>
+                <span class="mdc-notched-outline">
+                  <span class="mdc-notched-outline__leading"></span>
+                  <span class="mdc-notched-outline__notch">
+                    <span class="mdc-floating-label" id="my-label-id">Password</span>
+                  </span>
+                  <span class="mdc-notched-outline__trailing"></span>
+                </span>
+                <input type="password" class="mdc-text-field__input" aria-labelledby="my-label-id" name="password" required>
+              </label>
+            </div>
+          </div>
+          <div class="row justify-content-center">
+            <div class="col-auto align-self-center">
+              <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+                <span class="mdc-button__label">Submit</span>
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
     </centre>
     <script>

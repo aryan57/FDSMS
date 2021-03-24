@@ -17,7 +17,7 @@
       <span class="mdc-top-app-bar__title">Zomato</span>
     </section>
     <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-      <a href={{ url_for('signUp', message=message)}} id="anchor-link-nodesign">
+      <a href={{ url_for('signUp')}} id="anchor-link-nodesign">
         <div class="mdc-touch-target-wrapper">
           <button class="mdc-button mdc-button--raised">
             <span class="mdc-button__ripple"></span>
@@ -30,7 +30,7 @@
         <span class="mdc-button__ripple"></span>
         <span class="mdc-button__label">         </span>
       </button>   
-      <a href={{ url_for('login', message=message)}} id="anchor-link-nodesign">
+      <a href={{ url_for('login')}} id="anchor-link-nodesign">
         <div class="mdc-touch-target-wrapper">
           <button class="mdc-button mdc-button--raised">
             <span class="mdc-button__ripple"></span>
@@ -57,8 +57,5 @@
 </header>
 
 <main class="mdc-top-app-bar--fixed-adjust bkg-img-home">
-  {% if message=="None" %}
-    Hello World11
-  {% endif %}
 </main>
 {% endblock %}
