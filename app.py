@@ -2,7 +2,7 @@ import firebase_admin
 import pyrebase
 from firebase_admin import credentials, auth, firestore, storage
 import json
-from flask import Flask, render_template, url_for, request 
+from flask import Flask, render_template, url_for, request, redirect 
 from functools import wraps
 
 app = Flask(__name__)
@@ -41,18 +41,21 @@ def check_token(f):
 def userinfo():
     return {'data': users}, 200
 
-@app.route('/api/signup', methods=['POST','GET'])
+@app.route('/signup/api', methods=['POST','GET'])
 def signup():
 
     email = request.form['email']
     password = request.form['password']
+    gender = request.form['gender']
+    area = request.form['area']
     mobile = request.form['mobile']
     dob = request.form['dob']
     name = request.form['name']
     local_file_path = request.form['local_file_path']
+    message="Fail"
 
     if email is None or password is None:
-        return {'message': 'Error missing email or password'},400
+        redirect(url_for('customerSignup', message=message))
 
     if mobile is None:
         mobile = ""
@@ -60,8 +63,10 @@ def signup():
         dob = ""
     if name is None:
         name = ""
-    if local_file_path is None:
-        local_file_path = ""
+    if gender is None:
+        gender = ""
+    if area is None:
+        area = ""
 
     try:
         user = auth.create_user(
@@ -69,7 +74,7 @@ def signup():
             password=password
         )
     except:
-        return {'message': 'Error creating user'},400
+        redirect(url_for('customerSignup', message=message))
     try:
         json_data = {
             "name" : name,
@@ -78,20 +83,19 @@ def signup():
             "email" : email
         }
         print(name,dob,email,mobile)
-        db.collection("customers").document(user.uid).add(json_data)
+        db.collection("customers").document(user.uid).set(json_data)
     except:
-        return {'message': 'Error adding user text data'},400
+        redirect(url_for('customerSignup', message=message))
     try:
 
         local_file_path = "/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/pictures/1.jpg"
         storage_file_path = "customerProfilePics/"+user.uid+"jpg"
         fbupload = storage.child(storage_file_path).put(local_file_path,user.uid)
         print(fbupload)
-
-        return {'message': f'Successfully created user {user.uid}'},200
+        message="Success"
+        return redirect(url_for('login', message=message))
     except:
-        return {'message': 'Error uploading user profile picture'},400
-    
+        redirect(url_for('customerSignup', message=message))
 
 @app.route('/api/token')
 def token():
@@ -106,25 +110,31 @@ def token():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    message="None"
+    return render_template('index.html', message=message)
 
-@app.route('/signup')
-def signUp():
-    return render_template('signup.html')
+@app.route('/Signup<message>')
+def signUp(message):
+    return render_template('signup.html', message=message)
 
 
 
-@app.route('/login')
-def login():
-    return render_template('login.html')
+@app.route('/login<message>')
+def login(message):
+    if message==None:
+        print("No Message Recieved")
+    else:
+        print(message)
+    # message=request.args['message']
+    return render_template('login.html', message=message)
 
 @app.route('/adminLogin')
 def adminLogin():
     return render_template('adminLogin.html')
 
-@app.route('/customerSignup')
-def customerSignup():
-    return render_template('customerSignup.html')
+@app.route('/customerSignup<message>')
+def customerSignup(message):
+    return render_template('customerSignup.html', message=message)
 
 @app.route('/restaurantSignup')
 def restaurantSignup():
