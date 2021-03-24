@@ -2,12 +2,14 @@ import firebase_admin
 import pyrebase
 from firebase_admin import credentials, auth, firestore, storage
 import json
-from flask import Flask, render_template, url_for, request, redirect 
+from flask import Flask, render_template, url_for, request, redirect , session
 from functools import wraps
+from flask_session import Session
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['TEMPLATES_AUTO_RELOAD']=True
+app.secret_key ='a very very very long string'
 
 cred = credentials.Certificate('fbAdminConfig.json')
 firebase = firebase_admin.initialize_app(cred,json.load(open('fbConfig.json')))
@@ -92,7 +94,7 @@ def deliveryAgentsignup():
         db.collection("customers").document(user.uid).set(json_data)
     except:
         message="error adding user text data in firestore"
-        return redirect(url_for('deliveryAgentSignup', message=message))
+        return redirect(url_for('deliveryAgentSignup'))
     try:
 
         # local_file_path = "/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/pictures/1.jpg"
@@ -100,10 +102,10 @@ def deliveryAgentsignup():
         # fbupload = storage.child(storage_file_path).put(local_file_path,user.uid)
         # print(fbupload)
         message="Success"
-        return redirect(url_for('login', message=message))
+        return redirect(url_for('login'))
     except:
         message="error uploading photo in firebase storage"
-        return redirect(url_for('deliveryAgentSignup', message=message))
+        return redirect(url_for('deliveryAgentSignup'))
 
     
 
@@ -121,8 +123,8 @@ def signup():
     message="Fail"
 
     if email is None or password is None:
-        message="email or password is not provided"
-        return redirect(url_for('customerSignup', message=message))
+        session['sign_message']="email or password is not provided"
+        return redirect(url_for('customerSignup'))
 
     if mobile is None:
         mobile = ""
@@ -141,8 +143,8 @@ def signup():
             password=password
         )
     except:
-        message="error creating user in firebase"
-        return redirect(url_for('customerSignup', message=message))
+        session['sign_message']="error creating user in firebase"
+        return redirect(url_for('customerSignup'))
     try:
         json_data = {
             "name" : name,
@@ -153,19 +155,19 @@ def signup():
         print(name,dob,email,mobile)
         db.collection("customers").document(user.uid).set(json_data)
     except:
-        message="error adding user text data in firestore"
-        return redirect(url_for('customerSignup', message=message))
+        session['sign_message']="error adding user text data in firestore"
+        return redirect(url_for('customerSignup'))
     try:
 
         # local_file_path = "/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/pictures/1.jpg"
         # storage_file_path = "customerProfilePics/"+user.uid+"jpg"
         # fbupload = storage.child(storage_file_path).put(local_file_path,user.uid)
         # print(fbupload)
-        message="Success"
-        return redirect(url_for('login', message=message))
+        session['sign_message']="Success"
+        return redirect(url_for('login'))
     except:
-        message="error uploading photo in firebase storage"
-        return redirect(url_for('customerSignup', message=message))
+        session['sign_message']="error uploading photo in firebase storage"
+        return redirect(url_for('customerSignup'))
 
 @app.route('/api/token')
 def token():
@@ -180,30 +182,28 @@ def token():
 
 @app.route('/')
 def index():
-    message="None"
+    session['sign_message']="False"
+    message=session['sign_message']
     return render_template('index.html', message=message)
 
-@app.route('/Signup<message>')
-def signUp(message):
-    return render_template('signup.html', message=message)
+@app.route('/Signup')
+def signUp():
+    return render_template('signup.html')
 
 
 
-@app.route('/login<message>')
-def login(message):
-    if message==None:
-        print("No Message Recieved")
-    else:
-        print(message)
-    # message=request.args['message']
+@app.route('/login')
+def login():
+    message=session['sign_message']
     return render_template('login.html', message=message)
 
 @app.route('/adminLogin')
 def adminLogin():
     return render_template('adminLogin.html')
 
-@app.route('/customerSignup<message>')
-def customerSignup(message):
+@app.route('/customerSignup')
+def customerSignup():
+    message=session['sign_message']
     return render_template('customerSignup.html', message=message)
 
 @app.route('/restaurantSignup')
