@@ -1,2 +1,3 @@
 firebase_admin
 pyrebase
+Flask-Session

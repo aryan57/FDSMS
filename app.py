@@ -58,7 +58,7 @@ def deliveryAgentsignup():
     dob = request.form['dob']
     name = request.form['name']
     local_file_path = request.form['local_file_path']
-    message="Fail"
+    session['sign_message']="Fail"
     print(name)
 
     try:
@@ -67,7 +67,7 @@ def deliveryAgentsignup():
             password=password
         )
     except:
-        message="error creating user in firebase"
+        session['sign_message']="error creating user in firebase"
         return redirect(url_for('deliveryAgentSignup', message=message))
     try:
         json_data = {
@@ -79,7 +79,7 @@ def deliveryAgentsignup():
         print(name,dob,email,mobile)
         db.collection("customers").document(user.uid).set(json_data)
     except:
-        message="error adding user text data in firestore"
+        session['sign_message']="error adding user text data in firestore"
         return redirect(url_for('deliveryAgentSignup'))
     try:
 
@@ -87,10 +87,10 @@ def deliveryAgentsignup():
         # storage_file_path = "customerProfilePics/"+user.uid+"jpg"
         # fbupload = storage.child(storage_file_path).put(local_file_path,user.uid)
         # print(fbupload)
-        message="Success"
+        session['sign_message']="Success"
         return redirect(url_for('login'))
     except:
-        message="error uploading photo in firebase storage"
+        session['sign_message']="error uploading photo in firebase storage"
         return redirect(url_for('deliveryAgentSignup'))
 
     
