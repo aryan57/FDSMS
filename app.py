@@ -176,6 +176,7 @@ def token():
     try:
         user = pyrebase_pb.auth().sign_in_with_email_and_password(email, password)
         JWT_GLOBAL =jwt = user['idToken']
+        session['token_jwt']=jwt
         return {'token': jwt}, 200
     except:
         return {'message': 'There was an error logging in'},400
