@@ -38,7 +38,7 @@ def check_token(f):
 @app.route('/api/userinfo')
 @check_token
 def userinfo():
-    return {'data': users}, 200
+    return {'data'}, 200
 
 @app.route('/signup/resturant', methods=['POST', 'GET'])
 def restaurantsignup():
@@ -56,8 +56,6 @@ def deliveryAgentsignup():
     name = request.form['name']
     local_file_path = request.form['local_file_path']
     session['sign_message']="Fail"
-    print(name)
-
     try:
         user = auth.create_user(
             email=email,
@@ -65,7 +63,7 @@ def deliveryAgentsignup():
         )
     except:
         session['sign_message']="error creating user in firebase"
-        return redirect(url_for('deliveryAgentSignup', message=message))
+        return redirect(url_for('deliveryAgentSignup'))
     try:
         json_data = {
             "name" : name,
@@ -93,7 +91,7 @@ def deliveryAgentsignup():
 
     
 
-@app.route('/signup/api', methods=['POST','GET'])
+@app.route('/signup/customer', methods=['POST','GET'])
 def signup():
 
     email = request.form['email']
@@ -104,8 +102,8 @@ def signup():
     dob = request.form['dob']
     name = request.form['name']
     local_file_path = request.form['local_file_path']
-    message="Fail"
 
+    # create user
     try:
         user = auth.create_user(
             email=email,
@@ -114,24 +112,29 @@ def signup():
     except:
         session['sign_message']="error creating user in firebase"
         return redirect(url_for('customerSignup'))
+    
+    # add data in fire-store
     try:
         json_data = {
             "name" : name,
             "dob" : dob,
             "mobile" : mobile,
-            "email" : email
+            "email" : email,
+            "gender" : gender,
+            "area": area
         }
-        print(name,dob,email,mobile)
         db.collection("customers").document(user.uid).set(json_data)
     except:
         session['sign_message']="error adding user text data in firestore"
         return redirect(url_for('customerSignup'))
+
+    # upload profile picture
     try:
 
-        # local_file_path = "/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/pictures/1.jpg"
-        # storage_file_path = "customerProfilePics/"+user.uid+"jpg"
-        # fbupload = storage.child(storage_file_path).put(local_file_path,user.uid)
-        # print(fbupload)
+        local_file_path="/home/aryan/Documents/Academic pdfs/Semester Coursework/Sem 4/se lab/FDSMS/static/sample_pictures/a.jpg"
+        storage_file_path = "customerProfilePics/"+user.uid+".jpg"
+        blob = bucket.blob(storage_file_path)
+        blob.upload_from_filename(local_file_path)
         session['sign_message']="Success"
         return redirect(url_for('login'))
     except:
@@ -140,7 +143,8 @@ def signup():
 
 @app.route("/temp")
 def temp():
-    blob = bucket.blob("customerProfilePics/"+"YQ2pF5uHW7ZCvfpIzUD1sTcZL5n2"+".jpg")
+    # blob = bucket.blob("customerProfilePics/"+"YQ2pF5uHW7ZCvfpIzUD1sTcZL5n2"+".jpg")
+    blob = bucket.blob("deliveryProfilePics/"+"qrygiKJkrfRrBC3rNXaXEc65vdS2"+".jpg")
 
     str = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
     print(str)
