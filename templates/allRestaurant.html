@@ -27,6 +27,9 @@
       <div class='container-fluid' >
           <div class='row justify-content-center'>
               <div class='col-auto align-self-center'>
+                {% if not session['restaurantList'] %}
+                    <h1>There are no Restaurants in List</h1>
+                {% else %}
                 <div class="mdc-data-table">
                     <div class="mdc-data-table__table-container">
                       <table class="mdc-data-table__table" aria-label="Dessert calories">
@@ -80,7 +83,7 @@
                             <td class="mdc-data-table__cell">
                                 <a href={{url_for('deleteUser', user_type="restaurant", delete_id=loop.index)}} id="anchor-link-nodesign">
                                     <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-                                        <span class="mdc-button__label">Delete {{loop.index}}</span>
+                                        <span class="mdc-button__label">Delete</span>
                                     </button>
                                 </a>
                             </td>
@@ -92,6 +95,7 @@
                       </table>
                     </div>
                   </div>
+                  {% endif %}
               </div>
           </div>
       </div>
