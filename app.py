@@ -293,6 +293,33 @@ def logout():
     session['sign_message']="Successfully Logged Out"
     return redirect(url_for('login'))
 
+@app.route('/createMenu')
+def createMenu():
+    user = session['session_user']
+    return render_template('createMenu.html', user=user)
+
+@app.route('/addFoodItem')
+def addFoodItem():
+    user = session['session_user']
+    return render_template('addFoodItem.html', user=user)
+
+@app.route('/finishMenu')
+def finishMenu():
+    user = session['session_user']
+    return render_template('finishMenu.html', user=user)
+
+@app.route('/addFoodItem/adder', methods=['POST','GET'])
+def foodItemAdder():
+    name = request.form['name']
+    price = request.form['price']
+    local_file_path = request.files['local_file_path']
+    temp=tempfile.NamedTemporaryFile(delete=False)
+    local_file_path.save(temp.name)
+
+    foodItem = {'name': name, 'price': price}
+    print(foodItem)
+    return redirect(url_for('createMenu'))
+    
 if __name__ == "__main__":
     # cache.init_app(app)
     app.run(debug=True)
