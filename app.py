@@ -23,6 +23,8 @@ bucket = storage.bucket()
 # storage = pyrebase_pb.storage()
 
 
+
+
 def check_token(f):
     @wraps(f)
     def wrap(*args,**kwargs):
@@ -184,6 +186,26 @@ def temp():
 
     imagePublicURL = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
     return {"imageLink":imagePublicURL},200
+
+@app.route("/temp/delete")
+# @check_token
+def delete_user():
+    to_delete="2feA7KRsIHgN3inJdxzcpxhxaGq1"
+
+    try:
+        auth.delete_user(to_delete)
+    except:
+        print("user not found")
+    
+    try:
+        user_type = db.collection('type').document(to_delete).get().to_dict()["type"]
+        db.collection(user_type).document(to_delete).delete()
+    except :
+        print("user not found in collection : type ")
+        
+    db.collection("type").document(to_delete).delete()
+
+    return {"user_id":to_delete},200
 
 @app.route('/api/token', methods=['POST','GET'])
 def token():
