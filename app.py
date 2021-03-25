@@ -336,11 +336,12 @@ def createMenu():
     print(user)
     if not user['user_type'] == 'restaurant':
         return redirect(url_for('logout'))
-    currentRestaurantMenuId=user['user_id']
+    currentRestaurantMenuId=session['user_id']
     foodItemList=[]
-    docs=db.collection('restaurant').document(session['currentRestaurantMenuId']).collection('foodItem').stream()
+    docs=db.collection('restaurant').document(currentRestaurantMenuId).collection('foodItem').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
+        print(temp_dict)
         temp_dict['food_item_id']= doc.id
         foodItemList.append(temp_dict)
     return render_template('createMenu.html', user=user, menuList=foodItemList)
@@ -462,6 +463,7 @@ def allFoodItem():
     docs=db.collection('restaurant').document(session['currentRestaurantMenuId']).collection('foodItem').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
+        print(temp_dict)
         temp_dict['food_item_id']= doc.id
         foodItemList.append(temp_dict)
     return render_template('allFoodItem.html', user=user,foodItemList=foodItemList)
