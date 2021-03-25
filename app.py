@@ -313,19 +313,26 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route('/createMenu')
+@check_token
 def createMenu():
     user = session['session_user']
-    return render_template('createMenu.html', user=user)
+    if user == 'restaurant':
+        return render_template('createMenu.html', user=user)
+    else redirect(url_for('logout'))
 
 @app.route('/addFoodItem')
 def addFoodItem():
     user = session['session_user']
-    return render_template('addFoodItem.html', user=user)
+    if user == 'restaurant':
+        return render_template('addFoodItem.html', user=user)
+    else redirect(url_for('logout'))
 
 @app.route('/finishMenu')
 def finishMenu():
     user = session['session_user']
-    return render_template('finishMenu.html', user=user)
+    if user=='restaurant':
+        return render_template('finishMenu.html', user=user)
+    else redirect(url_for('logout'))
 
 @app.route('/addFoodItem/adder', methods=['POST','GET'])
 def foodItemAdder():
