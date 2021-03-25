@@ -22,6 +22,13 @@ db = firestore.client()
 bucket = storage.bucket()
 # storage = pyrebase_pb.storage()
 
+try:
+    json_data=db.collection('restaurant').document('KgAsPjK7aLcDN01kbWnW1lqcy063').get().to_dict()
+    print(json_data)
+except Exception as e:
+    print(e)
+
+
 def check_token(f):
     @wraps(f)
     def wrap(*args,**kwargs):
@@ -423,6 +430,7 @@ def allRestaurant():
         return redirect(url_for('logout'))
     if session.get('restaurantList') == None:
         session['restaurantList']=[]
+        
         docs=db.collection('restaurant').stream()
         for doc in docs:
             temp_dict=doc.to_dict()
