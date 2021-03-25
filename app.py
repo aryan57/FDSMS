@@ -437,7 +437,7 @@ def allDeliveryAgents():
             session['deliveryAgentList'].append(temp_dict)
     return render_template('allDeliveryAgents.html', user=user)
 
-@app.route('/allFoodItem/<restaurantUserId>')
+@app.route('/allFoodItem<restaurantUserId>')
 @check_token
 # customer is viewing menu of a restaurant
 def allFoodItem(restaurantUserId):
@@ -452,7 +452,7 @@ def allFoodItem(restaurantUserId):
         temp_dict=doc.to_dict()
         temp_dict['food_item_id']= doc.id
         foodItemList.append(temp_dict)
-    return render_template('allfoodItems.html', user=user,foodItemList=foodItemList)
+    return render_template('allFoodItem.html', user=user,foodItemList=foodItemList)
 
 def deleteUserFromDatabase(to_delete):
 
