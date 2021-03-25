@@ -437,6 +437,23 @@ def allDeliveryAgents():
             session['deliveryAgentList'].append(temp_dict)
     return render_template('allDeliveryAgents.html', user=user)
 
+@app.route('/allFoodItem/<restaurantUserId>')
+@check_token
+# customer is viewing menu of a restaurant
+def allFoodItem(restaurantUserId):
+
+    user=session['session_user']
+    if not user['user_type']=='customer':
+        return redirect(url_for('logout'))
+
+    foodItemList=[]
+    docs=db.collection('restaurant').document(restaurantUserId).collection('foodItem').stream()
+    for doc in docs:
+        temp_dict=doc.to_dict()
+        temp_dict['food_item_id']= doc.id
+        foodItemList.append(temp_dict)
+    return render_template('allfoodItems.html', user=user,foodItemList=foodItemList)
+
 def deleteUserFromDatabase(to_delete):
 
     user_type=""
@@ -509,21 +526,21 @@ def deleteUser(user_type, delete_id):
         return redirect(url_for('allDeliveryAgents'))
 
 
-#Check Validation
-@app.route("/allFoodItem")
-@check_token
-def allFoodItem():
-    user=session['session_user']
-    if not user['user_type'] == 'admin' and not user['user_type'] == 'customer':
-        return redirect(url_for('logout'))
-    if session.get('restaurantList') == None:
-        session['restaurantList']=[]
-        docs=db.collection('restaurant').stream()
-        for doc in docs:
-            temp_dict=doc.to_dict()
-            temp_dict['user_id']= doc.id
-            session['restaurantList'].append(temp_dict)
-    return render_template('allFoodItem.html', user=user)
+# #Check Validation
+# @app.route("/allFoodItem")
+# @check_token
+# def allFoodItem():
+#     user=session['session_user']
+#     if not user['user_type'] == 'admin' and not user['user_type'] == 'customer':
+#         return redirect(url_for('logout'))
+#     if session.get('restaurantList') == None:
+#         session['restaurantList']=[]
+#         docs=db.collection('restaurant').stream()
+#         for doc in docs:
+#             temp_dict=doc.to_dict()
+#             temp_dict['user_id']= doc.id
+#             session['restaurantList'].append(temp_dict)
+#     return render_template('allFoodItem.html', user=user)
 
 #check Validation
 @app.route('/order')
