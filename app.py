@@ -311,15 +311,25 @@ def foodItemAdder():
     price = request.form['price']
     local_file_obj = request.files['local_file_path']
     
-    # Add to database
-    # Add to database
-    # Add to database
-    # Add to database
-    # Add to database
+    try:
+        foodItem = { "name" : name, "price" : price}
+        doc_reference = db.collection("foodItem").document()
+        doc_reference.set(foodItem)
+        
+    except:
+        session['food_item_addition_msg'] = "Error adding food item text data in database"
+        # return redirect(url_for('addFoodItem'))
+    try:
+        storage_file_path = "foodItemPics/"+doc_reference.id+".jpg"
+        blob = bucket.blob(storage_file_path)
+        blob.upload_from_file(local_file_obj,content_type="image/jpeg")
+        session['food_item_addition_msg']="Food item text and photo successfully added in database"
+        return redirect(url_for('createMenu'))
+    except Exception as e:
+        print(e)
+        session['food_item_addition_msg']="error uploading photo in firebase storage"
+        return redirect(url_for('addFoodItem'))
 
-    foodItem = {'name': name, 'price': price}
-    print(foodItem)
-    return redirect(url_for('createMenu'))
     
 @app.route('/allRestaurant')
 @check_token
