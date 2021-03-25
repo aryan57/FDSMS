@@ -30,6 +30,7 @@ def check_token(f):
             session['sign_message']="No Token Provided. Try Logging In."
             return redirect(url_for('login'))
         try:
+            session['jwt_token'] = pyrebase_pb.auth().refresh(session['refresh_token'])['idToken']
             user = auth.verify_id_token(session['jwt_token'])
             request.user = user
         except:
