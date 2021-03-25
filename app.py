@@ -28,7 +28,11 @@ bucket = storage.bucket()
 def check_token(f):
     @wraps(f)
     def wrap(*args,**kwargs):
-        if session['jwt_token']==None:
+        try:
+            if session['jwt_token']==None:
+                session['sign_message']="No Token Provided. Try Logging In."
+                return redirect(url_for('login'))
+        except:
             session['sign_message']="No Token Provided. Try Logging In."
             return redirect(url_for('login'))
         try:
@@ -297,7 +301,10 @@ def deliveryAgentDashboard():
 def adminDashboard():
     print(type(session))
     user=session['session_user']
-    return render_template('adminDashboard.html', user=user)
+    if user == 'admin':
+        return render_template('adminDashboard.html', user=user)
+    else:
+        return redirect(url_for('logout'))
 
 @app.route('/personalData')
 @check_token
@@ -318,7 +325,8 @@ def createMenu():
     user = session['session_user']
     if user == 'restaurant':
         return render_template('createMenu.html', user=user)
-    else redirect(url_for('logout'))
+    else:
+        return redirect(url_for('logout'))
 
 @app.route('/addFoodItem')
 @check_token
@@ -326,7 +334,8 @@ def addFoodItem():
     user = session['session_user']
     if user == 'restaurant':
         return render_template('addFoodItem.html', user=user)
-    else redirect(url_for('logout'))
+    else:
+        return redirect(url_for('logout'))
 
 @app.route('/finishMenu')
 @check_token
@@ -334,7 +343,8 @@ def finishMenu():
     user = session['session_user']
     if user=='restaurant':
         return render_template('finishMenu.html', user=user)
-    else redirect(url_for('logout'))
+    else:
+        return redirect(url_for('logout'))
 
 @app.route('/addFoodItem/adder', methods=['POST','GET'])
 @check_token
@@ -367,6 +377,8 @@ def foodItemAdder():
 @check_token
 def allRestaurant():
     user=session['session_user']
+    if not user == 'admin' and not user == 'customer':
+        return redirect(url_for('logout'))
     if session.get('restaurantList') == None:
         session['restaurantList']=[]
         docs=db.collection('restaurant').stream()
@@ -380,6 +392,8 @@ def allRestaurant():
 @check_token
 def allCustomers():
     user=session['session_user']
+    if not user=="admin":
+        return redirect(url_for('logout'))
     if not "customerList" in session:
         session['customerList']=[]
         docs=db.collection('customer').stream()
@@ -393,6 +407,8 @@ def allCustomers():
 @check_token
 def allDeliveryAgents():
     user=session['session_user']
+    if not user=="admin" and not user=='restaurant':
+        return redirect(url_for('logout'))
     if session.get('deliveryAgentList')==None or not session['deliveryAgentList']:
         session['deliveryAgentList']=[]
         docs=db.collection('deliveryAgent').stream()
@@ -419,6 +435,8 @@ def deleteUserFromDatabase(to_delete):
 @check_token
 def deleteUser(user_type, delete_id):
     # print(request.args.get(user_type))
+    if not session['session_user'] == "admin":
+        return redirect(url_for('logout'))
     to_delete = int(delete_id)
     to_delete=to_delete-1
     if user_type == "restaurant":
