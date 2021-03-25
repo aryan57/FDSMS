@@ -22,9 +22,6 @@ db = firestore.client()
 bucket = storage.bucket()
 # storage = pyrebase_pb.storage()
 
-
-
-
 def check_token(f):
     @wraps(f)
     def wrap(*args,**kwargs):
@@ -71,7 +68,10 @@ def restaurantsignup():
         json_data = {
             "name" : name,
             "email" : email,
-            "area" : area,
+            "areaId" : "",
+            "ratingId": "",
+            "restaurantId" : user.uid,
+            "restaurantPicSrc" : "",
         }
         db.collection("restaurant").document(user.uid).set(json_data)
         db.collection("type").document(user.uid).set({"type" : "restaurant"})
@@ -80,7 +80,7 @@ def restaurantsignup():
         session['sign_message']="error adding user text data in firestore"
         return redirect(url_for('restaurantSignup'))
     try:
-        storage_file_path = "restaurantProfilePics/"+user.uid+".jpg"
+        storage_file_path = "restaurant/"+user.uid+".jpg"
         blob = bucket.blob(storage_file_path)
         blob.upload_from_file(local_file_obj,content_type="image/jpeg")
         session['sign_message']="Restaurant SignedUp. Please Login"
@@ -372,17 +372,18 @@ def foodItemAdder():
             "restaurantId" : session["user_id"],
             "picSrc": ""
         }
-        doc_reference = db.collection("foodItem").document()
+        doc_reference = db.collection("restaurant").document(session["user_id"]).collection("foodItem").document()
         doc_reference.set(foodItem)
+        # return {"ok":"True"},200
         
     except:
         session['food_item_addition_msg'] = "Error adding food item text data in database"
         return redirect(url_for('addFoodItem'))
     try:
-        storage_file_path = "foodItemPics/"+doc_reference.id+".jpg"
+        storage_file_path = "restaurant/"+session["user_id"]+"_"+doc_reference.id+".jpg"
         blob = bucket.blob(storage_file_path)
         blob.upload_from_file(local_file_obj,content_type="image/jpeg")
-        db.collection("foodItem").document(doc_reference.id).update({"picSrc":doc_reference.id})
+        doc_reference = db.collection("restaurant").document(session["user_id"]).collection("foodItem").document(doc_reference.id).update({"picSrc":storage_file_path})
         session['food_item_addition_msg']="Food item text and photo successfully added in database"
         return redirect(url_for('createMenu'))
     except Exception as e:
@@ -437,17 +438,51 @@ def allDeliveryAgents():
     return render_template('allDeliveryAgents.html', user=user)
 
 def deleteUserFromDatabase(to_delete):
+
+    user_type=""
+
     try:
         auth.delete_user(to_delete)
     except:
-        print("user not found")
+        print("Error deleting user from authentication")
+
     try:
         user_type = db.collection('type').document(to_delete).get().to_dict()["type"]
+        if(user_type=="restaurant"):
+            # If you have larger collections, you may want to delete the documents in smaller batches to avoid out-of-memory errors.
+            delete_collection(db.collection("restaurant").document(to_delete).collection("foodItem"),1000)
         db.collection(user_type).document(to_delete).delete()
+        db.collection("type").document(to_delete).delete()
     except :
-        print("user not found in collection : type ")
-    db.collection("type").document(to_delete).delete()
+        print("error deleting user from firestore")
 
+    try:
+        # deleting profile pictures
+        bucket.delete_blob(user_type+"/"+to_delete+".jpg")
+        
+        # deleting food item images
+        if user_type=="restaurant":
+            blob_objects=bucket.list_blobs(prefix="restaurant/"+to_delete+"_")
+            blob_object_names=[]
+            for blob in blob_objects:
+                blob_object_names.append(blob.name)
+            bucket.delete_blobs(blob_object_names)
+    
+    except Exception as e:
+        print(e)
+    
+
+def delete_collection(coll_ref, batch_size):
+    docs = coll_ref.limit(batch_size).stream()
+    deleted = 0
+
+    for doc in docs:
+        print(f'Deleting doc {doc.id} => {doc.to_dict()}')
+        doc.reference.delete()
+        deleted = deleted + 1
+
+    if deleted >= batch_size:
+        return delete_collection(coll_ref, batch_size)
 
 @app.route('/delete/<user_type>/<delete_id>')
 @check_token
