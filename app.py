@@ -198,13 +198,14 @@ def token():
         session['session_user']['user_type']=user_type
         session['jwt_token']=user['idToken']
         session['refresh_token']=user['refreshToken']
+        print(session['session_user']['user_type'])
         if user_type=="customer" : 
             return redirect(url_for('customerDashboard'))
         elif user_type == "restaurant" : 
             return redirect(url_for('restaurantDashboard'))
         elif user_type == "deliveryAgent" :
             return redirect(url_for('deliveryAgentDashboard'))
-        elif user_type == "Management" :
+        elif user_type == "admin" :
             return redirect(url_for('adminDashboard'))
     except:
         session['sign_message']="Please enter the correct credentials"
@@ -268,6 +269,12 @@ def deliveryAgentDashboard():
     user=session['session_user']
     return render_template('deliveryAgentDashboard.html', user=user)
 
+@app.route('/adminDashboard')
+@check_token
+def adminDashboard():
+    user=session['session_user']
+    return render_template('adminDashboard.html', user=user)
+
 @app.route('/personalData')
 @check_token
 def personalData():
@@ -293,6 +300,28 @@ def allRestaurant():
         restaurantList.append(doc.to_dict())
         
     return render_template('allRestaurant.html', user=user, restaurantList=restaurantList)
+
+@app.route('/allCustomers')
+@check_token
+def allCustomers():
+    user=session['session_user']
+    customerList=[]
+    docs=db.collection('customer').stream()
+    for doc in docs:
+        customerList.append(doc.to_dict())
+        
+    return render_template('allCustomers.html', user=user, customerList=customerList)
+
+@app.route('/allDeliveryAgents')
+@check_token
+def allDeliveryAgents():
+    user=session['session_user']
+    deliveryAgentList=[]
+    docs=db.collection('deliveryAgent').stream()
+    for doc in docs:
+        deliveryAgentList.append(doc.to_dict())
+        
+    return render_template('allDeliveryAgents.html', user=user, deliveryAgentList=deliveryAgentList)
 
 if __name__ == "__main__":
     # cache.init_app(app)
