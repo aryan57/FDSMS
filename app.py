@@ -272,6 +272,7 @@ def deliveryAgentDashboard():
 def personalData():
     user=session['session_user']
     return render_template('personalData.html', user=user)
+
 @app.route('/logout')
 @check_token
 def logout():
@@ -280,6 +281,17 @@ def logout():
     session['refresh_token']=None
     session['sign_message']="Successfully Logged Out"
     return redirect(url_for('login'))
+
+@app.route('/allRestaurant')
+@check_token
+def allRestaurant():
+    user=session['session_user']
+    restaurantList=[]
+    docs=db.collection('restaurant').stream()
+    for doc in docs:
+        restaurantList.append(doc.to_dict())
+        
+    return render_template('allRestaurant.html', user=user, restaurantList=restaurantList)
 
 if __name__ == "__main__":
     # cache.init_app(app)
