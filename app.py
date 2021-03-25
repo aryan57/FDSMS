@@ -23,6 +23,8 @@ bucket = storage.bucket()
 # storage = pyrebase_pb.storage()
 
 
+
+
 def check_token(f):
     @wraps(f)
     def wrap(*args,**kwargs):
@@ -30,6 +32,7 @@ def check_token(f):
             session['sign_message']="No Token Provided. Try Logging In."
             return redirect(url_for('login'))
         try:
+            session['jwt_token'] = pyrebase_pb.auth().refresh(session['refresh_token'])['idToken']
             user = auth.verify_id_token(session['jwt_token'])
             request.user = user
         except:
@@ -184,6 +187,26 @@ def temp():
     imagePublicURL = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
     return {"imageLink":imagePublicURL},200
 
+@app.route("/temp/delete")
+# @check_token
+def delete_user():
+    to_delete="2feA7KRsIHgN3inJdxzcpxhxaGq1"
+
+    try:
+        auth.delete_user(to_delete)
+    except:
+        print("user not found")
+    
+    try:
+        user_type = db.collection('type').document(to_delete).get().to_dict()["type"]
+        db.collection(user_type).document(to_delete).delete()
+    except :
+        print("user not found in collection : type ")
+        
+    db.collection("type").document(to_delete).delete()
+
+    return {"user_id":to_delete},200
+
 @app.route('/api/token', methods=['POST','GET'])
 def token():
     email = request.form['email']
@@ -289,6 +312,47 @@ def logout():
     session['sign_message']="Successfully Logged Out"
     return redirect(url_for('login'))
 
+@app.route('/createMenu')
+def createMenu():
+    user = session['session_user']
+    return render_template('createMenu.html', user=user)
+
+@app.route('/addFoodItem')
+def addFoodItem():
+    user = session['session_user']
+    return render_template('addFoodItem.html', user=user)
+
+@app.route('/finishMenu')
+def finishMenu():
+    user = session['session_user']
+    return render_template('finishMenu.html', user=user)
+
+@app.route('/addFoodItem/adder', methods=['POST','GET'])
+def foodItemAdder():
+    name = request.form['name']
+    price = request.form['price']
+    local_file_obj = request.files['local_file_path']
+    
+    try:
+        foodItem = { "name" : name, "price" : price}
+        doc_reference = db.collection("foodItem").document()
+        doc_reference.set(foodItem)
+        
+    except:
+        session['food_item_addition_msg'] = "Error adding food item text data in database"
+        # return redirect(url_for('addFoodItem'))
+    try:
+        storage_file_path = "foodItemPics/"+doc_reference.id+".jpg"
+        blob = bucket.blob(storage_file_path)
+        blob.upload_from_file(local_file_obj,content_type="image/jpeg")
+        session['food_item_addition_msg']="Food item text and photo successfully added in database"
+        return redirect(url_for('createMenu'))
+    except Exception as e:
+        print(e)
+        session['food_item_addition_msg']="error uploading photo in firebase storage"
+        return redirect(url_for('addFoodItem'))
+
+    
 @app.route('/allRestaurant')
 @check_token
 def allRestaurant():
