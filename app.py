@@ -282,7 +282,7 @@ def deliveryAgentSignup():
 @check_token
 def customerDashboard():
     user=session['session_user']
-    if user['user_type'] == 'customer'
+    if user['user_type'] == 'customer':
         return render_template('customerDashboard.html', user=user)
     else:
         return redirect(url_for('logout'))
@@ -291,7 +291,7 @@ def customerDashboard():
 @check_token
 def restaurantDashboard():
     user=session['session_user']
-    if user['user_type'] == 'restaurant'
+    if user['user_type'] == 'restaurant':
         return render_template('restaurantDashboard.html', user=user)
     else:
         return redirect(url_for('logout'))
@@ -300,7 +300,7 @@ def restaurantDashboard():
 @check_token
 def deliveryAgentDashboard():
     user=session['session_user']
-    if user['user_type'] == 'deliveryAgent'
+    if user['user_type'] == 'deliveryAgent':
         return render_template('deliveryAgentDashboard.html', user=user)
     else:
         return redirect(url_for('logout'))
