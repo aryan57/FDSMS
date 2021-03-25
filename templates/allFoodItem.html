@@ -29,7 +29,7 @@
       <div class='container-fluid' >
           <div class='row justify-content-center'>
               <div class='col-auto align-self-center'>
-                {% if not session['restaurantList'] %}
+                {% if not session['foodItemList'] %}
                     <h1>There are no Food Items in List</h1>
                 {% else %}
                 <div class="mdc-data-table">
@@ -51,12 +51,12 @@
                           </tr>
                         </thead>
                         <tbody class="mdc-data-table__content">
-                          {% for restaurant in session['restaurantList'] %}
+                          {% for foodItem in session['foodItemList'] %}
                           <tr class="mdc-data-table__row">
-                            <th class="mdc-data-table__cell" scope="row">{{restaurant['name']}}</th>
-                            <td class="mdc-data-table__cell">{{restaurant['name']}}</td>
-                            <td class="mdc-data-table__cell">{{restaurant['area']}}</td>
-                            <td class="mdc-data-table__cell">{{restaurant['email']}}</td>
+                            <th class="mdc-data-table__cell" scope="row">{{foodItem['name']}}</th>
+                            <td class="mdc-data-table__cell">{{foodItem['rating']}}</td>
+                            <td class="mdc-data-table__cell">{{foodItem['price']}}</td>
+                            <td class="mdc-data-table__cell">{{foodItem['recommended']}}</td>
                             <!-- <td class="mdc-data-table__cell">{{restaurant['user_id']}}</td> -->
                             <td class="col-2 mdc-data-table__cell">
                                 <input type="number" class="mdc-text-field__input" aria-labelledby="my-label-id" value="0" name={{loop.index}} required min="0">
