@@ -55,23 +55,27 @@ def restaurantsignup():
     name = request.form['name']
     local_file_obj = request.files['local_file_path']
     session['sign_message']="Fail"
-    
+    storage_file_path=""
     try:
         user = auth.create_user(
             email=email,
             password=password
         )
+        storage_file_path = "restaurant/"+user.uid+".jpg"
     except:
         session['sign_message']="error creating user in firebase"
         return redirect(url_for('restaurantSignup'))
     try:
         json_data = {
             "name" : name,
-            "email" : email,
-            "areaId" : "",
+            "areaId" : area,
             "ratingId": "",
             "restaurantId" : user.uid,
-            "restaurantPicSrc" : "",
+            "restaurantPicSrc" : storage_file_path,
+            "pendingOrderId": [],
+            "completedOrderId": [],
+            "email" : email,
+            "isRecommended" : False
         }
         db.collection("restaurant").document(user.uid).set(json_data)
         db.collection("type").document(user.uid).set({"type" : "restaurant"})
@@ -80,7 +84,7 @@ def restaurantsignup():
         session['sign_message']="error adding user text data in firestore"
         return redirect(url_for('restaurantSignup'))
     try:
-        storage_file_path = "restaurant/"+user.uid+".jpg"
+        
         blob = bucket.blob(storage_file_path)
         blob.upload_from_file(local_file_obj,content_type="image/jpeg")
         session['sign_message']="Restaurant SignedUp. Please Login"
@@ -101,22 +105,30 @@ def deliveryAgentsignup():
     name = request.form['name']
     local_file_obj = request.files['local_file_path']
     session['sign_message']="Fail"
+    storage_file_path = ""
+
     try:
         user = auth.create_user(
             email=email,
             password=password
         )
+        storage_file_path = "deliveryProfilePics/"+user.uid+".jpg"
     except:
         session['sign_message']="error creating user in firebase"
         return redirect(url_for('deliveryAgentSignup'))
+    
     try:
         json_data = {
             "name" : name,
-            "dob" : dob,
-            "mobile" : mobile,
+            "dateOfBirth" : dob,
+            "mobileNumber" : mobile,
+            "picSrc" : storage_file_path,
             "email" : email,
             "gender" : gender,
-            "area" : area,
+            "areaId" : area,
+            "deliveryAgentId" : user.uid,
+            "ratingId" : "",
+            "isAvailable" : True
         }
         db.collection("deliveryAgent").document(user.uid).set(json_data)
         db.collection("type").document(user.uid).set({"type" : "deliveryAgent"})
@@ -124,7 +136,7 @@ def deliveryAgentsignup():
         session['sign_message']="error adding user text data in firestore"
         return redirect(url_for('deliveryAgentSignup'))
     try:
-        storage_file_path = "deliveryProfilePics/"+user.uid+".jpg"
+        
         blob = bucket.blob(storage_file_path)
         blob.upload_from_file(local_file_obj,content_type="image/jpeg")
         session['sign_message']="Delivery Agent SignedUp. Please Login"
@@ -136,7 +148,7 @@ def deliveryAgentsignup():
 
 
 @app.route('/signup/customer', methods=['POST','GET'])
-def signup():
+def customersignup():
 
     email = request.form['email']
     password = request.form['password']
@@ -146,6 +158,7 @@ def signup():
     dob = request.form['dob']
     name = request.form['name']
     local_file_obj = request.files['local_file_path']
+    storage_file_path = ""
 
     # create user
     try:
@@ -153,6 +166,7 @@ def signup():
             email=email,
             password=password
         )
+        storage_file_path = "customerProfilePics/"+user.uid+".jpg"
     except:
         session['sign_message']="error creating user in firebase"
         return redirect(url_for('customerSignup'))
@@ -161,11 +175,14 @@ def signup():
     try:
         json_data = {
             "name" : name,
-            "dob" : dob,
-            "mobile" : mobile,
+            "dateOfBirth" : dob,
+            "mobileNumber" : mobile,
             "email" : email,
             "gender" : gender,
-            "area" : area,
+            "areaId" : area,
+            "customerId":user.uid,
+            "ratingId":"",
+            "picSrc": storage_file_path
         }
         db.collection("customer").document(user.uid).set(json_data)
         db.collection("type").document(user.uid).set({"type" : "customer"})
@@ -175,7 +192,6 @@ def signup():
 
     # upload profile picture
     try:
-        storage_file_path = "customerProfilePics/"+user.uid+".jpg"
         blob = bucket.blob(storage_file_path)
         blob.upload_from_file(local_file_obj,content_type="image/jpeg")
         session['sign_message']='Signup was Succesful. Please Login'
