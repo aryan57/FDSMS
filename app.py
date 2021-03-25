@@ -514,7 +514,7 @@ def deleteUser(user_type, delete_id):
 @check_token
 def allFoodItem():
     user=session['session_user']
-    if not user['user_type'] == 'admin' and not user['user_type'] == 'customer':
+    if user['user_type']=='deliveryAgent':
         return redirect(url_for('logout'))
     if session.get('restaurantList') == None:
         session['restaurantList']=[]
