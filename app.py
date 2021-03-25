@@ -174,6 +174,7 @@ def signup():
         storage_file_path = "customerProfilePics/"+user.uid+".jpg"
         blob = bucket.blob(storage_file_path)
         blob.upload_from_file(local_file_obj,content_type="image/jpeg")
+        session['sign_message']='Signup was Succesful. Please Login'
         return redirect(url_for('login'))
     except:
         session['sign_message']="error uploading photo in firebase storage"
