@@ -282,19 +282,28 @@ def deliveryAgentSignup():
 @check_token
 def customerDashboard():
     user=session['session_user']
-    return render_template('customerDashboard.html', user=user)
+    if user['user_type'] == 'customer'
+        return render_template('customerDashboard.html', user=user)
+    else:
+        return redirect(url_for('logout'))
 
 @app.route('/restaurantDashboard')
 @check_token
 def restaurantDashboard():
     user=session['session_user']
-    return render_template('restaurantDashboard.html', user=user)
+    if user['user_type'] == 'restaurant'
+        return render_template('restaurantDashboard.html', user=user)
+    else:
+        return redirect(url_for('logout'))
 
 @app.route('/deliveryAgentDashboard')
 @check_token
 def deliveryAgentDashboard():
     user=session['session_user']
-    return render_template('deliveryAgentDashboard.html', user=user)
+    if user['user_type'] == 'deliveryAgent'
+        return render_template('deliveryAgentDashboard.html', user=user)
+    else:
+        return redirect(url_for('logout'))
 
 @app.route('/adminDashboard')
 @check_token
