@@ -334,10 +334,16 @@ def logout():
 def createMenu():
     user = session['session_user']
     print(user)
-    if user['user_type'] == 'restaurant':
-        return render_template('createMenu.html', user=user)
-    else:
+    if not user['user_type'] == 'restaurant':
         return redirect(url_for('logout'))
+    currentRestaurantMenuId=user['user_id']
+    foodItemList=[]
+    docs=db.collection('restaurant').document(session['currentRestaurantMenuId']).collection('foodItem').stream()
+    for doc in docs:
+        temp_dict=doc.to_dict()
+        temp_dict['food_item_id']= doc.id
+        foodItemList.append(temp_dict)
+    return render_template('createMenu.html', user=user, menuList=foodItemList)
 
 @app.route('/addFoodItem')
 @check_token
@@ -437,17 +443,23 @@ def allDeliveryAgents():
             session['deliveryAgentList'].append(temp_dict)
     return render_template('allDeliveryAgents.html', user=user)
 
-@app.route('/allFoodItem<restaurantUserId>')
+@app.route('/allFoodItem11/<restaurantUserId>')
 @check_token
-# customer is viewing menu of a restaurant
-def allFoodItem(restaurantUserId):
+def allFoodItem11(restaurantUserId):
+    session['currentRestaurantMenuId']=restaurantUserId
+    return redirect(url_for('allFoodItem'))
+
+
+@app.route('/allFoodItem')
+@check_token
+def allFoodItem():
 
     user=session['session_user']
-    if not user['user_type']=='customer':
+    if not user['user_type']=='customer' and not user['user_type']=='admin':
         return redirect(url_for('logout'))
 
     foodItemList=[]
-    docs=db.collection('restaurant').document(restaurantUserId).collection('foodItem').stream()
+    docs=db.collection('restaurant').document(session['currentRestaurantMenuId']).collection('foodItem').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
         temp_dict['food_item_id']= doc.id
