@@ -19,7 +19,7 @@
               <span class="mdc-button__label">Logout</span>
             </button>
           </a>
-        <!-- <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Go Back" onclick="history.back()">arrow_back</button> -->
+        <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Go Back" onclick="history.back()">arrow_back</button>
       </section>
     </div>
   </header>
@@ -40,6 +40,7 @@
                             <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Email ID</th>
                             <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Phone Number</th>
                             {% if user['user_type']=='admin' %}
+                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Delete User</th>
                             {% elif user['user_type']=='restaurant' %}
                             {% endif %}
                           </tr>
@@ -58,7 +59,7 @@
                                 <td class="mdc-data-table__cell">
                                   <a href=# id="anchor-link-nodesign">
                                     <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-                                      <span class="mdc-button__label">Give Offer</span>
+                                      <span class="mdc-button__label">Delete</span>
                                     </button>
                                   </a>
                                 </td>

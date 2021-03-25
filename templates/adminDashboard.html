@@ -15,11 +15,11 @@
       </section>
       <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
         <a href={{url_for('logout')}} id="anchor-link-nodesign">
-            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-              <span class="mdc-button__label">Logout</span>
-            </button>
-          </a>
-        <!-- <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Go Back" onclick="history.back()">arrow_back</button> -->
+          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+            <span class="mdc-button__label">Logout</span>
+          </button>
+        </a>
+        <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Go Back" onclick="history.back()">arrow_back</button>
       </section>
     </div>
   </header>
@@ -37,19 +37,25 @@
       </div>
       <div class='row justify-content-center'>
         <div class='col-auto align-self-center'>
-          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-            <span class="mdc-button__label">Customers</span>
-          </button>
+          <a href={{url_for('allCustomers')}} id='anchor-link-nodesign'>
+            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+              <span class="mdc-button__label">Customers</span>
+            </button>
+          </a>
         </div>
         <div class='col-auto align-self-center'>
-          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-            <span class="mdc-button__label">Restaurant</span>
-          </button>
+          <a href={{url_for('allRestaurant')}} id='anchor-link-nodesign'>
+            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+              <span class="mdc-button__label">Restaurant</span>
+            </button>
+          </a>
         </div>
         <div class='col-auto align-self-center'>
-          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-            <span class="mdc-button__label">Delivery Agent</span>
-          </button>
+          <a href={{url_for('allDeliveryAgents')}} id='anchor-link-nodesign'>
+            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+              <span class="mdc-button__label">Delivery Agents</span>
+            </button>
+          </a>
         </div>
       </div>
       <div class='row justify-content-center'>
