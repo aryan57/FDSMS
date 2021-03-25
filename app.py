@@ -321,6 +321,7 @@ def createMenu():
     else redirect(url_for('logout'))
 
 @app.route('/addFoodItem')
+@check_token
 def addFoodItem():
     user = session['session_user']
     if user == 'restaurant':
@@ -328,6 +329,7 @@ def addFoodItem():
     else redirect(url_for('logout'))
 
 @app.route('/finishMenu')
+@check_token
 def finishMenu():
     user = session['session_user']
     if user=='restaurant':
@@ -335,6 +337,7 @@ def finishMenu():
     else redirect(url_for('logout'))
 
 @app.route('/addFoodItem/adder', methods=['POST','GET'])
+@check_token
 def foodItemAdder():
     name = request.form['name']
     price = request.form['price']
