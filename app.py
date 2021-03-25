@@ -9,8 +9,6 @@ import datetime
 import requests
 from requests.exceptions import HTTPError
 from flask_session import Session
-import os
-import tempfile
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -32,6 +30,7 @@ def check_token(f):
             session['sign_message']="No Token Provided. Try Logging In."
             return redirect(url_for('login'))
         try:
+            session['jwt_token'] = pyrebase_pb.auth().refresh(session['refresh_token'])['idToken']
             user = auth.verify_id_token(session['jwt_token'])
             request.user = user
         except:
@@ -51,9 +50,7 @@ def restaurantsignup():
     password = request.form['password']
     area = request.form['area']
     name = request.form['name']
-    local_file_path = request.files['local_file_path']
-    temp=tempfile.NamedTemporaryFile(delete=False)
-    local_file_path.save(temp.name)
+    local_file_obj = request.files['local_file_path']
     session['sign_message']="Fail"
     
     try:
@@ -79,11 +76,11 @@ def restaurantsignup():
     try:
         storage_file_path = "restaurantProfilePics/"+user.uid+".jpg"
         blob = bucket.blob(storage_file_path)
-        blob.upload_from_filename(temp.name)
-        os.remove(temp.name)
+        blob.upload_from_file(local_file_obj,content_type="image/jpeg")
         session['sign_message']="Restaurant SignedUp. Please Login"
         return redirect(url_for('login'))
-    except:
+    except Exception as e:
+        print(e)
         session['sign_message']="error uploading photo in firebase storage"
         return redirect(url_for('restaurantSignup'))
 
@@ -96,9 +93,7 @@ def deliveryAgentsignup():
     mobile = request.form['mobile']
     dob = request.form['dob']
     name = request.form['name']
-    local_file_path = request.files['local_file_path']
-    temp=tempfile.NamedTemporaryFile(delete=False)
-    local_file_path.save(temp.name)
+    local_file_obj = request.files['local_file_path']
     session['sign_message']="Fail"
     try:
         user = auth.create_user(
@@ -125,8 +120,7 @@ def deliveryAgentsignup():
     try:
         storage_file_path = "deliveryProfilePics/"+user.uid+".jpg"
         blob = bucket.blob(storage_file_path)
-        blob.upload_from_filename(temp.name)
-        os.remove(temp.name)
+        blob.upload_from_file(local_file_obj,content_type="image/jpeg")
         session['sign_message']="Delivery Agent SignedUp. Please Login"
         return redirect(url_for('login'))
     except:
@@ -145,9 +139,7 @@ def signup():
     mobile = request.form['mobile']
     dob = request.form['dob']
     name = request.form['name']
-    local_file_path = request.files['local_file_path']
-    temp=tempfile.NamedTemporaryFile(delete=False)
-    local_file_path.save(temp.name)
+    local_file_obj = request.files['local_file_path']
 
     # create user
     try:
@@ -179,8 +171,7 @@ def signup():
     try:
         storage_file_path = "customerProfilePics/"+user.uid+".jpg"
         blob = bucket.blob(storage_file_path)
-        blob.upload_from_filename(temp.name)
-        session['sign_message']="Customer Signed Up. Please Login."
+        blob.upload_from_file(local_file_obj,content_type="image/jpeg")
         return redirect(url_for('login'))
     except:
         session['sign_message']="error uploading photo in firebase storage"
@@ -189,17 +180,15 @@ def signup():
 @app.route("/temp")
 def temp():
     # blob = bucket.blob("customerProfilePics/"+"YQ2pF5uHW7ZCvfpIzUD1sTcZL5n2"+".jpg")
-    blob = bucket.blob("customerProfilePics/"+"4DcnUZkcrdOeJKCY7mPIMq1RSzg2"+".jpg")
+    blob = bucket.blob("restaurantProfilePics/"+"oDtSvO2uB8UE6889JHPRFTLvHJY2"+".jpg")
 
-    str1 = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
-    return str1,200
+    imagePublicURL = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
+    return {"imageLink":imagePublicURL},200
 
 @app.route('/api/token', methods=['POST','GET'])
 def token():
     email = request.form['email']
     password = request.form['password']
-    # email="aryanag65@gmail.com"
-    # password="88080ary"
     try:
         user = pyrebase_pb.auth().sign_in_with_email_and_password(email, password)
         # user2 = pyrebase_pb.auth().get_account_info(user['idToken'])
@@ -209,13 +198,14 @@ def token():
         session['session_user']['user_type']=user_type
         session['jwt_token']=user['idToken']
         session['refresh_token']=user['refreshToken']
+        print(session['session_user']['user_type'])
         if user_type=="customer" : 
             return redirect(url_for('customerDashboard'))
         elif user_type == "restaurant" : 
             return redirect(url_for('restaurantDashboard'))
         elif user_type == "deliveryAgent" :
             return redirect(url_for('deliveryAgentDashboard'))
-        elif user_type == "Management" :
+        elif user_type == "admin" :
             return redirect(url_for('adminDashboard'))
     except:
         session['sign_message']="Please enter the correct credentials"
@@ -279,11 +269,18 @@ def deliveryAgentDashboard():
     user=session['session_user']
     return render_template('deliveryAgentDashboard.html', user=user)
 
+@app.route('/adminDashboard')
+@check_token
+def adminDashboard():
+    user=session['session_user']
+    return render_template('adminDashboard.html', user=user)
+
 @app.route('/personalData')
 @check_token
 def personalData():
     user=session['session_user']
     return render_template('personalData.html', user=user)
+
 @app.route('/logout')
 @check_token
 def logout():
@@ -312,14 +309,51 @@ def finishMenu():
 def foodItemAdder():
     name = request.form['name']
     price = request.form['price']
-    local_file_path = request.files['local_file_path']
-    temp=tempfile.NamedTemporaryFile(delete=False)
-    local_file_path.save(temp.name)
+    local_file_obj = request.files['local_file_path']
+    
+    # Add to database
+    # Add to database
+    # Add to database
+    # Add to database
+    # Add to database
 
     foodItem = {'name': name, 'price': price}
     print(foodItem)
     return redirect(url_for('createMenu'))
     
+@app.route('/allRestaurant')
+@check_token
+def allRestaurant():
+    user=session['session_user']
+    restaurantList=[]
+    docs=db.collection('restaurant').stream()
+    for doc in docs:
+        restaurantList.append(doc.to_dict())
+        
+    return render_template('allRestaurant.html', user=user, restaurantList=restaurantList)
+
+@app.route('/allCustomers')
+@check_token
+def allCustomers():
+    user=session['session_user']
+    customerList=[]
+    docs=db.collection('customer').stream()
+    for doc in docs:
+        customerList.append(doc.to_dict())
+        
+    return render_template('allCustomers.html', user=user, customerList=customerList)
+
+@app.route('/allDeliveryAgents')
+@check_token
+def allDeliveryAgents():
+    user=session['session_user']
+    deliveryAgentList=[]
+    docs=db.collection('deliveryAgent').stream()
+    for doc in docs:
+        deliveryAgentList.append(doc.to_dict())
+        
+    return render_template('allDeliveryAgents.html', user=user, deliveryAgentList=deliveryAgentList)
+
 if __name__ == "__main__":
     # cache.init_app(app)
     app.run(debug=True)

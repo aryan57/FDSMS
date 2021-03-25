@@ -19,7 +19,7 @@
             <span class="mdc-button__label">Logout</span>
           </button>
         </a>
-        <!-- <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Go Back" onclick="history.back()">arrow_back</button> -->
+        <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Go Back" onclick="history.back()">arrow_back</button>
       </section>
     </div>
   </header>
@@ -60,7 +60,7 @@
             </a>
           </div>
           <div class='col-auto align-self-center'>
-            <a href=# id='anchor-link-nodesign'>
+            <a href={{url_for('allRestaurant')}} id='anchor-link-nodesign'>
               <button class="mdc-button mdc-button--raised" name="submit" type="submit">
                 <span class="mdc-button__label">All Restaurants</span>
               </button>
