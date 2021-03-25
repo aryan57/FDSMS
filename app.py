@@ -9,7 +9,7 @@ import datetime
 import requests
 from requests.exceptions import HTTPError
 # from flask_session import Session
-
+#addding a comment
 app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['TEMPLATES_AUTO_RELOAD']=True
@@ -507,6 +507,29 @@ def deleteUser(user_type, delete_id):
         session.modified = True
         deleteUserFromDatabase(user_deleted['user_id'])
         return redirect(url_for('allDeliveryAgents'))
+
+
+#Check Validation
+@app.route("/allFoodItem")
+@check_token
+def allFoodItem():
+    user=session['session_user']
+    if not user['user_type'] == 'admin' and not user['user_type'] == 'customer':
+        return redirect(url_for('logout'))
+    if session.get('restaurantList') == None:
+        session['restaurantList']=[]
+        docs=db.collection('restaurant').stream()
+        for doc in docs:
+            temp_dict=doc.to_dict()
+            temp_dict['user_id']= doc.id
+            session['restaurantList'].append(temp_dict)
+    return render_template('allFoodItem.html', user=user)
+
+#check Validation
+@app.route('/order')
+@check_token
+def order():
+    pass
 
 if __name__ == "__main__":
     # cache.init_app(app)
