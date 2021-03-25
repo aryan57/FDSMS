@@ -1,112 +1,103 @@
-{% extends 'base.html' %}
+{% extends 'topBarAdded.html' %}
 
-{% block head %}
-<title>Restaurant List</title>
+{% block title %}
+  <title>Restaurant List</title>
 {% endblock %}
 
 
-{% block body %}
-<header class="mdc-top-app-bar">
-    <div class="mdc-top-app-bar__row">
-      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-        <a href={{url_for('index')}} id = "anchor-link-nodesign">
-          <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Open navigation menu" disabled>room_service</button>
-        </a>
-        <span class="mdc-top-app-bar__title">Zomato</span>
-      </section>
-      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-        <a href={{url_for('logout')}} id="anchor-link-nodesign">
-            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-              <span class="mdc-button__label">Logout</span>
-            </button>
-          </a>
-        <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Go Back" onclick="history.back()">arrow_back</button>
-      </section>
-    </div>
-  </header>
-  <main class="mdc-top-app-bar--fixed-adjust">
-      <div class='container-fluid' >
-          <div class='row justify-content-center'>
-              <div class='col-auto align-self-center'>
-                {% if not session['restaurantList'] %}
-                    <h1>There are no Restaurants in List</h1>
-                {% else %}
-                <div class="mdc-data-table">
-                    <div class="mdc-data-table__table-container">
-                      <table class="mdc-data-table__table" aria-label="Dessert calories">
-                        <thead>
-                          <tr class="mdc-data-table__header-row">
-                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
-                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Rating</th>
-                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Area</th>
-                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recommended</th>
-                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Email Id</th>
-                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Menu</th>
-                            {% if user['user_type'] == "customer" %}
-                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Order Now</th>
-                            {% elif user['user_type'] == "admin" %}
-                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recommend</th>
-                            <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Delete User</th>
-                            {% endif %}
-                          </tr>
-                        </thead>
-                        <tbody class="mdc-data-table__content">
-                          {% for restaurant in session['restaurantList'] %}
-                          <tr class="mdc-data-table__row">
-                            <th class="mdc-data-table__cell" scope="row">{{restaurant['name']}}</th>
-                            <td class="mdc-data-table__cell">{{restaurant['ratingId']}}</td>
-                            <td class="mdc-data-table__cell">{{restaurant['areaId']}}</td>
-                            <td class="mdc-data-table__cell">
-                              {% if restaurant['isRecommended'] %}
-                                Yes
-                              {% endif %}
-                            </td>
-                            <td class="mdc-data-table__cell">{{restaurant['email']}}</td>
-                            <td class="mdc-data-table__cell">
-                                <a href={{url_for('allFoodItem11', restaurantUserId = restaurant['user_id'] )}} id="anchor-link-nodesign">
-                                    <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-                                        <span class="mdc-button__label">Open Menu</span>
-                                    </button>
-                                </a>
-                            </td>
-                            {% if user['user_type'] == "customer" %}
-                            <td class="mdc-data-table__cell">
-                              <a href={{url_for('allFoodItem11', restaurantUserId = restaurant['user_id'] )}} id="anchor-link-nodesign">
-                                    <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-                                        <span class="mdc-button__label">Click Here</span>
-                                    </button>
-                                </a>
-                            </td>
-                            {% elif user['user_type'] == "admin" %}
-                            <td class="mdc-data-table__cell">
-                                <a href=# id="anchor-link-nodesign">
-                                    <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-                                        <span class="mdc-button__label">Change</span>
-                                    </button>
-                                </a>
-                            </td>
-                            <td class="mdc-data-table__cell">
-                                <a href={{url_for('deleteUser', user_type="restaurant", delete_id=loop.index)}} id="anchor-link-nodesign">
-                                    <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-                                        <span class="mdc-button__label">Delete</span>
-                                    </button>
-                                </a>
-                            </td>
-                            {% endif %}
-                          </tr>
-                          {% endfor %} 
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                  {% endif %}
-              </div>
-          </div>
-      </div>
-  </main>
+{% block topBarButtons %}
+  <a href={{url_for('logout')}} id="anchor-link-nodesign">
+    <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+      <span class="mdc-button__label">Logout</span>
+    </button>
+  </a>
+  <button class="mdc-button" disabled>
+    <span class="mdc-button__ripple"></span>
+    <span class="mdc-button__label"></span>
+  </button>
+{% endblock %}
 
-    <script>
-          const textField4 = new mdc.dataTable.MDCDataTable(document.querySelector('.mdc-data-table'));
-    </script>
+{% block main %}
+  <div class='container-fluid' >
+    <div class='row justify-content-center'>
+      <div class='col-auto align-self-center'>
+        {% if not session['restaurantList'] %}
+            <h1>There are no Restaurants in List</h1>
+        {% else %}
+          <div class="mdc-data-table">
+            <div class="mdc-data-table__table-container">
+              <table class="mdc-data-table__table" aria-label="Dessert calories">
+                <thead>
+                  <tr class="mdc-data-table__header-row">
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Rating</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Area</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recommended</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Email Id</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Menu</th>
+                    {% if user['user_type'] == "customer" %}
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Order Now</th>
+                    {% elif user['user_type'] == "admin" %}
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recommend</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Delete User</th>
+                    {% endif %}
+                  </tr>
+                </thead>
+                <tbody class="mdc-data-table__content">
+                  {% for restaurant in session['restaurantList'] %}
+                    <tr class="mdc-data-table__row">
+                      <th class="mdc-data-table__cell" scope="row">{{restaurant['name']}}</th>
+                      <td class="mdc-data-table__cell">{{restaurant['ratingId']}}</td>
+                      <td class="mdc-data-table__cell">{{restaurant['areaId']}}</td>
+                      <td class="mdc-data-table__cell">
+                        {% if restaurant['isRecommended'] %}
+                          Yes
+                        {% endif %}
+                      </td>
+                      <td class="mdc-data-table__cell">{{restaurant['email']}}</td>
+                      <td class="mdc-data-table__cell">
+                        <a href={{url_for('allFoodItem11', restaurantUserId = restaurant['user_id'] )}} id="anchor-link-nodesign">
+                          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+                            <span class="mdc-button__label">Open Menu</span>
+                          </button>
+                        </a>
+                      </td>
+                      {% if user['user_type'] == "customer" %}
+                        <td class="mdc-data-table__cell">
+                          <a href={{url_for('allFoodItem11', restaurantUserId = restaurant['user_id'] )}} id="anchor-link-nodesign">
+                            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+                              <span class="mdc-button__label">Click Here</span>
+                            </button>
+                          </a>
+                        </td>
+                      {% elif user['user_type'] == "admin" %}
+                        <td class="mdc-data-table__cell">
+                          <a href=# id="anchor-link-nodesign">
+                            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+                              <span class="mdc-button__label">Change</span>
+                            </button>
+                          </a>
+                        </td>
+                        <td class="mdc-data-table__cell">
+                          <a href={{url_for('deleteUser', user_type="restaurant", delete_id=loop.index)}} id="anchor-link-nodesign">
+                            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+                              <span class="mdc-button__label">Delete</span>
+                            </button>
+                          </a>
+                        </td>
+                      {% endif %}
+                    </tr>
+                  {% endfor %} 
+                </tbody>
+              </table>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const textField4 = new mdc.dataTable.MDCDataTable(document.querySelector('.mdc-data-table'));
+  </script>
 {% endblock %}

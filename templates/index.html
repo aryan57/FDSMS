@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'topBarAdded.html' %}
 
 
 {% block head %}
@@ -7,17 +7,7 @@
 
 {% endblock %}
 
-{% block body %}
-
-<header class="mdc-top-app-bar">
-  <div class="mdc-top-app-bar__row">
-    <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-      <a href={{url_for('index')}} id = "anchor-link-nodesign">
-        <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Open navigation menu" disabled>room_service</button>
-      </a>
-      <span class="mdc-top-app-bar__title">Zomato</span>
-    </section>
-    <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+{% block topBarButtons %}
       <a href={{ url_for('signUp')}} id="anchor-link-nodesign">
         <div class="mdc-touch-target-wrapper">
           <button class="mdc-button mdc-button--raised">
@@ -29,7 +19,7 @@
       </a>
       <button class="mdc-button" disabled>
         <span class="mdc-button__ripple"></span>
-        <span class="mdc-button__label">         </span>
+        <span class="mdc-button__label"></span>
       </button>   
       <a href={{ url_for('login')}} id="anchor-link-nodesign">
         <div class="mdc-touch-target-wrapper">
@@ -42,21 +32,13 @@
       </a>
       <button class="mdc-button" disabled>
         <span class="mdc-button__ripple"></span>
-        <span class="mdc-button__label">         </span>
-      </button>  
-      <a href={{ url_for('adminLogin')}} id="anchor-link-nodesign">
-        <div class="mdc-touch-target-wrapper">
-          <button class="mdc-button mdc-button--raised">
-            <span class="mdc-button__ripple"></span>
-            <span class="mdc-button__label">Admin Login</span>
-            <!-- <span class="mdc-button__touch"></span> -->
-          </button>
-        </div>  
-      </a> 
-    </section>
-  </div>
-</header>
+        <span class="mdc-button__label"></span>
+      </button> 
+{% endblock %} 
 
-<main class="mdc-top-app-bar--fixed-adjust bkg-img-home">
-</main>
+{% block main %}
+
+<div class="bkg-img-home">
+</div>
 {% endblock %}
+      

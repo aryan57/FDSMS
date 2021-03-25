@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
 
+
 {% block head %}
-<title>Login page</title>
 <link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/textField.css')}}>
 <link rel="stylesheet" type="text/css" href ={{ url_for('static', filename='css/signupCSS.css')}}>
+{% block title %}{% endblock %}
 {% endblock %}
 
 {% block body %}
-  <header class="mdc-top-app-bar">
+
+<header class="mdc-top-app-bar">
     <div class="mdc-top-app-bar__row">
       <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
         <a href={{url_for('index')}} id = "anchor-link-nodesign">
@@ -16,12 +18,22 @@
         <span class="mdc-top-app-bar__title">Zomato</span>
       </section>
       <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+        {% block topBarButtons %}{% endblock %} 
+        <a href={{ url_for('redirectDashboard')}} id="anchor-link-nodesign">
+          <div class="mdc-touch-target-wrapper">
+            <button class="mdc-button mdc-button--raised">
+              <span class="mdc-button__ripple"></span>
+              <span class="mdc-button__label">Dashboard</span>
+            </button>
+          </div>  
+        </a> 
         <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Go Back" onclick="history.back()">arrow_back</button>
       </section>
     </div>
   </header>
-<script>
-  const textField4 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-5'));
-  const textField5 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-6'));
-</script>
+
+  <main class="mdc-top-app-bar--fixed-adjust">
+      {% block main %}{% endblock %}
+  </main>
+
 {% endblock %}

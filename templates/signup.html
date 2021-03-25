@@ -1,69 +1,47 @@
-{% extends 'base.html' %}
+{% extends 'topBarAdded.html' %}
 
-{% block head %}
+{% block title %}
 <title>Signup Page</title>
 {% endblock %}
 
-{% block body %}
-<header class="mdc-top-app-bar">
-  <div class="mdc-top-app-bar__row">
-    <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-      <a href={{url_for('index')}} id = "anchor-link-nodesign">
-        <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Open navigation menu" disabled>room_service</button>
-      </a>
-      <span class="mdc-top-app-bar__title">Zomato</span>
-    </section>
-    <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-      <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Go Back" onclick="history.back()">arrow_back</button>
-    </section>
+{% block main %}
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-auto align-self-center">
+        <h1>Which Category do you belong?</h1>
+      </div>
+    </div>
+    <div class="row justify-content-center" >
+      <div class="col-auto align-self-center">
+        <a href={{ url_for('customerSignup')}} id="anchor-link-nodesign">
+          <div class="mdc-touch-target-wrapper">
+            <button class="mdc-button mdc-button--raised">
+            <span class="mdc-button__ripple"></span>
+            <span class="mdc-button__label">Customer</span>
+            </button>
+          </div>    
+        </a>
+      </div>
+      <div class="col-auto align-self-center">
+        <a href={{ url_for('restaurantSignup')}} id="anchor-link-nodesign">
+          <div class="mdc-touch-target-wrapper">
+            <button class="mdc-button mdc-button--raised">
+            <span class="mdc-button__ripple"></span>
+            <span class="mdc-button__label">Restaurant</span>
+            </button>
+          </div>    
+        </a>
+      </div>
+      <div class="col-auto align-self-center">
+        <a href={{ url_for('deliveryAgentSignup')}} id="anchor-link-nodesign">
+          <div class="mdc-touch-target-wrapper">
+            <button class="mdc-button mdc-button--raised">
+            <span class="mdc-button__ripple"></span>
+            <span class="mdc-button__label">Delivery Agent</span>
+            </button>
+          </div>    
+        </a>
+      </div>
+    </div>
   </div>
-</header>
-  
-  <!-- <div class="bkg-img-home"></div> -->
-  <main class="mdc-top-app-bar--fixed-adjust">
-          <div class="container">
-            <div class="row justify-content-center">
-              <div class="col-auto align-self-center">
-                <h1>Which Category do you belong?</h1>
-              </div>
-            </div>
-              <div class="row justify-content-center" >
-                  <!-- <div class="col-3"></div> -->
-                  <div class="col-auto align-self-center">
-                    <a href={{ url_for('customerSignup')}} id="anchor-link-nodesign">
-                        <div class="mdc-touch-target-wrapper">
-                            <button class="mdc-button mdc-button--raised">
-                            <span class="mdc-button__ripple"></span>
-                            <span class="mdc-button__label">Customer</span>
-                            <!-- <span class="mdc-button__touch"></span> -->
-                            </button>
-                        </div>    
-                    </a>
-                  </div>
-                  <div class="col-auto align-self-center">
-                    <a href={{ url_for('restaurantSignup')}} id="anchor-link-nodesign">
-                        <div class="mdc-touch-target-wrapper">
-                            <button class="mdc-button mdc-button--raised">
-                            <span class="mdc-button__ripple"></span>
-                            <span class="mdc-button__label">Restaurant</span>
-                            <!-- <span class="mdc-button__touch"></span> -->
-                            </button>
-                        </div>    
-                    </a>
-                  </div>
-                  <div class="col-auto align-self-center">
-                    <a href={{ url_for('deliveryAgentSignup')}} id="anchor-link-nodesign">
-                        <div class="mdc-touch-target-wrapper">
-                            <button class="mdc-button mdc-button--raised">
-                            <span class="mdc-button__ripple"></span>
-                            <span class="mdc-button__label">Delivery Agent</span>
-                            <!-- <span class="mdc-button__touch"></span> -->
-                            </button>
-                        </div>    
-                    </a>
-                  </div>
-              </div>
-          </div>
-          </div>
-          </main>
 {% endblock %}

@@ -1,63 +1,40 @@
-{% extends 'base.html' %}
+{% extends 'topBarAdded.html' %}
 
-{% block head %}
-<title>Login page</title>
-<link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/textField.css')}}>
-<link rel="stylesheet" type="text/css" href ={{ url_for('static', filename='css/signupCSS.css')}}>
+{% block title %}
+  <title>Create Menu</title>
 {% endblock %}
 
-{% block body %}
-  <header class="mdc-top-app-bar">
-    <div class="mdc-top-app-bar__row">
-      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-        <a href={{url_for('index')}} id = "anchor-link-nodesign">
-          <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Open navigation menu" disabled>room_service</button>
+{% block main %}
+  <div class='container'>
+    <div class='p-3 row justify-content-center'>
+      <div class='col-auto align-self-center'>
+        <a href={{url_for('addFoodItem')}} id='anchor-link-nodesign'>
+          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+            <span class="mdc-button__label">Add Food Item</span>
+          </button>
         </a>
-        <span class="mdc-top-app-bar__title">Zomato</span>
-      </section>
-      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-        <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Go Back" onclick="history.back()">arrow_back</button>
-      </section>
-    </div>
-  </header>
-  <main class="mdc-top-app-bar--fixed-adjust">
-    <div class='container'>
-      <div class='p-3 row justify-content-center'>
-        <div class='col-auto align-self-center'>
-          <a href={{url_for('addFoodItem')}} id='anchor-link-nodesign'>
-            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-              <span class="mdc-button__label">Add Food Item</span>
-            </button>
-          </a>
-        </div>
-        <!-- <div class='col-auto align-self-center'>
-          <a href={{url_for('finishMenu')}} id='anchor-link-nodesign'>
-            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-              <span class="mdc-button__label">Finish Menu</span>
-            </button>
-          </a>
-        </div> -->
       </div>
-      <div class="row justify-content-center">
-        <div class="col-auto align-self-center">
-          {% if not menuList %}
-              <h2>There are no items in the menu. Add Food Items</h2>
-          {% else %}
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-auto align-self-center">
+        {% if not menuList %}
+            <h2>There are no items in the menu. Add Food Items</h2>
+        {% else %}
           <div class="mdc-data-table">
-              <div class="mdc-data-table__table-container">
-                <table class="mdc-data-table__table" aria-label="Dessert calories">
-                  <thead>
-                    <tr class="mdc-data-table__header-row">
-                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
-                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Rating</th>
-                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Price</th>
-                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recommended</th>
-                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Update Item</th>
-                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Delete Item</th>
-                    </tr>
-                  </thead>
-                  <tbody class="mdc-data-table__content">
-                    {% for foodItem in menuList %}
+            <div class="mdc-data-table__table-container">
+              <table class="mdc-data-table__table" aria-label="Dessert calories">
+                <thead>
+                  <tr class="mdc-data-table__header-row">
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Rating</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Price</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recommended</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Update Item</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Delete Item</th>
+                  </tr>
+                </thead>
+                <tbody class="mdc-data-table__content">
+                  {% for foodItem in menuList %}
                     <tr class="mdc-data-table__row">
                       <th class="mdc-data-table__cell" scope="row">{{foodItem['name']}}</th>
                       <td class="mdc-data-table__cell">{{foodItem['rating']}}</td>
@@ -82,19 +59,17 @@
                         </a>
                       </td>
                     </tr>
-                    {% endfor %} 
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+                  {% endfor %} 
+                </tbody>
+              </table>
             </div>
-          {% endif %}
-        </div>
+          </div>
+        {% endif %}
       </div>
     </div>
-  </main>
-<script>
-  const textField4 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-5'));
-  const textField5 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-6'));
-</script>
+  </div>
+  <script>
+    const textField4 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-5'));
+    const textField5 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-6'));
+  </script>
 {% endblock %}

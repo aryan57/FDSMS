@@ -63,6 +63,9 @@ def restaurantsignup():
     local_file_obj = request.files['local_file_path']
     session['sign_message']="Fail"
     storage_file_path=""
+    if area=='Other':
+        session['sign_message'] = "We currently don't have service in your area."
+        return redirect(url_for('restaurantSignup'))
     try:
         user = auth.create_user(
             email=email,
@@ -113,6 +116,9 @@ def deliveryAgentsignup():
     local_file_obj = request.files['local_file_path']
     session['sign_message']="Fail"
     storage_file_path = ""
+    if area=='Other':
+        session['sign_message'] = "We currently don't deliver in your area."
+        return redirect(url_for('deliveryAgentSignup'))
 
     try:
         user = auth.create_user(
@@ -166,7 +172,9 @@ def customersignup():
     name = request.form['name']
     local_file_obj = request.files['local_file_path']
     storage_file_path = ""
-
+    if area=='Other':
+        session['sign_message'] = "We currently don't deliver in your area."
+        return redirect(url_for('customerSignup'))
     # create user
     try:
         user = auth.create_user(
@@ -568,6 +576,19 @@ def deleteUser(user_type, delete_id):
 @check_token
 def order():
     pass
+
+@app.route('/redirectDashboard')
+@check_token
+def redirectDashboard():
+    if session['session_user']['user_type']=='customer':
+        return redirect(url_for('customerDashboard'))
+    elif session['session_user']['user_type']=='restaurant':
+        return redirect(url_for('restaurantDashboard'))
+    elif session['session_user']['user_type']=='deliveryAgent':
+        return redirect(url_for('deliverAgentDashboard'))
+    elif session['session_user']['user_type']=='admin':
+        return redirect(url_for('adminDashboard'))
+        
 
 if __name__ == "__main__":
     # cache.init_app(app)
