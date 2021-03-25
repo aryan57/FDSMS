@@ -293,34 +293,78 @@ def logout():
 @check_token
 def allRestaurant():
     user=session['session_user']
-    restaurantList=[]
-    docs=db.collection('restaurant').stream()
-    for doc in docs:
-        restaurantList.append(doc.to_dict())
-        
-    return render_template('allRestaurant.html', user=user, restaurantList=restaurantList)
+    print()
+    for retaurant in session['restaurantList']:
+        print(retaurant)
+    print()
+    if session.get('restaurantList') == None or not session['restaurantList']:
+        print()
+        print("im here")
+        print()
+        session['restaurantList']=[]
+        docs=db.collection('restaurant').stream()
+        for doc in docs:
+            temp_dict=doc.to_dict()
+            temp_dict['user_id']= doc.id
+            session['restaurantList'].append(temp_dict)
+    return render_template('allRestaurant.html', user=user)
 
 @app.route('/allCustomers')
 @check_token
 def allCustomers():
     user=session['session_user']
-    customerList=[]
-    docs=db.collection('customer').stream()
-    for doc in docs:
-        customerList.append(doc.to_dict())
-        
+    if not "customerList" in session:
+        session['customerList']=[]
+        docs=db.collection('customer').stream()
+        for doc in docs:
+            temp_dict=doc.to_dict()
+            temp_dict['user_id']= doc.id
+            session['customerList'].append(temp_dict)
+    customerList=session['customer_list']
     return render_template('allCustomers.html', user=user, customerList=customerList)
 
 @app.route('/allDeliveryAgents')
 @check_token
 def allDeliveryAgents():
     user=session['session_user']
-    deliveryAgentList=[]
-    docs=db.collection('deliveryAgent').stream()
-    for doc in docs:
-        deliveryAgentList.append(doc.to_dict())
-        
+    if not "deliveryAgentList" in session:
+        session['deliveryAgentList']=[]
+        docs=db.collection('delivery').stream()
+        for doc in docs:
+            temp_dict=doc.to_dict()
+            temp_dict['user_id']= doc.id
+            session['deliveryAgentList'].append(temp_dict)
+    deliveryAgentList=session['deliveryAgentList']
     return render_template('allDeliveryAgents.html', user=user, deliveryAgentList=deliveryAgentList)
+
+@app.route('/delete/<user_type>/<delete_id>')
+@check_token
+def deleteUser(user_type, delete_id):
+    # print(request.args.get(user_type))
+    to_delete = int(delete_id)
+    to_delete=to_delete-1
+    if user_type == "restaurant":
+        user_deleted=session['restaurantList'].pop(to_delete)
+        session.modified = True
+        if not session['restaurantList']:
+            print('restaurant List is empty')
+        print(user_deleted)
+        print()
+        for retaurant in session['restaurantList']:
+            print(retaurant)
+        #add line to remove the database from the firestore
+        #add line to remove user from login system
+        return redirect(url_for('allRestaurant'))
+    elif user_type == "customer":
+        user_deleted = session['customerList'].pop(to_delete)
+        #add line to remove the database from the firestore
+        #add line to remove user from login system
+        return redirect(url_for('allCustomers'))
+    elif user_type == 'deliveryAgent':
+        user_deleted = session['deliveryAgentList'].pop(to_delete)
+        #add line to remove the database from the firestore
+        #add line to remove user from login system
+        return redirect(url_for('allDeliveryAgents'))
 
 if __name__ == "__main__":
     # cache.init_app(app)

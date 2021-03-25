@@ -47,13 +47,13 @@
                           </tr>
                         </thead>
                         <tbody class="mdc-data-table__content">
-                          {% for restaurant in restaurantList %}
+                          {% for restaurant in session['restaurantList'] %}
                           <tr class="mdc-data-table__row">
                             <th class="mdc-data-table__cell" scope="row">{{restaurant['name']}}</th>
                             <td class="mdc-data-table__cell">{{restaurant['name']}}</td>
                             <td class="mdc-data-table__cell">{{restaurant['area']}}</td>
                             <td class="mdc-data-table__cell">{{restaurant['email']}}</td>
-                            <td class="mdc-data-table__cell">{{restaurant['email']}}</td>
+                            <td class="mdc-data-table__cell">{{restaurant['user_id']}}</td>
                             <td class="mdc-data-table__cell">
                                 <a href=# id="anchor-link-nodesign">
                                     <button class="mdc-button mdc-button--raised" name="submit" type="submit">
@@ -78,9 +78,9 @@
                                 </a>
                             </td>
                             <td class="mdc-data-table__cell">
-                                <a href=# id="anchor-link-nodesign">
+                                <a href={{url_for('deleteUser', user_type="restaurant", delete_id=loop.index)}} id="anchor-link-nodesign">
                                     <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-                                        <span class="mdc-button__label">Delete</span>
+                                        <span class="mdc-button__label">Delete {{loop.index}}</span>
                                     </button>
                                 </a>
                             </td>
