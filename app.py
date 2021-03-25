@@ -225,6 +225,7 @@ def token():
         session['session_user']['user_type']=user_type
         session['jwt_token']=user['idToken']
         session['refresh_token']=user['refreshToken']
+        session['user_id']=user['localId']
         print(session['session_user']['user_type'])
         if user_type=="customer" : 
             return redirect(url_for('customerDashboard'))
@@ -364,17 +365,24 @@ def foodItemAdder():
     local_file_obj = request.files['local_file_path']
     
     try:
-        foodItem = { "name" : name, "price" : price}
+        foodItem = {
+            "name" : name,
+            "pricePerItem" : price,
+            "isRecommended": False,
+            "restaurantId" : session["user_id"],
+            "picSrc": ""
+        }
         doc_reference = db.collection("foodItem").document()
         doc_reference.set(foodItem)
         
     except:
         session['food_item_addition_msg'] = "Error adding food item text data in database"
-        # return redirect(url_for('addFoodItem'))
+        return redirect(url_for('addFoodItem'))
     try:
         storage_file_path = "foodItemPics/"+doc_reference.id+".jpg"
         blob = bucket.blob(storage_file_path)
         blob.upload_from_file(local_file_obj,content_type="image/jpeg")
+        db.collection("foodItem").document(doc_reference.id).update({"picSrc":doc_reference.id})
         session['food_item_addition_msg']="Food item text and photo successfully added in database"
         return redirect(url_for('createMenu'))
     except Exception as e:
