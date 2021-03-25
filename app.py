@@ -313,21 +313,25 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route('/createMenu')
+@check_token
 def createMenu():
     user = session['session_user']
     return render_template('createMenu.html', user=user)
 
 @app.route('/addFoodItem')
+@check_token
 def addFoodItem():
     user = session['session_user']
     return render_template('addFoodItem.html', user=user)
 
 @app.route('/finishMenu')
+@check_token
 def finishMenu():
     user = session['session_user']
     return render_template('finishMenu.html', user=user)
 
 @app.route('/addFoodItem/adder', methods=['POST','GET'])
+@check_token
 def foodItemAdder():
     name = request.form['name']
     price = request.form['price']
