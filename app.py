@@ -179,10 +179,10 @@ def signup():
 @app.route("/temp")
 def temp():
     # blob = bucket.blob("customerProfilePics/"+"YQ2pF5uHW7ZCvfpIzUD1sTcZL5n2"+".jpg")
-    blob = bucket.blob("customerProfilePics/"+"4DcnUZkcrdOeJKCY7mPIMq1RSzg2"+".jpg")
+    blob = bucket.blob("restaurantProfilePics/"+"oDtSvO2uB8UE6889JHPRFTLvHJY2"+".jpg")
 
-    str1 = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
-    return str1,200
+    imagePublicURL = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
+    return {"imageLink":imagePublicURL},200
 
 @app.route('/api/token', methods=['POST','GET'])
 def token():
