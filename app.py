@@ -225,7 +225,7 @@ def token():
         session['session_user']['user_type']=user_type
         session['jwt_token']=user['idToken']
         session['refresh_token']=user['refreshToken']
-        print(session['session_user']['user_type'])
+        # print(session['session_user']['user_type'])
         if user_type=="customer" : 
             return redirect(url_for('customerDashboard'))
         elif user_type == "restaurant" : 
