@@ -53,12 +53,12 @@
                           {% for deliveryAgent in session['deliveryAgentList'] %}
                             <tr class="mdc-data-table__row">
                               <th class="mdc-data-table__cell" scope="row">{{deliveryAgent['name']}}</th>
-                              <td class="mdc-data-table__cell">{{deliveryAgent['name']}}</td>
-                              <td class="mdc-data-table__cell">{{deliveryAgent['area']}}</td>
+                              <td class="mdc-data-table__cell">{{deliveryAgent['ratingId']}}</td>
+                              <td class="mdc-data-table__cell">{{deliveryAgent['areaId']}}</td>
                               <td class="mdc-data-table__cell">{{deliveryAgent['gender']}}</td>
-                              <td class="mdc-data-table__cell">{{deliveryAgent['dob']}}</td>
+                              <td class="mdc-data-table__cell">{{deliveryAgent['dateOfBirth']}}</td>
                               <td class="mdc-data-table__cell">{{deliveryAgent['email']}}</td>
-                              <td class="mdc-data-table__cell">{{deliveryAgent['mobile']}}</td>
+                              <td class="mdc-data-table__cell">{{deliveryAgent['mobileNumber']}}</td>
                               {% if user['user_type']=='admin' %}
                                 <td class="mdc-data-table__cell">
                                   <a href={{url_for('deleteUser', user_type="deliveryAgent", delete_id=loop.index)}} id="anchor-link-nodesign">

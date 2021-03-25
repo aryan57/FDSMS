@@ -61,11 +61,11 @@
                                 Yes
                               {% endif %}
                             </td>
-                    
+                            {% if user['user_type'] == 'customer' %}
                             <td class="col-2 mdc-data-table__cell">
                                 <input type="number" class="mdc-text-field__input" aria-labelledby="my-label-id" value="0" name={{loop.index}} required min="0">
                             </td>
-                            {% if user['user_type'] == "admin" %}
+                            {% elif user['user_type'] == "admin" %}
                             <td class="mdc-data-table__cell">
                                 <a href=# id="anchor-link-nodesign">
                                     <button class="mdc-button mdc-button--raised" name="submit" type="submit">
@@ -84,6 +84,7 @@
                   {% endif %}
               </div>
           </div>
+          {% if user['user_type'] == 'customer' %}
           <div class='row justify-content-center'>
             <div class='col-auto align-self-center'>
               <button class="mdc-button mdc-button--raised" name="submit" type="submit">
@@ -91,6 +92,7 @@
               </button>
             </div> 
           </div>
+          {% endif %}
       </div>
     </form>
   </main>

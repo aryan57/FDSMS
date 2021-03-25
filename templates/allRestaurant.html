@@ -54,10 +54,14 @@
                           {% for restaurant in session['restaurantList'] %}
                           <tr class="mdc-data-table__row">
                             <th class="mdc-data-table__cell" scope="row">{{restaurant['name']}}</th>
-                            <td class="mdc-data-table__cell">{{restaurant['name']}}</td>
-                            <td class="mdc-data-table__cell">{{restaurant['area']}}</td>
+                            <td class="mdc-data-table__cell">{{restaurant['ratingId']}}</td>
+                            <td class="mdc-data-table__cell">{{restaurant['areaId']}}</td>
+                            <td class="mdc-data-table__cell">
+                              {% if restaurant['isRecommended'] %}
+                                Yes
+                              {% endif %}
+                            </td>
                             <td class="mdc-data-table__cell">{{restaurant['email']}}</td>
-                            <td class="mdc-data-table__cell">{{restaurant['user_id']}}</td>
                             <td class="mdc-data-table__cell">
                                 <a href={{url_for('allFoodItem11', restaurantUserId = restaurant['user_id'] )}} id="anchor-link-nodesign">
                                     <button class="mdc-button mdc-button--raised" name="submit" type="submit">
