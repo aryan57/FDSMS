@@ -301,7 +301,7 @@ def deliveryAgentDashboard():
 def adminDashboard():
     print(type(session))
     user=session['session_user']
-    if user == 'admin':
+    if user['user_type'] == 'admin':
         return render_template('adminDashboard.html', user=user)
     else:
         return redirect(url_for('logout'))
@@ -323,7 +323,8 @@ def logout():
 @check_token
 def createMenu():
     user = session['session_user']
-    if user == 'restaurant':
+    print(user)
+    if user['user_type'] == 'restaurant':
         return render_template('createMenu.html', user=user)
     else:
         return redirect(url_for('logout'))
@@ -332,7 +333,7 @@ def createMenu():
 @check_token
 def addFoodItem():
     user = session['session_user']
-    if user == 'restaurant':
+    if user['user_type'] == 'restaurant':
         return render_template('addFoodItem.html', user=user)
     else:
         return redirect(url_for('logout'))
@@ -341,7 +342,7 @@ def addFoodItem():
 @check_token
 def finishMenu():
     user = session['session_user']
-    if user=='restaurant':
+    if user['user_type']=='restaurant':
         return render_template('finishMenu.html', user=user)
     else:
         return redirect(url_for('logout'))
@@ -377,7 +378,7 @@ def foodItemAdder():
 @check_token
 def allRestaurant():
     user=session['session_user']
-    if not user == 'admin' and not user == 'customer':
+    if not user['user_type'] == 'admin' and not user['user_type'] == 'customer':
         return redirect(url_for('logout'))
     if session.get('restaurantList') == None:
         session['restaurantList']=[]
@@ -392,7 +393,7 @@ def allRestaurant():
 @check_token
 def allCustomers():
     user=session['session_user']
-    if not user=="admin":
+    if not user['user_type']=="admin":
         return redirect(url_for('logout'))
     if not "customerList" in session:
         session['customerList']=[]
@@ -407,7 +408,7 @@ def allCustomers():
 @check_token
 def allDeliveryAgents():
     user=session['session_user']
-    if not user=="admin" and not user=='restaurant':
+    if not user['user_type']=="admin" and not user['user_type']=='restaurant':
         return redirect(url_for('logout'))
     if session.get('deliveryAgentList')==None or not session['deliveryAgentList']:
         session['deliveryAgentList']=[]
@@ -435,7 +436,7 @@ def deleteUserFromDatabase(to_delete):
 @check_token
 def deleteUser(user_type, delete_id):
     # print(request.args.get(user_type))
-    if not session['session_user'] == "admin":
+    if not session['session_user']['user_type'] == "admin":
         return redirect(url_for('logout'))
     to_delete = int(delete_id)
     to_delete=to_delete-1
