@@ -7,17 +7,16 @@
 {% block main %}
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-3"></div>
-      <div class="col-6 align-self-center">
+      <div class="col-auto align-self-center">
         <h1>Add Food Item</h1>
       </div>
     </div>
     {% if message!="False" %}
-    <div class="row justify-content-center">
-      <div class="col-auto align-self-center">
-        {{ message }}
+      <div class="row justify-content-center">
+        <div class="col-auto align-self-center">
+          {{ message }}
+        </div>
       </div>
-    </div>
     {% endif %}
     <form action={{url_for('foodItemAdder')}} method="POST" enctype="multipart/form-data">
       <div class="row justify-content-center">

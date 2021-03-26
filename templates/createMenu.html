@@ -15,6 +15,13 @@
         </a>
       </div>
     </div>
+    <div class='p-3 row justify-content-center'>
+      <div class='col-auto align-self-center'>
+        {% if message != "False" %}
+          message
+        {% endif %}
+      </div>
+    </div>
     <div class="row justify-content-center">
       <div class="col-auto align-self-center">
         {% if not menuList %}
@@ -29,7 +36,6 @@
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Rating</th>
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Price</th>
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recommended</th>
-                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Update Item</th>
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Delete Item</th>
                   </tr>
                 </thead>
@@ -37,7 +43,7 @@
                   {% for foodItem in menuList %}
                     <tr class="mdc-data-table__row">
                       <th class="mdc-data-table__cell" scope="row">{{foodItem['name']}}</th>
-                      <td class="mdc-data-table__cell">{{foodItem['rating']}}</td>
+                      <td class="mdc-data-table__cell">{{foodItem['ratingId']}}</td>
                       <td class="mdc-data-table__cell">{{foodItem['pricePerItem']}}</td>
                       <td class="mdc-data-table__cell">
                         {% if foodItem['isRecommended'] %}
@@ -45,14 +51,7 @@
                         {% endif %}
                       </td>
                       <td class="mdc-data-table__cell">
-                        <a href=# id="anchor-link-nodesign">
-                          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-                            <span class="mdc-button__label">Update</span>
-                          </button>
-                        </a>
-                      </td>
-                      <td class="mdc-data-table__cell">
-                        <a href=# id="anchor-link-nodesign">
+                        <a href=url_for('deleteFoodItem', foodItemId=foodItem['foodItemId']) id="anchor-link-nodesign">
                           <button class="mdc-button mdc-button--raised" name="submit" type="submit">
                             <span class="mdc-button__label">Delete</span>
                           </button>

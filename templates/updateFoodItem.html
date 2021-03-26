@@ -18,6 +18,7 @@
         </div>
       </div>
     {% endif %}
+    {% set session['foodItemUpdating'] = item['foodItemId'] %}
     <form action={{url_for('foodItemAdder')}} method="POST" enctype="multipart/form-data">
       <div class="row justify-content-center">
         <div class="col align-self-center">          

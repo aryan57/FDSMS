@@ -375,14 +375,22 @@ def createMenu():
         print(temp_dict)
         temp_dict['food_item_id']= doc.id
         foodItemList.append(temp_dict)
-    return render_template('createMenu.html', user=user, menuList=foodItemList)
+    if session['food_item_addition_msg']:
+        message=session['food_item_addition_msg']
+        session['food_item_addition_msg']="False"
+    else:
+        session['food_item_addition_msg']="False"
+        message="False"
+    return render_template('createMenu.html', user=user, menuList=foodItemList, message=message)
 
 @app.route('/addFoodItem')
 @check_token
 def addFoodItem():
     user = session['session_user']
     if user['user_type'] == 'restaurant':
-        return render_template('addFoodItem.html', user=user)
+        message=session['food_item_addition_msg']
+        session['food_item_addition_msg']="False"
+        return render_template('addFoodItem.html', user=user, message=message)
     else:
         return redirect(url_for('logout'))
 
@@ -407,11 +415,13 @@ def foodItemAdder():
             "name" : name,
             "pricePerItem" : price,
             "isRecommended": False,
+            "ratingId": "",
             "restaurantId" : session["user_id"],
             "picSrc": ""
         }
         doc_reference = db.collection("restaurant").document(session["user_id"]).collection("foodItem").document()
         doc_reference.set(foodItem)
+        doc_reference1 = db.collection("restaurant").document(session["user_id"]).collection("foodItem").document(doc_reference.id).update({"foodItemId":doc_reference.id})
         # return {"ok":"True"},200
         
     except:
@@ -422,7 +432,7 @@ def foodItemAdder():
         blob = bucket.blob(storage_file_path)
         blob.upload_from_file(local_file_obj,content_type="image/jpeg")
         doc_reference = db.collection("restaurant").document(session["user_id"]).collection("foodItem").document(doc_reference.id).update({"picSrc":storage_file_path})
-        session['food_item_addition_msg']="Food item text and photo successfully added in database"
+        session['food_item_addition_msg']="Food item text and photo successfully added in database."
         return redirect(url_for('createMenu'))
     except Exception as e:
         print(e)
@@ -436,15 +446,15 @@ def allRestaurant():
     user=session['session_user']
     if not user['user_type'] == 'admin' and not user['user_type'] == 'customer':
         return redirect(url_for('logout'))
-    if session.get('restaurantList') == None:
-        session['restaurantList']=[]
-        
-        docs=db.collection('restaurant').stream()
-        for doc in docs:
-            temp_dict=doc.to_dict()
-            temp_dict['user_id']= doc.id
-            session['restaurantList'].append(temp_dict)
-    return render_template('allRestaurant.html', user=user)
+    session['restaurantList']=[]
+    
+    docs=db.collection('restaurant').stream()
+    for doc in docs:
+        temp_dict=doc.to_dict()
+        temp_dict['user_id']= doc.id
+        session['restaurantList'].append(temp_dict)
+    restaurantList=session['restaurantList']
+    return render_template('allRestaurant.html', user=user, restaurantList=restaurantList)
 
 @app.route('/allCustomers')
 @check_token
@@ -452,13 +462,12 @@ def allCustomers():
     user=session['session_user']
     if not user['user_type']=="admin":
         return redirect(url_for('logout'))
-    if not "customerList" in session:
-        session['customerList']=[]
-        docs=db.collection('customer').stream()
-        for doc in docs:
-            temp_dict=doc.to_dict()
-            temp_dict['user_id']= doc.id
-            session['customerList'].append(temp_dict)
+    session['customerList']=[]
+    docs=db.collection('customer').stream()
+    for doc in docs:
+        temp_dict=doc.to_dict()
+        temp_dict['user_id']= doc.id
+        session['customerList'].append(temp_dict)
     return render_template('allCustomers.html', user=user)
 
 @app.route('/allDeliveryAgents')
@@ -467,13 +476,12 @@ def allDeliveryAgents():
     user=session['session_user']
     if not user['user_type']=="admin" and not user['user_type']=='restaurant':
         return redirect(url_for('logout'))
-    if session.get('deliveryAgentList')==None or not session['deliveryAgentList']:
-        session['deliveryAgentList']=[]
-        docs=db.collection('deliveryAgent').stream()
-        for doc in docs:
-            temp_dict=doc.to_dict()
-            temp_dict['user_id']= doc.id
-            session['deliveryAgentList'].append(temp_dict)
+    session['deliveryAgentList']=[]
+    docs=db.collection('deliveryAgent').stream()
+    for doc in docs:
+        temp_dict=doc.to_dict()
+        temp_dict['user_id']= doc.id
+        session['deliveryAgentList'].append(temp_dict)
     return render_template('allDeliveryAgents.html', user=user)
 
 @app.route('/allFoodItem11/<restaurantUserId>')
@@ -498,6 +506,7 @@ def allFoodItem():
         print(temp_dict)
         temp_dict['food_item_id']= doc.id
         foodItemList.append(temp_dict)
+    session['current_menu_viewed']=foodItemList
     return render_template('allFoodItem.html', user=user,foodItemList=foodItemList)
 
 def deleteUserFromDatabase(to_delete):
@@ -588,6 +597,63 @@ def redirectDashboard():
         return redirect(url_for('deliverAgentDashboard'))
     elif session['session_user']['user_type']=='admin':
         return redirect(url_for('adminDashboard'))
+    
+@app.route('/deleteFoodItem<foodItemId>')
+@check_token
+def deleteFoodItem(foodItemId):
+    restaurantId=session['user_id']
+    #command_to delete the id
+    return redirect(url_for('createMenu'))
+
+@app.route('/changeRecommendRestaurant<id_to_change>')
+@check_token
+def changeRecommendRestaurant(id_to_change):
+    id=int(id_to_change)
+    id=id-1
+    if session['restaurantList'][id]['isRecommended'] == False:
+        session['restaurantList'][id]['isRecommended'] = True
+        session.modified = True
+        #change in database
+    else :
+        session['restaurantList'][id]['isRecommended'] = False
+        session.modified = True
+        #change in database
+    return redirect(url_for('allRestaurant'))
+
+@app.route('/changeRecommendFoodItem<id_to_change>')
+@check_token
+def changeRecommendRestaurant(id_to_change):
+    id=int(id_to_change)
+    id=id-1
+    if session['current_menu_viewed'][id]['isRecommended'] == False:
+        session['restaurantList'][id]['isRecommended'] = True
+        session.modified = True
+        #change in database
+    else :
+        session['current_menu_viewed'][id]['isRecommended'] = False
+        session.modified = True
+        #change in database
+    return redirect(url_for('allRestaurant'))
+
+@app.route('/recommendedRestaurant')
+@check_token
+def recommendedRestaurant():
+    user=session['session_user']
+    if not user['user_type'] == 'customer':
+        return redirect(url_for('logout'))
+    if session.get('restaurantList') == None:
+        session['restaurantList']=[]
+        docs=db.collection('restaurant').stream()
+        for doc in docs:
+            temp_dict=doc.to_dict()
+            temp_dict['user_id']= doc.id
+            session['restaurantList'].append(temp_dict)
+    restaurantList=[]
+    for restaurant in session['restaurantList']:
+        if restaurant['isRecommended']:
+            restaurantList.append(restaurant)
+    
+    return render_template('recommendedRestaurant.html', restaurantList, user=user)
         
 
 if __name__ == "__main__":

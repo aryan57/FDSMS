@@ -58,7 +58,7 @@
                           </td>
                         {% elif user['user_type'] == "admin" %}
                           <td class="mdc-data-table__cell">
-                            <a href=# id="anchor-link-nodesign">
+                            <a href= url_for('changeRecommendFoodItem', id_to_chang=loop.index) id="anchor-link-nodesign">
                               <button class="mdc-button mdc-button--raised" name="submit" type="submit">
                                 <span class="mdc-button__label">Change</span>
                               </button>

@@ -1,7 +1,7 @@
 {% extends 'topBarAdded.html' %}
 
 {% block title %}
-  <title>Restaurant List</title>
+  <title>Recommended Restaurant</title>
 {% endblock %}
 
 
@@ -37,9 +37,6 @@
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Menu</th>
                     {% if user['user_type'] == "customer" %}
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Order Now</th>
-                    {% elif user['user_type'] == "admin" %}
-                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recommend</th>
-                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Delete User</th>
                     {% endif %}
                   </tr>
                 </thead>
@@ -67,21 +64,6 @@
                           <a href={{url_for('allFoodItem11', restaurantUserId = restaurant['user_id'] )}} id="anchor-link-nodesign">
                             <button class="mdc-button mdc-button--raised" name="submit" type="submit">
                               <span class="mdc-button__label">Click Here</span>
-                            </button>
-                          </a>
-                        </td>
-                      {% elif user['user_type'] == "admin" %}
-                        <td class="mdc-data-table__cell">
-                          <a href=url_for('changeRecommendRestaurant', id_to_change=loop.index) id="anchor-link-nodesign">
-                            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-                              <span class="mdc-button__label">Change</span>
-                            </button>
-                          </a>
-                        </td>
-                        <td class="mdc-data-table__cell">
-                          <a href={{url_for('deleteUser', user_type="restaurant", delete_id=loop.index)}} id="anchor-link-nodesign">
-                            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-                              <span class="mdc-button__label">Delete</span>
                             </button>
                           </a>
                         </td>
