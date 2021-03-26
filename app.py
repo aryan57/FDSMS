@@ -375,10 +375,10 @@ def createMenu():
         print(temp_dict)
         temp_dict['food_item_id']= doc.id
         foodItemList.append(temp_dict)
-    if session['food_item_addition_msg']:
+    try:
         message=session['food_item_addition_msg']
         session['food_item_addition_msg']="False"
-    else:
+    except: 
         session['food_item_addition_msg']="False"
         message="False"
     return render_template('createMenu.html', user=user, menuList=foodItemList, message=message)
@@ -622,7 +622,7 @@ def changeRecommendRestaurant(id_to_change):
 
 @app.route('/changeRecommendFoodItem<id_to_change>')
 @check_token
-def changeRecommendRestaurant(id_to_change):
+def changeRecommendFoodItem(id_to_change):
     id=int(id_to_change)
     id=id-1
     if session['current_menu_viewed'][id]['isRecommended'] == False:

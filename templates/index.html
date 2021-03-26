@@ -1,44 +1,65 @@
-{% extends 'topBarAdded.html' %}
+{% extends 'base.html' %}
 
 
 {% block head %}
-
 <title>First Page</title>
+<link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/textField.css')}}>
+<link rel="stylesheet" type="text/css" href ={{ url_for('static', filename='css/signupCSS.css')}}>
+{% endblock %}
+
+{% block body %}
+
+<header class="mdc-top-app-bar">
+    <div class="mdc-top-app-bar__row">
+      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+        <a href={{url_for('index')}} id = "anchor-link-nodesign">
+          <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Open navigation menu" disabled>room_service</button>
+        </a>
+        <span class="mdc-top-app-bar__title">Zomato</span>
+      </section>
+      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+        <a href={{ url_for('signUp')}} id="anchor-link-nodesign">
+          <div class="mdc-touch-target-wrapper">
+            <button class="mdc-button mdc-button--raised">
+              <span class="mdc-button__ripple"></span>
+              <span class="mdc-button__label">Signup</span>
+              <!-- <span class="mdc-button__touch"></span> -->
+            </button>
+          </div>    
+        </a>
+        <button class="mdc-button" disabled>
+          <span class="mdc-button__ripple"></span>
+          <span class="mdc-button__label"></span>
+        </button>   
+        <a href={{ url_for('login')}} id="anchor-link-nodesign">
+          <div class="mdc-touch-target-wrapper">
+            <button class="mdc-button mdc-button--raised">
+              <span class="mdc-button__ripple"></span>
+              <span class="mdc-button__label">Login</span>
+              <!-- <span class="mdc-button__touch"></span> -->
+            </button>
+          </div>  
+        </a>
+        <button class="mdc-button" disabled>
+          <span class="mdc-button__ripple"></span>
+          <span class="mdc-button__label"></span>
+        </button> 
+        <a href={{ url_for('redirectDashboard')}} id="anchor-link-nodesign">
+          <div class="mdc-touch-target-wrapper">
+            <button class="mdc-button mdc-button--raised">
+              <span class="mdc-button__ripple"></span>
+              <span class="mdc-button__label">Dashboard</span>
+            </button>
+          </div>  
+        </a> 
+        <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Go Back" onclick="history.back()">arrow_back</button>
+      </section>
+    </div>
+  </header>
+
+  <main class="mdc-top-app-bar--fixed-adjust bkg-img-home">
+  </main>
 
 {% endblock %}
 
-{% block topBarButtons %}
-      <a href={{ url_for('signUp')}} id="anchor-link-nodesign">
-        <div class="mdc-touch-target-wrapper">
-          <button class="mdc-button mdc-button--raised">
-            <span class="mdc-button__ripple"></span>
-            <span class="mdc-button__label">Signup</span>
-            <!-- <span class="mdc-button__touch"></span> -->
-          </button>
-        </div>    
-      </a>
-      <button class="mdc-button" disabled>
-        <span class="mdc-button__ripple"></span>
-        <span class="mdc-button__label"></span>
-      </button>   
-      <a href={{ url_for('login')}} id="anchor-link-nodesign">
-        <div class="mdc-touch-target-wrapper">
-          <button class="mdc-button mdc-button--raised">
-            <span class="mdc-button__ripple"></span>
-            <span class="mdc-button__label">Login</span>
-            <!-- <span class="mdc-button__touch"></span> -->
-          </button>
-        </div>  
-      </a>
-      <button class="mdc-button" disabled>
-        <span class="mdc-button__ripple"></span>
-        <span class="mdc-button__label"></span>
-      </button> 
-{% endblock %} 
-
-{% block main %}
-
-<div class="bkg-img-home">
-</div>
-{% endblock %}
       
