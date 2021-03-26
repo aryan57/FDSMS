@@ -104,31 +104,18 @@ def restaurantsignup():
         session['sign_message']="error uploading photo in firebase storage"
         return redirect(url_for('restaurantSignup'))
 
-@app.route('/signup/deliveryAgent', methods=['POST', 'GET'])
-def deliveryAgentsignup():
-    email = request.form['email']
-    password = request.form['password']
-    gender = request.form['gender']
-    area = request.form['area']
-    mobile = request.form['mobile']
-    dob = request.form['dob']
-    name = request.form['name']
-    local_file_obj = request.files['local_file_path']
-    session['sign_message']="Fail"
-    storage_file_path = ""
-    if area=='Other':
-        session['sign_message'] = "We currently don't deliver in your area."
-        return redirect(url_for('deliveryAgentSignup'))
 
+def testDeliveryAgentsignup(email,password,gender,area,mobile,dob,name,local_file_path):
+    storage_file_path = ""
+    error_message=[]
     try:
         user = auth.create_user(
             email=email,
             password=password
         )
         storage_file_path = "deliveryProfilePics/"+user.uid+".jpg"
-    except:
-        session['sign_message']="error creating user in firebase"
-        return redirect(url_for('deliveryAgentSignup'))
+    except Exception as e:
+        error_message.append(str(e))
     
     try:
         json_data = {
@@ -145,19 +132,20 @@ def deliveryAgentsignup():
         }
         db.collection("deliveryAgent").document(user.uid).set(json_data)
         db.collection("type").document(user.uid).set({"type" : "deliveryAgent"})
-    except:
-        session['sign_message']="error adding user text data in firestore"
-        return redirect(url_for('deliveryAgentSignup'))
+    except Exception as e:
+        error_message.append(str(e))
     try:
         
         blob = bucket.blob(storage_file_path)
-        blob.upload_from_file(local_file_obj,content_type="image/jpeg")
-        session['sign_message']="Delivery Agent SignedUp. Please Login"
-        return redirect(url_for('login'))
-    except:
-        session['sign_message']="error uploading photo in firebase storage"
-        return redirect(url_for('deliveryAgentSignup'))
+        blob.upload_from_filename(local_file_path,content_type="image/jpeg")
+    except Exception as e:
+        error_message.append(str(e))
 
+    if(len(error_message)==0):
+        return "PASSED\n"
+    else :
+        # print(error_message)
+        return "FAILED\n"
 
 
 @app.route('/signup/customer', methods=['POST','GET'])
