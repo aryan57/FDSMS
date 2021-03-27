@@ -125,7 +125,7 @@ def deliveryAgentsignup():
             email=email,
             password=password
         )
-        storage_file_path = "deliveryProfilePics/"+user.uid+".jpg"
+        storage_file_path = "deliveryAgent/"+user.uid+".jpg"
     except:
         session['sign_message']="error creating user in firebase"
         return redirect(url_for('deliveryAgentSignup'))
@@ -181,7 +181,7 @@ def customersignup():
             email=email,
             password=password
         )
-        storage_file_path = "customerProfilePics/"+user.uid+".jpg"
+        storage_file_path = "customer/"+user.uid+".jpg"
     except:
         session['sign_message']="error creating user in firebase"
         return redirect(url_for('customerSignup'))
@@ -217,31 +217,13 @@ def customersignup():
 
 @app.route("/temp")
 def temp():
-    # blob = bucket.blob("customerProfilePics/"+"YQ2pF5uHW7ZCvfpIzUD1sTcZL5n2"+".jpg")
-    blob = bucket.blob("restaurantProfilePics/"+"oDtSvO2uB8UE6889JHPRFTLvHJY2"+".jpg")
+    # blob = bucket.blob("customer/"+"YQ2pF5uHW7ZCvfpIzUD1sTcZL5n2"+".jpg")
+    blob = bucket.blob("restaurant/"+"oDtSvO2uB8UE6889JHPRFTLvHJY2"+".jpg")
 
     imagePublicURL = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
     return {"imageLink":imagePublicURL},200
 
-@app.route("/temp/delete")
-# @check_token
-def delete_user():
-    to_delete="2feA7KRsIHgN3inJdxzcpxhxaGq1"
 
-    try:
-        auth.delete_user(to_delete)
-    except:
-        print("user not found")
-    
-    try:
-        user_type = db.collection('type').document(to_delete).get().to_dict()["type"]
-        db.collection(user_type).document(to_delete).delete()
-    except :
-        print("user not found in collection : type ")
-        
-    db.collection("type").document(to_delete).delete()
-
-    return {"user_id":to_delete},200
 
 @app.route('/api/token', methods=['POST','GET'])
 def token():
