@@ -51,7 +51,7 @@
                       <td class="mdc-data-table__cell">{{customer['email']}}</td>
                       <td class="mdc-data-table__cell">{{customer['mobileNumber']}}</td>
                       <td class="mdc-data-table__cell">
-                        <a href={{url_for('giveOffer', customer_id=loop.index)}} id="anchor-link-nodesign">
+                        <a href={{url_for('allOffer', customer_id=loop.index)}} id="anchor-link-nodesign">
                           <button class="mdc-button mdc-button--raised" name="submit" type="submit">
                             <span class="mdc-button__label">Give Offer</span>
                           </button>

@@ -741,6 +741,36 @@ def offerAdder():
         session['offerAdditionMessage'] = "Error adding offer in database"
         return redirect(url_for('addOffer'))
 
+@app.route('/allOffer<customer_id>')
+@check_token
+def allOffer(customer_id):
+    customer_id=int(customer_id)
+    customer_id=customer_id-1
+    session['customerGettingOffer']=session['customerList'][customer_id]['customerId']
+    
+    session['offerList']=[]
+    #add sentence for getting the docs of the offer.
+    for doc in docs:
+        session['offerList'].append(doc.to_dict())
+        
+    offerList=session['offerList']
+    return render_template(url_for('allOfferAdmin.html', offerList=offerList))
+
+
+@app.route('/giveOffer<toGive>')
+@check_token
+def giveOffer(toGive):
+    toGive=int(toGive)
+    toGive=toGive-1
+
+    customerGettingOffer=session['customerGettingOffer']
+    offerId=session['offerList'][toGive]['offerId']
+    
+    # push that id in the list by creating a copy of that offer
+    
+    return redirect(url_for('allCustomers'))
+
+
 
 if __name__ == "__main__":
     # cache.init_app(app)
