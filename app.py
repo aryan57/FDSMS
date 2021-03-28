@@ -563,10 +563,28 @@ def deleteUser(user_type, delete_id):
         return redirect(url_for('allDeliveryAgents'))
     
     
-@app.route('/order')
+@app.route('/order', methods=['POST','GET'])
 @check_token
 def order():
-    pass
+    foodItemList = session['current_menu_viewed']
+    
+    cost = 0
+    orderList = []
+    for i in range(len(foodItemList)):
+        if(request.form[str(i+1)]):
+            foodItemList[i]['frequency'] = request.form[str(i+1)]
+            orderList.append(foodItemList[i])
+            cost += int(foodItemList[i]['pricePerItem']) * int(foodItemList[i]['frequency'])
+            
+    session['currentOrderCreating'] = {'cost': cost, 
+            'orderList': orderList, 
+            'deliveryChange': 50,
+            'isPending': True,
+            'customerId': session['user_id'],
+            'restaurantId': foodItemList[0]['restaurantId'],
+            'offerId': None
+    }
+    return render_template('orderDetails.html')
 
 @app.route('/redirectDashboard')
 @check_token
