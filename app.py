@@ -762,6 +762,46 @@ def offerAdder():
         session['offerAdditionMessage'] = "Error adding offer in database"
         return redirect(url_for('addOffer'))
 
+@app.route('/allOffer<customer_id>')
+@check_token
+def allOffer(customer_id):
+    customer_id=int(customer_id)
+    customer_id=customer_id-1
+    session['customerGettingOffer']=session['customerList'][customer_id]['customerId']
+    
+    session['offerList']=[]
+    docs = db.collection('offer').stream()
+    for doc in docs:
+        session['offerList'].append(doc.to_dict())
+        
+    offerList=session['offerList']
+    return render_template(url_for('allOfferAdmin.html', offerList=offerList))
+
+
+@app.route('/giveOffer<toGive>')
+@check_token
+def giveOffer(toGive):
+    toGive=int(toGive)
+    toGive=toGive-1
+
+    customerGettingOffer=session['customerGettingOffer']
+    offerId=session['offerList'][toGive]['offerId']
+    
+    try:
+        offer_json_data = db.collection('offer').document(offerId).get().to_dict()
+        doc_reference = db.collection("customer").document(customerGettingOffer).collection("promotionalOfferId").document()
+        doc_reference.set(offer_json_data)
+        # doc_reference1 = db.collection("customer").document(customerGettingOffer).collection("foodItem").document(doc_reference.id).update({"foodItemId":doc_reference.id})
+        # return {"ok":"True"},200
+        
+    except:
+        # Error creating offer for customer in database
+        # return redirect(url_for('allOffer'))
+        pass
+    
+    return redirect(url_for('allCustomers'))
+
+
 
 if __name__ == "__main__":
     # cache.init_app(app)
