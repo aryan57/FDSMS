@@ -767,7 +767,7 @@ def allOffer(customer_id):
     session['customerGettingOffer']=session['customerList'][customer_id]['customerId']
     
     session['offerList']=[]
-    #add sentence for getting the docs of the offer.
+    docs = db.collection('offer').stream()
     for doc in docs:
         session['offerList'].append(doc.to_dict())
         
@@ -784,7 +784,17 @@ def giveOffer(toGive):
     customerGettingOffer=session['customerGettingOffer']
     offerId=session['offerList'][toGive]['offerId']
     
-    # push that id in the list by creating a copy of that offer
+    try:
+        offer_json_data = db.collection('offer').document(offerId).get().to_dict()
+        doc_reference = db.collection("customer").document(customerGettingOffer).collection("promotionalOfferId").document()
+        doc_reference.set(offer_json_data)
+        # doc_reference1 = db.collection("customer").document(customerGettingOffer).collection("foodItem").document(doc_reference.id).update({"foodItemId":doc_reference.id})
+        # return {"ok":"True"},200
+        
+    except:
+        # Error creating offer for customer in database
+        # return redirect(url_for('allOffer'))
+        pass
     
     return redirect(url_for('allCustomers'))
 
