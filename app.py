@@ -485,7 +485,7 @@ def allFoodItem():
     docs=db.collection('restaurant').document(session['currentRestaurantMenuId']).collection('foodItem').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
-        print(temp_dict)
+        # print(temp_dict)
         temp_dict['food_item_id']= doc.id
         foodItemList.append(temp_dict)
     session['current_menu_viewed']=foodItemList
@@ -635,8 +635,81 @@ def recommendedRestaurant():
         if restaurant['isRecommended']:
             restaurantList.append(restaurant)
     
-    return render_template('recommendedRestaurant.html', restaurantList, user=user)
+    return render_template('recommendedRestaurant.html', restaurantList=restaurantList, user=user)
         
+
+@app.route('/createOffer')
+@check_token
+def createOffer():
+    user = session['session_user']
+    if not user['user_type'] == 'admin':
+        return redirect(url_for('logout'))
+    currentAdminId=session['user_id']
+    offerList=[]
+    # Add statement for getting a docs for the offers
+    # docs=db.collection('restaurant').document(currentRestaurantMenuId).collection('foodItem').stream()
+    for doc in docs:
+        temp_dict=doc.to_dict()
+        temp_dict['offerId']= doc.id
+        offerList.append(temp_dict)
+    try:
+        message=session['offerAdditionMessage']
+        session['offerAdditionMessage']="False"
+    except: 
+        session['offerAdditionMessage']="False"
+        message="False"
+    return render_template('createOffer.html', user=user, offerList=offerList, message=message)
+
+@app.route('/addOffer')
+@check_token
+def addOffer():
+    user = session['session_user']
+    if user['user_type'] == 'admin':
+        message=session['offerAdditionMessage']
+        session['offerAdditionMessage']="False"
+        return render_template('addOffer.html', user=user, message=message)
+    else:
+        return redirect(url_for('logout'))
+
+@app.route('/addOffer/adder', methods=['POST','GET'])
+@check_route
+def offerAdder():
+    name = request.form['name']
+    discount = request.form['discount']
+    price = request.files['price']
+    
+    try:
+        offer = {
+            "name" : name,
+            "discount" : discount,
+            "upperLimit": price
+        }
+        
+        # Chenges to be done here
+        # doc_reference = db.collection("restaurant").document(session["user_id"]).collection("foodItem").document()
+        # doc_reference.set(foodItem)
+        # doc_reference1 = db.collection("restaurant").document(session["user_id"]).collection("foodItem").document(doc_reference.id).update({"foodItemId":doc_reference.id})
+        # return {"ok":"True"},200
+        
+    except:
+        session['offerAdditionMessage'] = "Error adding offer text data in database"
+        return redirect(url_for('addFoodItem'))
+    try:
+        
+        Take care of the
+        
+        # storage_file_path = "restaurant/"+session["user_id"]+"_"+doc_reference.id+".jpg"
+        # blob = bucket.blob(storage_file_path)
+        # blob.upload_from_file(local_file_obj,content_type="image/jpeg")
+        # doc_reference = db.collection("restaurant").document(session["user_id"]).collection("foodItem").document(doc_reference.id).update({"picSrc":storage_file_path})
+        session['offerAdditionMessage']="Offer added successfully."
+        return redirect(url_for('createOffer'))
+    except Exception as e:
+        print(e)
+        session['food_item_addition_msg']="error uploading photo in firebase storage"
+        return redirect(url_for('addOffer'))
+
+
 
 if __name__ == "__main__":
     # cache.init_app(app)

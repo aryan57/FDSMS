@@ -18,7 +18,9 @@
 {% endblock %}
 
 {% block main %}
+  {% if user['user_type']  == 'customer' %}
   <form action={{url_for('order')}} method="POST">
+  {% endif %}
     <div class='container-fluid' >
       <div class='row justify-content-center'>
         <div class='col-auto align-self-center'>
@@ -58,8 +60,8 @@
                           </td>
                         {% elif user['user_type'] == "admin" %}
                           <td class="mdc-data-table__cell">
-                            <a href= url_for('changeRecommendFoodItem', id_to_chang=loop.index) id="anchor-link-nodesign">
-                              <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+                            <a href= {{url_for('changeRecommendFoodItem', id_to_change=loop.index)}} id="anchor-link-nodesign">
+                              <button class="mdc-button mdc-button--raised" name="submit">
                                 <span class="mdc-button__label">Change</span>
                               </button>
                             </a>
@@ -84,8 +86,9 @@
         </div>
       {% endif %}
     </div>
+  {% if user['user_type'] == 'customer' %}
   </form>
-
+  {% endif %}
   <script>
     const textField4 = new mdc.dataTable.MDCDataTable(document.querySelector('.mdc-data-table'));
   </script>

@@ -1,14 +1,14 @@
 {% extends 'topBarAdded.html' %}
 
 {% block title %}
-  <title>Add Food Item</title>
+  <title>Add Offer</title>
 {% endblock %}
 
 {% block main %}
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-auto align-self-center">
-        <h1>Add Food Item</h1>
+        <h1>Add Offer/h1>
       </div>
     </div>
     {% if message!="False" %}
@@ -18,7 +18,7 @@
         </div>
       </div>
     {% endif %}
-    <form action={{url_for('foodItemAdder')}} method="POST" enctype="multipart/form-data">
+    <form action={{url_for('offerAdder')}} method="POST" enctype="multipart/form-data">
       <div class="row justify-content-center">
         <div class="col align-self-center">          
           <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-1">
@@ -26,7 +26,7 @@
             <span class="mdc-notched-outline">
               <span class="mdc-notched-outline__leading"></span>
               <span class="mdc-notched-outline__notch">
-                <span class="mdc-floating-label" id="my-label-id" required>Name of Food Item</span>
+                <span class="mdc-floating-label" id="my-label-id" required>Offer Name</span>
               </span>
               <span class="mdc-notched-outline__trailing"></span>
             </span>
@@ -41,21 +41,24 @@
             <span class="mdc-notched-outline">
               <span class="mdc-notched-outline__leading"></span>
               <span class="mdc-notched-outline__notch">
-                <span class="mdc-floating-label" id="my-label-id" required>Price(in Rupees)</span>
+                <span class="mdc-floating-label" id="my-label-id" required>Discount(in percentage)</span>
               </span>
               <span class="mdc-notched-outline__trailing"></span>
             </span>
-            <input type="text" class="mdc-text-field__input" aria-labelledby="my-label-id" name="price" required min="0">
+            <input type="number" class="mdc-text-field__input" aria-labelledby="my-label-id" name="discount" required min='0'>
           </label>
         </div>
         <div class="col-6 align-self-center">
-          <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon">
-            <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">insert_photo</i>
+          <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-3">
+            <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">attach_money</i>
             <span class="mdc-notched-outline">
               <span class="mdc-notched-outline__leading"></span>
+              <span class="mdc-notched-outline__notch">
+                <span class="mdc-floating-label" id="my-label-id" required>Upper Limit</span>
+              </span>
               <span class="mdc-notched-outline__trailing"></span>
             </span>
-            <input type="file" id="inputImage" name="local_file_path" accept="image/*">
+            <input type="number" class="mdc-text-field__input" aria-labelledby="my-label-id" name="price" required min='0'>
           </label>
         </div>
       </div>
@@ -71,6 +74,7 @@
   <script>
     const textField = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-1'));
     const textField1 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-2'));
+    const textField2 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-3'));
     const helperText = new mdc.textFieldHelperText.MDCTextFieldHelperText(document.querySelector('.mdc-text-field-helper-text'));
   </script>
 {% endblock %}
