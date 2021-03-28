@@ -676,7 +676,7 @@ def addOffer():
 def offerAdder():
     name = request.form['name']
     discount = request.form['discount']
-    price = request.files['price']
+    price = request.form['price']
     
     try:
         offer = {
@@ -692,8 +692,8 @@ def offerAdder():
         # return {"ok":"True"},200
         
     except:
-        session['offerAdditionMessage'] = "Error adding offer text data in database"
-        return redirect(url_for('addFoodItem'))
+        session['offerAdditionMessage'] = "Error adding offer data in database"
+        return redirect(url_for('addOffer'))
     try:
         
         # Take care of the database addition
@@ -709,7 +709,16 @@ def offerAdder():
         session['food_item_addition_msg']="error uploading photo in firebase storage"
         return redirect(url_for('addOffer'))
 
-
+# @app.route('/giveOffer<customer_id>')
+# @check_token
+# def giveOffer(customer_id):
+#     customer_id=int(customer_id)
+#     customer_id=customer_id-1
+#     customer=session['customerList'][customer_id]
+    
+    
+    
+    
 
 if __name__ == "__main__":
     # cache.init_app(app)
