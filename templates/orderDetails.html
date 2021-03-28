@@ -1,9 +1,58 @@
 {% extends 'topBarAdded.html' %}
 
 {% block title %}
-  <title>Create Menu</title>
+  <title>Offer Details</title>
+{% endblock %}
+
+{% block topBarButtons %}
+  <a href={{url_for('logout')}} id="anchor-link-nodesign">
+    <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+      <span class="mdc-button__label">Logout</span>
+    </button>
+  </a>
+  <button class="mdc-button" disabled>
+    <span class="mdc-button__ripple"></span>
+    <span class="mdc-button__label"></span>
+  </button>
 {% endblock %}
 
 {% block main %}
-  
+<div class='p-3 row justify-content-center'>
+  <div class='col-auto align-self-center'>
+    From: {{session['currentOrderCreating']['restaurantId']}}    
+  </div>
+</div>
+    <div class='container-fluid' >
+      <div class='row justify-content-center'>
+        <div class='col-auto align-self-center'>
+          {% if session['currentOrderCreating']['orderList'] == None %}
+              <h1>There are no Order Items in List</h1>
+          {% else %}
+            <div class="mdc-data-table">
+              <div class="mdc-data-table__table-container">
+                <table class="mdc-data-table__table" aria-label="Dessert calories">
+                  <thead>
+                    <tr class="mdc-data-table__header-row">
+                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
+                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Price</th>
+                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Frequency</th>
+                      <th class="mdc-data-table__header-cell bg-info" role="columnheader" scope="col">Total Price</th>
+                    </tr>
+                  </thead>
+                  <tbody class="mdc-data-table__content">
+                    {% for foodItem in session['currentOrderCreating']['orderList'] %}
+                      <tr class="mdc-data-table__row">
+                        <th class="mdc-data-table__cell" scope="row">{{foodItem['name']}}</th>
+                        <td class="mdc-data-table__cell">{{foodItem['pricePerItem']}}</td>
+                        <td class="mdc-data-table__cell">{{foodItem['frequency']}}</td>
+                        <td class="mdc-data-table__cell">{{foodItem['pricePerItem'] * foodItem['frequency']}}</td>
+                      </tr>
+                    {% endfor %} 
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+    </div>
 {% endblock %}

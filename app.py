@@ -355,7 +355,7 @@ def createMenu():
     for doc in docs:
         temp_dict=doc.to_dict()
         print(temp_dict)
-        temp_dict['food_item_id']= doc.id
+        # temp_dict['food_item_id']= doc.id
         foodItemList.append(temp_dict)
     try:
         message=session['food_item_addition_msg']
@@ -572,7 +572,9 @@ def order():
     orderList = []
     for i in range(len(foodItemList)):
         if(request.form[str(i+1)]):
-            foodItemList[i]['frequency'] = request.form[str(i+1)]
+            print(foodItemList[i]['name'])
+            foodItemList[i]['frequency'] = int(request.form[str(i+1)])
+            foodItemList[i]['pricePerItem'] = int(foodItemList[i]['pricePerItem'])
             orderList.append(foodItemList[i])
             cost += int(foodItemList[i]['pricePerItem']) * int(foodItemList[i]['frequency'])
             
@@ -584,7 +586,8 @@ def order():
             'restaurantId': foodItemList[0]['restaurantId'],
             'offerId': None
     }
-    return render_template('orderDetails.html')
+    return render_template('orderDetails.html',)
+
 
 @app.route('/redirectDashboard')
 @check_token
