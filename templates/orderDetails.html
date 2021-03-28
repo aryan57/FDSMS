@@ -17,42 +17,140 @@
 {% endblock %}
 
 {% block main %}
-<div class='p-3 row justify-content-center'>
-  <div class='col-auto align-self-center'>
-    From: {{session['currentOrderCreating']['restaurantId']}}    
+<div class='container-fluid'>
+  <div class='row justify-content-center'>
+    <div class='col-auto align-self-center'>
+      From: {{customerName}}    
+    </div>
   </div>
-</div>
-    <div class='container-fluid' >
+  <div class='row justify-content-center'>
+    <div class='col-auto align-self-center'>
+      To: {{restaurantName}}    
+    </div>
+  </div>
+  {% if not orderList %}
+    <div class='row justify-content-center'>
+      <div class='col-auto align-self-center'>
+        <h1>There are no Order Items in List</h1>
+      </div>
+    </div>
+  {% else %}
+    <div class='row justify-content-center'>
+      <div class='col-auto align-self-center'>
+        <div class="mdc-data-table">
+          <div class="mdc-data-table__table-container">
+            <table class="mdc-data-table__table" aria-label="Dessert calories">
+              <thead>
+                <tr class="mdc-data-table__header-row">
+                  <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
+                  <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Price</th>
+                  <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Frequency</th>
+                  <th class="mdc-data-table__header-cell bg-info" role="columnheader" scope="col">Total Price</th>
+                </tr>
+              </thead>
+              <tbody class="mdc-data-table__content">
+                {% for foodItem in orderList %}
+                  <tr class="mdc-data-table__row">
+                    <th class="mdc-data-table__cell" scope="row">{{foodItem['name']}}</th>
+                    <td class="mdc-data-table__cell">{{foodItem['pricePerItem']}}</td>
+                    <td class="mdc-data-table__cell">{{foodItem['frequency']}}</td>
+                    <td class="mdc-data-table__cell">{{foodItem['pricePerItem'] * foodItem['frequency']}}</td>
+                  </tr>
+                {% endfor %} 
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='row justify-content-center'>
+      <div class='col-auto align-self-center'>
+        <a href= {{url_for('offerListCustomer')}} id="anchor-link-nodesign">
+          <button class="mdc-button mdc-button--raised" name="submit">
+            {% if offerUsed == None %}
+              <span class="mdc-button__label">Offers</span>
+            {% else %}
+              <span class="mdc-button__label">Change Offer</span>
+            {% endif %}
+          </button>
+        </a>
+      </div>
+    </div>
+    {% if offerUsed == None %}
       <div class='row justify-content-center'>
         <div class='col-auto align-self-center'>
-          {% if session['currentOrderCreating']['orderList'] == None %}
-              <h1>There are no Order Items in List</h1>
-          {% else %}
-            <div class="mdc-data-table">
-              <div class="mdc-data-table__table-container">
-                <table class="mdc-data-table__table" aria-label="Dessert calories">
-                  <thead>
-                    <tr class="mdc-data-table__header-row">
-                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
-                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Price</th>
-                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Frequency</th>
-                      <th class="mdc-data-table__header-cell bg-info" role="columnheader" scope="col">Total Price</th>
-                    </tr>
-                  </thead>
-                  <tbody class="mdc-data-table__content">
-                    {% for foodItem in session['currentOrderCreating']['orderList'] %}
-                      <tr class="mdc-data-table__row">
-                        <th class="mdc-data-table__cell" scope="row">{{foodItem['name']}}</th>
-                        <td class="mdc-data-table__cell">{{foodItem['pricePerItem']}}</td>
-                        <td class="mdc-data-table__cell">{{foodItem['frequency']}}</td>
-                        <td class="mdc-data-table__cell">{{foodItem['pricePerItem'] * foodItem['frequency']}}</td>
-                      </tr>
-                    {% endfor %} 
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          {% endif %}
+          <h2>No offer selected yet.</h2>
         </div>
-    </div>
+      </div>
+    {% else %}
+      <div class='row justify-content-center'>
+        <div class='col-auto align-self-center'>
+          <div class="mdc-data-table">
+            <div class="mdc-data-table__table-container">
+              <table class="mdc-data-table__table" aria-label="Dessert calories">
+                <thead>
+                  <tr class="mdc-data-table__header-row">
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Discount(%)</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Upper Limit</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Remove Offer</th>
+                  </tr>
+                </thead>
+                <tbody class="mdc-data-table__content">
+                  <tr class="mdc-data-table__row">
+                    <th class="mdc-data-table__cell" scope="row">{{offerUsed['name']}}</th>
+                    <td class="mdc-data-table__cell">{{offerUsed['discount']}}</td>
+                    <td class="mdc-data-table__cell">{{offerUsed['upperLimit']}}</td>
+                    <td class="mdc-data-table__cell">
+                      <a href= {{url_for('removeOfferFromOrder')}} id="anchor-link-nodesign">
+                        <button class="mdc-button mdc-button--raised" name="submit">
+                          <span class="mdc-button__label">Remove</span>
+                        </button>
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+      <div class='row justify-content-center'>
+        <div class='col-auto align-self-center'>
+          <div class="mdc-data-table">
+            <div class="mdc-data-table__table-container">
+              <table class="mdc-data-table__table" aria-label="Dessert calories">
+                <thead>
+                  <tr class="mdc-data-table__header-row">
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Base Cost</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Discount</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Delivery Charges</th>
+                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Total to Pay</th>
+                  </tr>
+                </thead>
+                <tbody class="mdc-data-table__content">
+                  <tr class="mdc-data-table__row">
+                    <th class="mdc-data-table__cell" scope="row">{{cost}}</th>
+                    <td class="mdc-data-table__cell">{{discount}}</td>
+                    <td class="mdc-data-table__cell">{{deliveryCharge}}</td>
+                    <td class="mdc-data-table__cell">{{final}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class='row justify-content-center'>
+        <div class='col-auto align-self-center'>
+          <a href= {{url_for('placeOrder')}} id="anchor-link-nodesign">
+            <button class="mdc-button mdc-button--raised" name="submit">
+              <span class="mdc-button__label">Place Order</span>
+            </button>
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
 {% endblock %}

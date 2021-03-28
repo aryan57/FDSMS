@@ -578,16 +578,57 @@ def order():
             orderList.append(foodItemList[i])
             cost += int(foodItemList[i]['pricePerItem']) * int(foodItemList[i]['frequency'])
             
-    session['currentOrderCreating'] = {'cost': cost, 
+    session['currentOrderCreating'] = {
+            'orderValue': cost, 
             'orderList': orderList, 
-            'deliveryChange': 50,
+            'deliveryCharge': 50,
             'isPending': True,
             'customerId': session['user_id'],
             'restaurantId': foodItemList[0]['restaurantId'],
-            'offerId': None
+            'offerId': None,
+            'discountValue':0,
+            'paidValue': cost+50,
+            'orderDateTime': "",
+            'deliveryAgentId' : ""
     }
-    return render_template('orderDetails.html',)
+    return redirect(url_for('orderDetails'))
 
+@app.route('/orderDetails')
+@check_token
+def orderDetails():
+    currentOrder=session['currentOrderCreating']
+    customerName = db.collection('customer').document(currentOrder['customerId']).get().to_dict()['name']
+    restaurantName = db.collection('restaurant').document(currentOrder['restaurantId']).get().to_dict()['name']
+    orderList=currentOrder['orderList']
+    discount=currentOrder['discountValue']
+    if currentOrder['offerId'] == None:
+        offerUsed=None
+    else: 
+        offerUsed=db.collection('customer').document(currentOrder['customerId']).collection('promotionalOfferId').document(currentOrder['offerId']).get().to_dict()
+        discount=min(int(int(currentOrder['orderValue'])*int(offerUsed['discount'])/100), int(offerUsed['upperLimit']))
+    currentOrder['discountValue']=discount
+    final=max(currentOrder['orderValue']+ currentOrder['deliveryCharge']- discount,0)
+    return render_template('orderDetails.html',orderList=orderList, customerName=customerName, restaurantName=restaurantName, offerUsed=offerUsed, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final)
+
+@app.route('/placeOrder')
+@check_token
+def placeOrder():
+    return good
+
+@app.route('/useOffer<toUse>')
+@check_token
+def useOffer(toUse):
+    user=session['user_id']
+    toUse=int(toUse)
+    toUse=toUse-1
+    session['currentOrderCreating']['offerId']=session['offerList'][toUse]['offerId']
+    return redirect(url_for('orderDetails'))
+
+@app.route('/removeOfferFromOrder')
+@check_token
+def removeOfferFromOrder():
+    session['currentOrderCreating']['offerId']=None
+    return redirect(url_for('orderDetails'))
 
 @app.route('/redirectDashboard')
 @check_token
@@ -776,7 +817,8 @@ def allOffer(customer_id):
         temp_dict['offerId']= doc.id
         session['offerList'].append(temp_dict)
     offerList=session['offerList']
-    return render_template(url_for('allOfferAdmin.html', offerList=offerList))
+    print(offerList)
+    return render_template('allOfferAdmin.html', offerList=offerList)
 
 
 @app.route('/giveOffer<toGive>')
@@ -791,6 +833,7 @@ def giveOffer(toGive):
     try:
         offer_json_data = db.collection('offer').document(offerId).get().to_dict()
         doc_reference = db.collection("customer").document(customerGettingOffer).collection("promotionalOfferId").document()
+        offer_json_data['offerId']=doc_reference.id
         doc_reference.set(offer_json_data)
         # doc_reference1 = db.collection("customer").document(customerGettingOffer).collection("foodItem").document(doc_reference.id).update({"foodItemId":doc_reference.id})
         # return {"ok":"True"},200
@@ -802,8 +845,21 @@ def giveOffer(toGive):
     
     return redirect(url_for('allCustomers'))
 
-
-
+@app.route('/offerListCustomer')
+@check_token
+def offerListCustomer():
+    user=session['user_id']
+    session['offerList']=[]
+    docs = db.collection('customer').document(user).collection('promotionalOfferId').stream()
+    for doc in docs:
+        temp_dict=doc.to_dict()
+        temp_dict['offerId']= doc.id
+        session['offerList'].append(temp_dict)
+    offerList=session['offerList']
+    print(offerList)
+    return render_template('allOfferCustomer.html', offerList=offerList)
+    
+    
 if __name__ == "__main__":
     # cache.init_app(app)
     app.run(debug=True)
