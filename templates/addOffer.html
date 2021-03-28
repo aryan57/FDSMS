@@ -8,7 +8,7 @@
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-auto align-self-center">
-        <h1>Add Offer/h1>
+        <h1>Add Offer</h1>
       </div>
     </div>
     {% if message!="False" %}
@@ -58,12 +58,12 @@
               </span>
               <span class="mdc-notched-outline__trailing"></span>
             </span>
-            <input type="number" class="mdc-text-field__input" aria-labelledby="my-label-id" name="price" required min='0'>
+            <input type="number" class="mdc-text-field__input" aria-labelledby="my-label-id" name="price" required min='0' max='100'>
           </label>
         </div>
       </div>
       <div class="row justify-content-center">
-        <div class="col-2 align-self-center">
+        <div class="col-auto align-self-center">
           <button class="mdc-button mdc-button--raised" name="submit" type="submit">
             <span class="mdc-button__label">Submit</span>
           </button>
