@@ -584,7 +584,15 @@ def redirectDashboard():
 @check_token
 def deleteFoodItem(foodItemId):
     restaurantId=session['user_id']
+
     #command_to delete the id
+    try:
+        db.collection("restaurant").document(restaurantId).collection('foodItem').document(foodItemId).delete()
+        session['food_item_addition_msg']="food item deletion from databse is successful"
+    except Exception as e:
+        # print(e)
+        session['food_item_addition_msg']="Error deleting food item from databse"
+
     return redirect(url_for('createMenu'))
 
 @app.route('/changeRecommendRestaurant<id_to_change>')
@@ -592,14 +600,33 @@ def deleteFoodItem(foodItemId):
 def changeRecommendRestaurant(id_to_change):
     id=int(id_to_change)
     id=id-1
+
+    restaurantId=session['restaurantList'][id]['restaurantId']
+
     if session['restaurantList'][id]['isRecommended'] == False:
         session['restaurantList'][id]['isRecommended'] = True
         session.modified = True
-        #change in database
+        
     else :
         session['restaurantList'][id]['isRecommended'] = False
         session.modified = True
-        #change in database
+
+    #change in database
+    isRecommended=""
+    try:
+        isRecommended = db.collection("restaurant").document(restaurantId).get().to_dict()['isRecommended']
+    except Exception as e:
+        # print(str(e))
+        # error retriving isRecommended from database
+        pass
+    
+    try:
+        db.collection("restaurant").document(restaurantId).update({'isRecommended':not isRecommended})
+    except Exception as e:
+        # print(str(e))
+        # error changing isRecommended from database
+        pass
+
     return redirect(url_for('allRestaurant'))
 
 @app.route('/changeRecommendFoodItem<id_to_change>')
@@ -610,12 +637,29 @@ def changeRecommendFoodItem(id_to_change):
     if session['current_menu_viewed'][id]['isRecommended'] == False:
         session['restaurantList'][id]['isRecommended'] = True
         session.modified = True
-        #change in database
     else :
         session['current_menu_viewed'][id]['isRecommended'] = False
         session.modified = True
-        #change in database
-    return redirect(url_for('allRestaurant'))
+
+    foodItemId=session['current_menu_viewed'][id]['foodItemId']
+    restaurantId=session['current_menu_viewed'][id]['restaurantId']
+
+    isRecommended=""
+    try:
+        isRecommended = db.collection("restaurant").document(restaurantId).collection("foodItem").document(foodItemId).get().to_dict()['isRecommended']
+    except Exception as e:
+        # print(str(e))
+        # error retriving isRecommended from database
+        pass
+    
+    try:
+        db.collection("restaurant").document(restaurantId).collection("foodItem").document(foodItemId).update({'isRecommended':not isRecommended})
+    except Exception as e:
+        # print(str(e))
+        # error changing isRecommended from database
+        pass
+
+    return redirect(url_for('allFoodItem11', restaurantUserId = restaurantId ))
 
 @app.route('/recommendedRestaurant')
 @check_token
@@ -623,13 +667,12 @@ def recommendedRestaurant():
     user=session['session_user']
     if not user['user_type'] == 'customer':
         return redirect(url_for('logout'))
-    if session.get('restaurantList') == None:
-        session['restaurantList']=[]
-        docs=db.collection('restaurant').stream()
-        for doc in docs:
-            temp_dict=doc.to_dict()
-            temp_dict['user_id']= doc.id
-            session['restaurantList'].append(temp_dict)
+    session['restaurantList']=[]
+    docs=db.collection('restaurant').stream()
+    for doc in docs:
+        temp_dict=doc.to_dict()
+        temp_dict['user_id']= doc.id
+        session['restaurantList'].append(temp_dict)
     restaurantList=[]
     for restaurant in session['restaurantList']:
         if restaurant['isRecommended']:
@@ -647,7 +690,7 @@ def createOffer():
     currentAdminId=session['user_id']
     offerList=[]
     # Add statement for getting a docs for the offers
-    # docs=db.collection('restaurant').document(currentRestaurantMenuId).collection('foodItem').stream()
+    docs=db.collection('offer').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
         temp_dict['offerId']= doc.id
@@ -676,39 +719,27 @@ def addOffer():
 def offerAdder():
     name = request.form['name']
     discount = request.form['discount']
-    price = request.files['price']
+    price = request.form['price']
     
     try:
-        offer = {
+        json_data = {
             "name" : name,
             "discount" : discount,
-            "upperLimit": price
+            "upperLimit": price,
+            "offerId":""
         }
         
-        # Changes to be done here
-        # doc_reference = db.collection("restaurant").document(session["user_id"]).collection("foodItem").document()
-        # doc_reference.set(foodItem)
-        # doc_reference1 = db.collection("restaurant").document(session["user_id"]).collection("foodItem").document(doc_reference.id).update({"foodItemId":doc_reference.id})
-        # return {"ok":"True"},200
-        
-    except:
-        session['offerAdditionMessage'] = "Error adding offer text data in database"
-        return redirect(url_for('addFoodItem'))
-    try:
-        
-        # Take care of the database addition
-        
-        # storage_file_path = "restaurant/"+session["user_id"]+"_"+doc_reference.id+".jpg"
-        # blob = bucket.blob(storage_file_path)
-        # blob.upload_from_file(local_file_obj,content_type="image/jpeg")
-        # doc_reference = db.collection("restaurant").document(session["user_id"]).collection("foodItem").document(doc_reference.id).update({"picSrc":storage_file_path})
+        doc_reference = db.collection("offer").document()
+        doc_reference.set(json_data)
+        db.collection("offer").document(doc_reference.id).update({"offerId":doc_reference.id})
+
         session['offerAdditionMessage']="Offer added successfully."
         return redirect(url_for('createOffer'))
+        
     except Exception as e:
-        print(e)
-        session['food_item_addition_msg']="error uploading photo in firebase storage"
+        print(str(e))
+        session['offerAdditionMessage'] = "Error adding offer in database"
         return redirect(url_for('addOffer'))
-
 
 
 if __name__ == "__main__":
