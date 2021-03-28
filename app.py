@@ -672,7 +672,7 @@ def addOffer():
         return redirect(url_for('logout'))
 
 @app.route('/addOffer/adder', methods=['POST','GET'])
-@check_route
+@check_token
 def offerAdder():
     name = request.form['name']
     discount = request.form['discount']
@@ -696,7 +696,7 @@ def offerAdder():
         return redirect(url_for('addFoodItem'))
     try:
         
-        Take care of the
+        # Take care of the
         
         # storage_file_path = "restaurant/"+session["user_id"]+"_"+doc_reference.id+".jpg"
         # blob = bucket.blob(storage_file_path)
