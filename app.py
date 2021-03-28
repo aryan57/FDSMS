@@ -589,7 +589,10 @@ def order():
             'discountValue':0,
             'paidValue': cost+50,
             'orderDateTime': "",
-            'deliveryAgentId' : ""
+            'deliveryAgentId' : "",
+            'updateLevel' :1,
+            'updateMessage' : "Accept/Reject"
+            
     }
     return redirect(url_for('orderDetails'))
 
@@ -613,6 +616,7 @@ def orderDetails():
 @app.route('/placeOrder')
 @check_token
 def placeOrder():
+    
     return good
 
 @app.route('/useOffer<toUse>')
