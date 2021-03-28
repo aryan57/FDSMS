@@ -767,10 +767,11 @@ def allOffer(customer_id):
     session['customerGettingOffer']=session['customerList'][customer_id]['customerId']
     
     session['offerList']=[]
-    #add sentence for getting the docs of the offer.
+    docs=db.collection('offer').stream()
     for doc in docs:
-        session['offerList'].append(doc.to_dict())
-        
+        temp_dict=doc.to_dict()
+        temp_dict['offerId']= doc.id
+        session['offerList'].append(temp_dict)
     offerList=session['offerList']
     return render_template(url_for('allOfferAdmin.html', offerList=offerList))
 

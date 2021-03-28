@@ -1,0 +1,64 @@
+{% extends 'topBarAdded.html' %}
+
+{% block title %}
+<title>Offers</title>
+{% endblock %}
+
+
+{% block topBarButtons %}
+  <a href={{url_for('logout')}} id="anchor-link-nodesign">
+    <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+      <span class="mdc-button__label">Logout</span>
+    </button>
+  </a>
+  <button class="mdc-button" disabled>
+    <span class="mdc-button__ripple"></span>
+    <span class="mdc-button__label"></span>
+  </button>
+{% endblock %}
+
+{% block main %}
+    <div class='container-fluid' >
+      <div class='row justify-content-center'>
+        <div class='col-auto align-self-center'>
+          {% if not offerList %}
+              <h1>There are no Offers in List</h1>
+          {% else %}
+            <div class="mdc-data-table">
+              <div class="mdc-data-table__table-container">
+                <table class="mdc-data-table__table" aria-label="Dessert calories">
+                  <thead>
+                    <tr class="mdc-data-table__header-row">
+                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
+                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Discount(%)</th>
+                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Upper Limit</th>
+                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Use Offer</th>
+                    </tr>
+                  </thead>
+                  <tbody class="mdc-data-table__content">
+                    {% for offer in offerLists %}
+                      <tr class="mdc-data-table__row">
+                        <th class="mdc-data-table__cell" scope="row">{{offer['name']}}</th>
+                        <td class="mdc-data-table__cell">{{offer['discount']}}</td>
+                        <td class="mdc-data-table__cell">{{offer['upperLimit']}}</td>
+                        <td class="mdc-data-table__cell">
+                            <a href= {{url_for('useOffer', toUse=loop.index)}} id="anchor-link-nodesign">
+                                <button class="mdc-button mdc-button--raised" name="submit">
+                                <span class="mdc-button__label">Give</span>
+                                </button>
+                            </a>
+                        </td>
+                      </tr>
+                    {% endfor %} 
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  <script>
+    const textField4 = new mdc.dataTable.MDCDataTable(document.querySelector('.mdc-data-table'));
+  </script>
+{% endblock %}
