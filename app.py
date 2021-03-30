@@ -591,8 +591,9 @@ def order():
             'paidValue': cost+50,
             'orderDateTime': "",
             'deliveryAgentId' : "",
-            'updateLevel' :1,
+            'updateLevel' :0,
             'updateMessage' : "Accept/Reject",
+            'orderUpdates' : [],
             'orderId': ''
     }
     return redirect(url_for('orderDetails'))
@@ -661,7 +662,8 @@ def moreDetailsOrder(orderId):
     if orderId > len(session['presentOrderCustomer']):
         return redirect(url_for('recentOrderCustomer'))
     orderId=orderId-1
-    currentOrder=session['presentOrderCustomer'][orderId]
+    currentOrder=session['presentOrderCustomer'][orderId]['orderId']
+    currentOrder=db.collection('order').document(currentOrder).get().to_dict()
     customerName = db.collection('customer').document(currentOrder['customerId']).get().to_dict()['name']
     restaurantName = db.collection('restaurant').document(currentOrder['restaurantId']).get().to_dict()['name']
     orderList=currentOrder['orderList']
@@ -673,8 +675,7 @@ def moreDetailsOrder(orderId):
         discount=min(int(int(currentOrder['orderValue'])*int(offerUsed['discount'])/100), int(offerUsed['upperLimit']))
     currentOrder['discountValue']=discount
     final=max(currentOrder['orderValue']+ currentOrder['deliveryCharge']- discount,0)
-    
-    return render_template('moreDetailsOrder.html',  orderList=orderList, customerName=customerName, restaurantName=restaurantName, offerUsed=offerUsed, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final)
+    return render_template('moreDetailsOrder.html',  orderList=orderList, customerName=customerName, restaurantName=restaurantName, offerUsed=offerUsed, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final, updateLevel=currentOrder['updateLevel'], orderUpdate = currentOrder['orderUpdates'])
 
 @app.route('/useOffer<toUse>')
 @check_token

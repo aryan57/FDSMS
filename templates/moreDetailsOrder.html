@@ -130,44 +130,79 @@
   {% endif %}
 </div>
 
-<section class="py-5">
   <div class="container">
     <div class='row justify-content-center'>
       <div class='col-auto align-self-center'>
         <div class="timeline">
           <div class="timeline__header">
-            <span>Estimated delivery:</span>
-            <h1>Mar 04 - Mar  13</h1>
-       
-            <div class="process">
-             <div class="xd"></div>
-           </div>
-       
+            <h1>Timeline</h1>
+            <!-- <div class="process">
+             <div class="xd" id={{updateLevel}}></div>
+            </div> -->
           </div>
        
           <div class="line">
             <div class="line-content">
-       
-              <div class="content">
-                <h1>Delivering</h1>
-                <p>Departed country of origin</p>
-              </div>
-       
-              <div class="content">
-               <h1>Shipment accepted</h1>
-               <p>Departed country of origin</p>
-             </div>
-             
-             <div class="content">
-               <h1>Pick up</h1>
-               <p>Shipment dispatched</p>
-             </div>
+              {% if updateLevel >=0 %}
+                <div class="content">
+                  <h1>Order Given</h1>
+                  <p>Order has been sent to the restaurant<br>
+                  Waiting for confirmation</p>
+                </div>
+              {% endif %}
               
+              {% if updateLevel >=1 %}
+                {% if orderUpdate[0]['heading'] == 'Accepted' %}
+                  <div class="content">
+                    <h1>Order Accepted</h1>
+                    <p>Preparation time: {{ orderUpdate[0]['time'] }} min</p>
+                  </div>
+                {% else %}
+                  <div class="content">
+                    <h1>Rejected</h1>
+                    <p>Order has been rejected by the Restaurant</p>
+                  </div>
+                {% endif %}
+              {% endif %}
+
+              {% if updateLevel >=2 %}
+                <div class="content">
+                  <h1>Food Prepared</h1>
+                  <p>Food open for delivery</p>
+                </div>
+              {% endif %}
+
+              {% if updateLevel >=3 %}
+                <div class="content">
+                  <h1>Delivery Accepted</h1>
+                  <p>
+                    Order is accepted by {{ deliveryAgentName }}<br>
+                    Estimated time for pickup: {{orderUpdate[1]['timePickUp']}} min<br>
+                  </p>
+                </div>
+              {% endif %}
+
+              {% if updateLevel >=4 %}
+                <div class="content">
+                  <h1>Out for Delivery</h1>
+                  <p>Estimated Time for Delivery: {{orderUpdate[2]['deliveryTime']}} min</p>
+                </div>
+              {% endif %}
+
+              {% if updateLevel >=5 %}
+                <div class="content">
+                  <h1>Delivered</h1>
+                  <p>Food was Delivered</p>
+                </div>
+              {% endif %}
             </div>
           </div>
         </div>       
       </div>
     </div>
   </div>
-</section>
+
+  <script>
+
+  </script>
 {% endblock %}
