@@ -197,7 +197,8 @@ def customersignup():
             "areaId" : area,
             "customerId":user.uid,
             "ratingId":"",
-            "picSrc": storage_file_path
+            "picSrc": storage_file_path,
+            "pendingOrderId": []
         }
         db.collection("customer").document(user.uid).set(json_data)
         db.collection("type").document(user.uid).set({"type" : "customer"})
@@ -625,24 +626,33 @@ def placeOrder():
     # add restaurant array
     restaurantId=currentOrder['restaurantId']
     restaurantDocReference = db.collection('restaurant').document(restaurantId)
-    restaurantDocReference = res.child('pendingOrderId')
+    restaurantDocReference.update({'pendingOrderId': firestore.ArrayUnion([orderId])})
     # customer array main add karna hai
+    customerId=currentOrder['customerId']
+    customerDocReference = db.collection('customer').document(customerId)
+    customerDocReference.update({'pendingOrderId': firestore.ArrayUnion([orderId])})
+    
     # offerId !=None
-    # customer offer list, woh offer remove karna hai
-    # change this return statement
-    return 
+    if not currentOrder['offerId'] == None:
+        db.collection('customer').document(customerId).collection('promotionalOfferId').document(currentOrder['offerId']).delete()
+    return redirect(url_for('recentOrderCustomer'))
 
 @app.route('/recentOrderCustomer')
 @check_token
-def recentOrdersCustomer():
-    # This will have the database of the student and a list of all the present running orders.
+def recentOrderCustomer():
     user = session['session_user']
+    customerId=user['customerId']
+    listOrderId = db.collection('customer').document(customerId).get().to_dict()['pendingOrderId']
+    docs = db.collection('order').stream()
     recentOrderList=[]
-    # get the list of all the present orders and store in the list. This list will be 
-    # updated with every refresh
-    # push restaurant name in the list
-    
-    return render_template('recentOrderCustomer.html', recentOrderList=recentOrderList)
+    for doc in docs:
+        if doc.id in listOrderId:
+            temp=doc.to_dict()
+            temp['restaurantName']=db.collection('restaurant').document(temp['restaurantId']).get().to_dict()['name']
+            recentOrderList.append(temp)
+    session['presentOrderCustomer']=recentOrderList
+    session.modified = True
+    return render_template('recentOrderCustomer.html', recentOrderList=recentOrderList, )
 
 @app.route('/moreDetailsOrder<orderId>')
 @check_token
