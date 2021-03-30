@@ -2,6 +2,7 @@
 
 {% block title %}
   <title>Offer Details</title>
+  <link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/timeline.css')}}>
 {% endblock %}
 
 {% block topBarButtons %}
@@ -122,50 +123,47 @@
         </div>
       </div>
       <div class='row justify-content-center'>
-          <div class='col-auto align-self-center'>
-              <h1>Order Updates</h1>
-          </div>
+        <div class='col-auto align-self-center'>
+          <h1>Order Updates</h1>
+        </div>
       </div>
-      <div class='row justify-content-center'>
-          <div class='col-auto align-self-center'>
-              
-          </div>
+  {% endif %}
+</div>
+
+<section class="py-5">
+  <div class="container">
+    <div class='row justify-content-center'>
+      <div class='col-auto align-self-center'>
+        <div class="container-timeline">
+          <ul>
+            <li>
+              <p class="h6 fw-bold">Step one</p>
+              <p class="small">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat</p>
+            </li>
+            <li>
+              <p class="h6 fw-bold">Step two</p>
+              <p class="small">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur</p>
+            </li>
+            <li>
+              <p class="h6 fw-bold">Step three</p>
+              <p class="small">Lorem ipsum dolor amet</p>
+            </li>
+            <li>
+              <p class="h6 fw-bold">Final</p>
+              <p class="small">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam</p>
+            </li>
+            <li>
+              <p class="h6 fw-bold">Final</p>
+              <p class="small">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam</p>
+            </li>
+            <li>
+              <p class="h6 fw-bold">Final</p>
+              <p class="small">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam</p>
+            </li>
+          </ul>
+        </div>
       </div>
-    {% endif %}
+    </div>
   </div>
-
-  <section class="py-5">
-    <div class="container">
-      <p class="h2 mb-5">Adaptive timeline for Bootstrap</p>
-
-      <div class="container-timeline">
-        <ul>
-          <li>
-            <p class="h6 fw-bold">Step one</p>
-            <p class="small">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat</p>
-          </li>
-          <li>
-            <p class="h6 fw-bold">Step two</p>
-            <p class="small">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur</p>
-          </li>
-          <li>
-            <p class="h6 fw-bold">Step three</p>
-            <p class="small">Lorem ipsum dolor amet</p>
-          </li>
-          <li>
-            <p class="h6 fw-bold">Final</p>
-            <p class="small">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam</p>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </section>
-  
-  <sectin>
-    <div class="container">
-      <p class="h5">Comments</p>
-      <p class="small mb-1">You can use bootstrap breakpoints, if using SCSS preprocessor. Just replace <code>@media (min-width: 1199px)</code> with <code>@include media-breakpoint-up(lg)</code> where <code>lg</code> is breakpoint that you want to use.</p>
-      <p class="small mb-1">Feel free to contact with me, if you need more instructions, or modifications of this timeline CSS.</p>
-    </div>
-  </section>
+</section>
 {% endblock %}
