@@ -613,7 +613,7 @@ def orderDetails():
 @app.route('/placeOrder')
 @check_token
 def placeOrder():
-    return good
+    return {"good":"ok"},200
 
 @app.route('/useOffer<toUse>')
 @check_token
