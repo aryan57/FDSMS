@@ -1,58 +1,128 @@
-.container-timeline {
-    position: relative;
-  }
-  
-  .container-timeline ul {
-    margin: 0;
-    padding: 0;
-    padding-left: 20px;
-    display: inline-block;
-    counter-reset: wa-process-counter;
-  }
-  
-  .container-timeline ul li {
-    list-style: none;
-    margin: 0;
-    border-left: 1px solid #6200ee;
-    padding: 0 0 30px 40px;
-    position: relative;
-    counter-increment: wa-process-counter;
-  }
-  
-  .container-timeline ul li:last-child {
-    border: 0;
-  }
-  
-  .container-timeline ul li::before {
-    position: absolute;
-    left: -21px;
-    top: 0;
-    content: counter(wa-process-counter);
-    border: 3px solid #6200ee;
-    border-radius: 5px;
-    background: white;
-    height: 41px;
-    width: 41px;
-    text-align: center;
-    line-height: 41px;
-  }
-  
-  @media (min-width: 1200px) {
-    .container-timeline ul {
-      display: flex;
-      padding-left: 0;
-      padding-top: 20px;
-    }
-  
-    .container-timeline ul li {
-      flex: 1 1 0;
-      border-left: 0;
-      border-top: 2px solid #6200ee;
-      padding: 50px 2em 0 0;
-    }
-  
-    .container-timeline ul li::before {
-      left: 0;
-      top: -21px;
-    }
-  }
+@import url("https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700&display=swap");
+* {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+}
+
+body {
+  background-color: #f4f4f6;
+  font-family: "Mulish", sans-serif;
+  margin: 5px;
+}
+
+.timeline {
+  max-width: 540px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding: 34px 30px;
+  background-color: #fff;
+  border-radius: 18px;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.timeline__header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  width: 100%;
+  border: 2px solid #f0f0f8;
+  padding: 34px 70px;
+  border-radius: 5px;
+  position: relative;
+}
+
+.timeline__header::after {
+  content: "";
+  width: 100%;
+  height: 70px;
+  bottom: 0px;
+  left: 0px;
+  position: absolute;
+  z-index: 2;
+  background-color: #f0f0f8;
+}
+
+.timeline__header span {
+  margin-bottom: 10px;
+  text-align: center;
+  color: gray;
+  font-size: 14px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.timeline__header h1 {
+  margin-bottom: 100px;
+  font-size: 20px;
+  color: #262245;
+  text-align: center;
+}
+
+.timeline__header .process {
+  height: 8px;
+  background-color: #fff;
+  border-radius: 3px;
+  z-index: 4;
+}
+
+.timeline__header .process .xd {
+  width: 50%;
+  border-radius: 3px;
+  height: 8px;
+  background-color: #6969dc;
+}
+
+.line {
+  padding: 10px 90px;
+  position: relative;
+  margin-top: 50px;
+}
+
+.line::before {
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  left: 90px;
+  background-color: #6969dc;
+  content: "";
+}
+
+.line .content {
+  position: relative;
+  padding-left: 30px;
+}
+
+.line .content + .content {
+  margin-top: 40px;
+}
+
+.line .content h1 {
+  font-size: 16px;
+  margin-bottom: 5px;
+  margin-top: 15px;
+}
+
+.line .content p {
+  font-size: 14px;
+}
+
+.line .content::before {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: #6969dc;
+  content: "";
+  left: -9px;
+  border-radius: 50%;
+}
+/*# sourceMappingURL=main.css.map */
