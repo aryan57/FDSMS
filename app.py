@@ -700,9 +700,12 @@ def updateStatus0(val):
         # Add the update suitably in the order
         return render_template('getEstimatedTime.html')
 
-@app.route('/getEstimatedTime')
+@app.route('/getEstimatedTime', methods=['POST','GET'])
 @check_token
 def getEstimatedTime():
+    estimatedTime = request.form['time']
+    print(estimatedTime)
+    pass
     # Write the function here
         
 @app.route('/moreDetailsOrder<orderId>')
