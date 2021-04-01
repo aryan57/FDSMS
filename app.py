@@ -22,11 +22,6 @@ db = firestore.client()
 bucket = storage.bucket()
 # storage = pyrebase_pb.storage()
 
-try:
-    json_data=db.collection('restaurant').document('KgAsPjK7aLcDN01kbWnW1lqcy063').get().to_dict()
-    print(json_data)
-except Exception as e:
-    print(e)
 
 
 def check_token(f):
@@ -624,8 +619,8 @@ def placeOrder():
     orderId=doc_reference.id
     # add restaurant array
     restaurantId=currentOrder['restaurantId']
-    restaurantDocReference = db.collection('restaurant').document(restaurantId)
-    restaurantDocReference = res.child('pendingOrderId')
+    restaurantDocReference = db.collection('restaurant').document(restaurantId).update({'pendingOrderId': firestore.ArrayUnion([orderId])})
+    restaurantDocReference = restaurantDocReference.child('pendingOrderId')
     # customer array main add karna hai
     # offerId !=None
     # customer offer list, woh offer remove karna hai
