@@ -694,12 +694,12 @@ def orderDetailRestaurant(orderId):
 def updateStatus0(val):
     if val == "Reject":
         updateOrderDic = {'heading': "Rejected"}
-        db.collection('order').document(session['currentOrderUpdating']).update({'orderUpdates' : firestore.ArrayUnion([updatedOrderDic])})
-        db.collection('order').document(session['currentOrderUpdating']).update({'isPending': False})
-        db.collection('order').document(session['currentOrderUpdating']).update({'updateMessage': "Rejected"})
+        db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'orderUpdates' : firestore.ArrayUnion([updatedOrderDic])})
+        db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'isPending': False})
+        db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'updateMessage': "Rejected"})
         db.collection('customer').document(session['currentOrderUpdating']['customerId']).update({'pendingOrders' : firestore.ArrayRemove([session['currentOrderUpdating']['orderId']])})
         db.collection('restaurant').document(session['currentOrderUpdating']['restaurantId']).update({'pendingOrders' : firestore.ArrayRemove([session['currentOrderUpdating']['orderId']])})
-        return redirect('recentOrderRestaurant')
+        return redirect(url_for('recentOrderRestaurant'))
     else :
         return render_template('getEstimatedTime.html')
 
@@ -709,11 +709,11 @@ def getEstimatedTime():
     estimatedTime = request.form['time']
     updateOrderDic = {
         'heading': "Accepted",
-        'time' : string(time)+"min"
+        'time' : str(estimatedTime)+"min"
         }
     db.collection('order').document(session['currentOrderUpdating']).update({'updateMessage': "Accepted. Preparing Food"})
     db.collection('order').document(session['currentOrderUpdating']).update({'orderUpdates' : firestore.ArrayUnion([updatedOrderDic])})
-    return redirect('recentOrderRestaurant')
+    return redirect(url_for('recentOrderRestaurant'))
         
 @app.route('/moreDetailsOrder<orderId>')
 @check_token
