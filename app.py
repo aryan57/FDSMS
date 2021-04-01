@@ -630,6 +630,7 @@ def placeOrder():
     
     # offerId !=None
     if not currentOrder['offerId'] == None:
+        db.collection('order').document(orderId).update({'offerId': db.collection('customer').document(customerId).collection('promotionalOfferId').document(currentOrder['offerId']).get().to_dict()})
         db.collection('customer').document(customerId).collection('promotionalOfferId').document(currentOrder['offerId']).delete()
     return redirect(url_for('recentOrderCustomer'))
 
@@ -692,12 +693,17 @@ def orderDetailRestaurant(orderId):
 @check_token
 def updateStatus0(val):
     if val == "Reject":
-        print("goood")
+        # Add the update suitably in the order
+        # Update the order as completed
+        return redirect('recentOrderRestaurant')
     else :
-        print('gooood')
-        
-    return good
-    
+        # Add the update suitably in the order
+        return render_template('getEstimatedTime.html')
+
+@app.route('/getEstimatedTime')
+@check_token
+def getEstimatedTime():
+    # Write the function here
         
 @app.route('/moreDetailsOrder<orderId>')
 @check_token
@@ -712,10 +718,11 @@ def moreDetailsOrder(orderId):
     restaurantName = db.collection('restaurant').document(currentOrder['restaurantId']).get().to_dict()['name']
     orderList=currentOrder['orderList']
     discount=currentOrder['discountValue']
+    print(currentOrder['offerId'])
     if currentOrder['offerId'] == None:
         offerUsed=None
     else: 
-        offerUsed=db.collection('customer').document(currentOrder['customerId']).collection('promotionalOfferId').document(currentOrder['offerId']).get().to_dict()
+        offerUsed=currentOrder['offerId']
         discount=min(int(int(currentOrder['orderValue'])*int(offerUsed['discount'])/100), int(offerUsed['upperLimit']))
     currentOrder['discountValue']=discount
     final=max(currentOrder['orderValue']+ currentOrder['deliveryCharge']- discount,0)
