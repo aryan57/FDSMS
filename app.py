@@ -653,8 +653,57 @@ def recentOrderCustomer():
             recentOrderList.append(temp)
     session['presentOrderCustomer']=recentOrderList
     session.modified = True
-    return render_template('recentOrderCustomer.html', recentOrderList=recentOrderList, )
+    return render_template('recentOrderCustomer.html', recentOrderList=recentOrderList)
 
+@app.route('/recentOrderRestaurant')
+@check_token
+def recentOrderRestaurant():
+    user=session['session_user']
+    restaurantId = user['restaurantId']
+    listOrderId = db.collection('restaurant').document(restaurantId).get().to_dict()['pendingOrderId']
+    docs = db.collection('order').stream()
+    recentOrderList = []
+    
+    for doc in docs:
+        if doc.id in listOrderId:
+            temp = doc.to_dict()
+            temp['customerName']=db.collection('customer').document(temp['customerId']).get().to_dict()['name']
+            recentOrderList.append(temp)
+    session['presentOrderRestaurant'] = recentOrderList
+    session.modified = True
+        
+    return render_template('recentOrderRestaurant.html', recentOrderList=recentOrderList)
+
+@app.route('/orderDetailRestaurant<orderId>')
+@check_token
+def orderDetailRestaurant(orderId):
+    orderId=int(orderId)
+    if orderId > len(session['presentOrderRestaurant']):
+        return redirect(url_for('recentOrderRestaurant'))
+    orderId=orderId-1
+    currentOrder=session['presentOrderRestaurant'][orderId]['orderId']
+    currentOrder=db.collection('order').document(currentOrder).get().to_dict()
+    customerName = db.collection('customer').document(currentOrder['customerId']).get().to_dict()['name']
+    restaurantName = db.collection('restaurant').document(currentOrder['restaurantId']).get().to_dict()['name']
+    orderList=currentOrder['orderList']
+    discount=currentOrder['discountValue']
+    currentOrder['discountValue']=discount
+    final=max(currentOrder['orderValue']+ currentOrder['deliveryCharge']- discount,0)
+    return render_template('orderDetailsRestaurant.html',  orderList=orderList, customerName=customerName, restaurantName=restaurantName, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final, updateLevel=currentOrder['updateLevel'])
+
+
+# This has to be updated
+@app.route('/updateStatus0<val>')
+@check_token
+def updateStatus0(val):
+    if val == "Reject":
+        print("goood")
+    else :
+        print('gooood')
+        
+    return good
+    
+        
 @app.route('/moreDetailsOrder<orderId>')
 @check_token
 def moreDetailsOrder(orderId):
@@ -668,11 +717,6 @@ def moreDetailsOrder(orderId):
     restaurantName = db.collection('restaurant').document(currentOrder['restaurantId']).get().to_dict()['name']
     orderList=currentOrder['orderList']
     discount=currentOrder['discountValue']
-    if currentOrder['offerId'] == None:
-        offerUsed=None
-    else: 
-        offerUsed=db.collection('customer').document(currentOrder['customerId']).collection('promotionalOfferId').document(currentOrder['offerId']).get().to_dict()
-        discount=min(int(int(currentOrder['orderValue'])*int(offerUsed['discount'])/100), int(offerUsed['upperLimit']))
     currentOrder['discountValue']=discount
     final=max(currentOrder['orderValue']+ currentOrder['deliveryCharge']- discount,0)
     return render_template('moreDetailsOrder.html',  orderList=orderList, customerName=customerName, restaurantName=restaurantName, offerUsed=offerUsed, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final, updateLevel=currentOrder['updateLevel'], orderUpdate = currentOrder['orderUpdates'])
