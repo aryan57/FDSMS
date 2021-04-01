@@ -684,6 +684,7 @@ def orderDetailRestaurant(orderId):
     orderList=currentOrder['orderList']
     discount=currentOrder['discountValue']
     currentOrder['discountValue']=discount
+    session['currentOrderUpdating']=currentOrder
     final=max(currentOrder['orderValue']+ currentOrder['deliveryCharge']- discount,0)
     return render_template('orderDetailsRestaurant.html',  orderList=orderList, customerName=customerName, restaurantName=restaurantName, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final, updateLevel=currentOrder['updateLevel'])
 
@@ -693,11 +694,12 @@ def orderDetailRestaurant(orderId):
 @check_token
 def updateStatus0(val):
     if val == "Reject":
-        # Add the update suitably in the order
-        # Update the order as completed
+        updateOrderDic = {'heading': "Rejected"}
+        db.collection('order').document(session['currentOrderUpdating']).update({'orderUpdates' : firestore.ArrayUnion([updatedOrderDic])})
         return redirect('recentOrderRestaurant')
     else :
-        # Add the update suitably in the order
+        # updateOrderDic = {'heading': "Accepted"}
+        # db.collection('order').document(session['currentOrderUpdating']).update({'orderUpdates' : firestore.ArrayUnion([updatedOrderDic])})
         return render_template('getEstimatedTime.html')
 
 @app.route('/getEstimatedTime')
@@ -741,7 +743,6 @@ def useOffer(toUse):
 @check_token
 def removeOfferFromOrder():
     session['currentOrderCreating']['offerId']=None
-    
     return redirect(url_for('orderDetails'))
 
 @app.route('/redirectDashboard')

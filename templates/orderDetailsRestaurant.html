@@ -97,23 +97,32 @@
     </div>
   {% endif %}
   {% if updateLevel == 0 %}
-      <div class='row justify-content-center'>
-        <div class='col-auto align-self-center'>
-          <a href = {{url_for('updateStatus0', val="Accept")}} id="anchor-link-nodesign">
-            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-              <span class="mdc-button__label">Accept</span>
-            </button>
-          </a>
-        </div>
-        <div class='col-auto align-self-center'>
-          <a href={{url_for('updateStatus0', val="Reject")}} id="anchor-link-nodesign">
-            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-              <span class="mdc-button__label">Reject</span>
-            </button>
-          </a>
-        </div>
+    <div class='row justify-content-center'>
+      <div class='col-auto align-self-center'>
+        <a href = {{url_for('updateStatus0', val="Accept")}} id="anchor-link-nodesign">
+          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+            <span class="mdc-button__label">Accept</span>
+          </button>
+        </a>
       </div>
+      <div class='col-auto align-self-center'>
+        <a href={{url_for('updateStatus0', val="Reject")}} id="anchor-link-nodesign">
+          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+            <span class="mdc-button__label">Reject</span>
+          </button>
+        </a>
+      </div>
+    </div>
   {% elif updateLevel ==1 %}
+    <div class='row justify-content-center'>
+      <div class='col-auto align-self-center'>
+        <a href = {{url_for('updateStatus0', val="Accept", orderId = )}} id="anchor-link-nodesign">
+          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+            <span class="mdc-button__label">Food is prepared</span>
+          </button>
+        </a>
+      </div>
+    </div>
   {% elif updateLevel ==2 %}
   {% elif updateLevel ==3 %}
   {% endif %}
