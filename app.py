@@ -698,8 +698,8 @@ def updateStatus0(val):
         db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'isPending': False})
         db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'updateMessage': "Rejected"})
         db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'updateLevel': 1})
-        db.collection('customer').document(session['currentOrderUpdating']['customerId']).update({'pendingOrders' : firestore.ArrayRemove([session['currentOrderUpdating']['orderId']])})
-        db.collection('restaurant').document(session['currentOrderUpdating']['restaurantId']).update({'pendingOrders' : firestore.ArrayRemove([session['currentOrderUpdating']['orderId']])})
+        db.collection('customer').document(session['currentOrderUpdating']['customerId']).update({'pendingOrderId' : firestore.ArrayRemove([session['currentOrderUpdating']['orderId']])})
+        db.collection('restaurant').document(session['currentOrderUpdating']['restaurantId']).update({'pendingOrderId' : firestore.ArrayRemove([session['currentOrderUpdating']['orderId']])})
         return redirect('recentOrderRestaurant')
     else :
         return render_template('getEstimatedTime.html')
@@ -994,9 +994,10 @@ def offerListCustomer():
         temp_dict['offerId']= doc.id
         session['offerList'].append(temp_dict)
     offerList=session['offerList']
-    print(offerList)
+    # print(offerList)
     return render_template('allOfferCustomer.html', offerList=offerList)
-    
+
+
     
 if __name__ == "__main__":
     # cache.init_app(app)
