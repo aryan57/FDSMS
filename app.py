@@ -702,9 +702,12 @@ def updateStatus0(val):
         # db.collection('order').document(session['currentOrderUpdating']).update({'orderUpdates' : firestore.ArrayUnion([updatedOrderDic])})
         return render_template('getEstimatedTime.html')
 
-@app.route('/getEstimatedTime')
+@app.route('/getEstimatedTime', methods=['POST','GET'])
 @check_token
 def getEstimatedTime():
+    estimatedTime = request.form['time']
+    print(estimatedTime)
+    pass
     # Write the function here
         
 @app.route('/moreDetailsOrder<orderId>')
