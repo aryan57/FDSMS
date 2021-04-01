@@ -27,7 +27,7 @@
                                 {% for order in recentOrderList %}
                                 <tr class="mdc-data-table__row">
                                     <th class="mdc-data-table__cell" scope="row">{{order['customerName']}}</th>
-                                    <th class="mdc-data-table__cell" scope="row">{{order['cost']}}</th>
+                                    <th class="mdc-data-table__cell" scope="row">{{order['orderValue']}}</th>
                                     <th class="mdc-data-table__cell" scope="row">{{order['updateMessage']}}</th>
                                     <td class="mdc-data-table__cell">
                                         <a href= {{url_for('orderDetailRestaurant', orderId=loop.index)}} id="anchor-link-nodesign">
