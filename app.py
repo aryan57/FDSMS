@@ -689,26 +689,31 @@ def orderDetailRestaurant(orderId):
     return render_template('orderDetailsRestaurant.html',  orderList=orderList, customerName=customerName, restaurantName=restaurantName, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final, updateLevel=currentOrder['updateLevel'])
 
 
-# This has to be updated
 @app.route('/updateStatus0<val>')
 @check_token
 def updateStatus0(val):
     if val == "Reject":
         updateOrderDic = {'heading': "Rejected"}
         db.collection('order').document(session['currentOrderUpdating']).update({'orderUpdates' : firestore.ArrayUnion([updatedOrderDic])})
+        db.collection('order').document(session['currentOrderUpdating']).update({'isPending': False})
+        db.collection('order').document(session['currentOrderUpdating']).update({'updateMessage': "Rejected"})
+        db.collection('customer').document(session['currentOrderUpdating']['customerId']).update({'pendingOrders' : firestore.ArrayRemove([session['currentOrderUpdating']['orderId']])})
+        db.collection('restaurant').document(session['currentOrderUpdating']['restaurantId']).update({'pendingOrders' : firestore.ArrayRemove([session['currentOrderUpdating']['orderId']])})
         return redirect('recentOrderRestaurant')
     else :
-        # updateOrderDic = {'heading': "Accepted"}
-        # db.collection('order').document(session['currentOrderUpdating']).update({'orderUpdates' : firestore.ArrayUnion([updatedOrderDic])})
         return render_template('getEstimatedTime.html')
 
 @app.route('/getEstimatedTime', methods=['POST','GET'])
 @check_token
 def getEstimatedTime():
     estimatedTime = request.form['time']
-    print(estimatedTime)
-    pass
-    # Write the function here
+    updateOrderDic = {
+        'heading': "Accepted",
+        'time' : string(time)+"min"
+        }
+    db.collection('order').document(session['currentOrderUpdating']).update({'updateMessage': "Accepted. Preparing Food"})
+    db.collection('order').document(session['currentOrderUpdating']).update({'orderUpdates' : firestore.ArrayUnion([updatedOrderDic])})
+    return redirect('recentOrderRestaurant')
         
 @app.route('/moreDetailsOrder<orderId>')
 @check_token
