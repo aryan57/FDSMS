@@ -22,11 +22,6 @@ db = firestore.client()
 bucket = storage.bucket()
 # storage = pyrebase_pb.storage()
 
-try:
-    json_data=db.collection('restaurant').document('KgAsPjK7aLcDN01kbWnW1lqcy063').get().to_dict()
-    print(json_data)
-except Exception as e:
-    print(e)
 
 
 def check_token(f):
