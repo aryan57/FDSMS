@@ -997,7 +997,24 @@ def offerListCustomer():
     # print(offerList)
     return render_template('allOfferCustomer.html', offerList=offerList)
 
+@app.route('/getPendingOrder')
+@check_token
+def getPendingOrder():
+    userId=session['user_id']
+    userType=session['userType']
 
+    pendingOrderId=[]
+
+    docs = db.collection('order').stream()
+    for doc in docs:
+        temp_dict=doc.to_dict()
+        if temp_dict['isPending'] :
+            if userType=='customer' and userId==temp_dict['customerId']:
+                pendingOrderId.append(doc.id)
+            elif userType=='restaurant' and userId==temp_dict['restaurantId']:
+                pendingOrderId.append(doc.id)
+
+    return {"ok":"ok"},200
     
 if __name__ == "__main__":
     # cache.init_app(app)
