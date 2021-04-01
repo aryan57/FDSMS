@@ -694,9 +694,10 @@ def orderDetailRestaurant(orderId):
 def updateStatus0(val):
     if val == "Reject":
         updateOrderDic = {'heading': "Rejected"}
-        db.collection('order').document(session['currentOrderUpdating']).update({'orderUpdates' : firestore.ArrayUnion([updatedOrderDic])})
-        db.collection('order').document(session['currentOrderUpdating']).update({'isPending': False})
-        db.collection('order').document(session['currentOrderUpdating']).update({'updateMessage': "Rejected"})
+        db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'orderUpdates' : firestore.ArrayUnion([updateOrderDic])})
+        db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'isPending': False})
+        db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'updateMessage': "Rejected"})
+        db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'updateLevel': 1})
         db.collection('customer').document(session['currentOrderUpdating']['customerId']).update({'pendingOrders' : firestore.ArrayRemove([session['currentOrderUpdating']['orderId']])})
         db.collection('restaurant').document(session['currentOrderUpdating']['restaurantId']).update({'pendingOrders' : firestore.ArrayRemove([session['currentOrderUpdating']['orderId']])})
         return redirect('recentOrderRestaurant')
@@ -706,14 +707,28 @@ def updateStatus0(val):
 @app.route('/getEstimatedTime', methods=['POST','GET'])
 @check_token
 def getEstimatedTime():
-    estimatedTime = request.form['time']
-    updateOrderDic = {
-        'heading': "Accepted",
-        'time' : string(time)+"min"
-        }
-    db.collection('order').document(session['currentOrderUpdating']).update({'updateMessage': "Accepted. Preparing Food"})
-    db.collection('order').document(session['currentOrderUpdating']).update({'orderUpdates' : firestore.ArrayUnion([updatedOrderDic])})
-    return redirect('recentOrderRestaurant')
+
+    try:
+        estimatedTime = request.form['time']
+        updateOrderDic = {
+            'heading': "Accepted",
+            'time' : str(estimatedTime)+" min"
+            
+            }
+        # print(estimatedTime)
+    except Exception as e:
+        print(str(e))
+
+    try:
+        db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'updateMessage': "Accepted. Preparing Food"})
+        db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'updateLevel': 1})
+        db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'orderUpdates' : firestore.ArrayUnion([updateOrderDic])})
+    except Exception as e:
+        print(str(e))
+
+    return redirect(url_for('recentOrderRestaurant'))
+    # return {"ok":"ok"},200
+
         
 @app.route('/moreDetailsOrder<orderId>')
 @check_token
