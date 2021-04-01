@@ -192,7 +192,8 @@ def customersignup():
             "areaId" : area,
             "customerId":user.uid,
             "ratingId":"",
-            "picSrc": storage_file_path
+            "picSrc": storage_file_path,
+            "pendingOrderId": []
         }
         db.collection("customer").document(user.uid).set(json_data)
         db.collection("type").document(user.uid).set({"type" : "customer"})
@@ -585,8 +586,9 @@ def order():
             'paidValue': cost+50,
             'orderDateTime': "",
             'deliveryAgentId' : "",
-            'updateLevel' :1,
+            'updateLevel' :0,
             'updateMessage' : "Accept/Reject",
+            'orderUpdates' : [],
             'orderId': ''
     }
     return redirect(url_for('orderDetails'))
@@ -619,25 +621,34 @@ def placeOrder():
     orderId=doc_reference.id
     # add restaurant array
     restaurantId=currentOrder['restaurantId']
-    restaurantDocReference = db.collection('restaurant').document(restaurantId).update({'pendingOrderId': firestore.ArrayUnion([orderId])})
-    restaurantDocReference = restaurantDocReference.child('pendingOrderId')
+    restaurantDocReference = db.collection('restaurant').document(restaurantId)
+    restaurantDocReference.update({'pendingOrderId': firestore.ArrayUnion([orderId])})
     # customer array main add karna hai
+    customerId=currentOrder['customerId']
+    customerDocReference = db.collection('customer').document(customerId)
+    customerDocReference.update({'pendingOrderId': firestore.ArrayUnion([orderId])})
+    
     # offerId !=None
-    # customer offer list, woh offer remove karna hai
-    # change this return statement
-    return 
+    if not currentOrder['offerId'] == None:
+        db.collection('customer').document(customerId).collection('promotionalOfferId').document(currentOrder['offerId']).delete()
+    return redirect(url_for('recentOrderCustomer'))
 
 @app.route('/recentOrderCustomer')
 @check_token
-def recentOrdersCustomer():
-    # This will have the database of the student and a list of all the present running orders.
+def recentOrderCustomer():
     user = session['session_user']
+    customerId=user['customerId']
+    listOrderId = db.collection('customer').document(customerId).get().to_dict()['pendingOrderId']
+    docs = db.collection('order').stream()
     recentOrderList=[]
-    # get the list of all the present orders and store in the list. This list will be 
-    # updated with every refresh
-    # push restaurant name in the list
-    
-    return render_template('recentOrderCustomer.html', recentOrderList=recentOrderList)
+    for doc in docs:
+        if doc.id in listOrderId:
+            temp=doc.to_dict()
+            temp['restaurantName']=db.collection('restaurant').document(temp['restaurantId']).get().to_dict()['name']
+            recentOrderList.append(temp)
+    session['presentOrderCustomer']=recentOrderList
+    session.modified = True
+    return render_template('recentOrderCustomer.html', recentOrderList=recentOrderList, )
 
 @app.route('/moreDetailsOrder<orderId>')
 @check_token
@@ -646,7 +657,8 @@ def moreDetailsOrder(orderId):
     if orderId > len(session['presentOrderCustomer']):
         return redirect(url_for('recentOrderCustomer'))
     orderId=orderId-1
-    currentOrder=session['presentOrderCustomer'][orderId]
+    currentOrder=session['presentOrderCustomer'][orderId]['orderId']
+    currentOrder=db.collection('order').document(currentOrder).get().to_dict()
     customerName = db.collection('customer').document(currentOrder['customerId']).get().to_dict()['name']
     restaurantName = db.collection('restaurant').document(currentOrder['restaurantId']).get().to_dict()['name']
     orderList=currentOrder['orderList']
@@ -658,8 +670,7 @@ def moreDetailsOrder(orderId):
         discount=min(int(int(currentOrder['orderValue'])*int(offerUsed['discount'])/100), int(offerUsed['upperLimit']))
     currentOrder['discountValue']=discount
     final=max(currentOrder['orderValue']+ currentOrder['deliveryCharge']- discount,0)
-    
-    return render_template('moreDetailsOrder.html',  orderList=orderList, customerName=customerName, restaurantName=restaurantName, offerUsed=offerUsed, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final)
+    return render_template('moreDetailsOrder.html',  orderList=orderList, customerName=customerName, restaurantName=restaurantName, offerUsed=offerUsed, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final, updateLevel=currentOrder['updateLevel'], orderUpdate = currentOrder['orderUpdates'])
 
 @app.route('/useOffer<toUse>')
 @check_token
