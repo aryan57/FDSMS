@@ -35,9 +35,9 @@
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recommended</th>
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Email Id</th>
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Menu</th>
-                    {% if user['user_type'] == "customer" %}
+                    {% if user['userType'] == "customer" %}
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Order Now</th>
-                    {% elif user['user_type'] == "admin" %}
+                    {% elif user['userType'] == "admin" %}
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recommend</th>
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Delete User</th>
                     {% endif %}
@@ -62,7 +62,7 @@
                           </button>
                         </a>
                       </td>
-                      {% if user['user_type'] == "customer" %}
+                      {% if user['userType'] == "customer" %}
                         <td class="mdc-data-table__cell">
                           <a href={{url_for('allFoodItem11', restaurantUserId = restaurant['userId'] )}} id="anchor-link-nodesign">
                             <button class="mdc-button mdc-button--raised" name="submit" type="submit">
@@ -70,7 +70,7 @@
                             </button>
                           </a>
                         </td>
-                      {% elif user['user_type'] == "admin" %}
+                      {% elif user['userType'] == "admin" %}
                         <td class="mdc-data-table__cell">
                           <a href={{url_for('changeRecommendRestaurant', id_to_change=loop.index)}} id="anchor-link-nodesign">
                             <button class="mdc-button mdc-button--raised" name="submit" type="submit">

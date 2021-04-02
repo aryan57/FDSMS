@@ -91,20 +91,11 @@ def restaurantsignup():
         
         blob = bucket.blob(storage_file_path)
         blob.upload_from_file(local_file_obj,content_type="image/jpeg")
-        # db.collection('area').document(area).update()
-        # session['sign_message']="Restaurant SignedUp. Please Login"
-        # return redirect(url_for('login'))
-    except Exception as e:
-        print(e)
-        session['sign_message']="error uploading photo in firebase storage"
-        return redirect(url_for('restaurantSignup'))
-    try :
-        db.collection('area').document(area).update({"restaurantId" : firestore.ArrayUnion([user.uid])})
         session['sign_message']="Restaurant SignedUp. Please Login"
         return redirect(url_for('login'))
     except Exception as e:
-        # print(str(e))
-        session['sign_message']= "Signup was unsuccessful, unable to enter area"
+        print(e)
+        session['sign_message']="error uploading photo in firebase storage"
         return redirect(url_for('restaurantSignup'))
 
 @app.route('/signup/deliveryAgent', methods=['POST', 'GET'])
@@ -418,22 +409,22 @@ def foodItemAdder():
             "pricePerItem" : price,
             "isRecommended": False,
             "ratingId": "",
-            "restaurantId" : session["userId"],
+            "restaurantId" : session["user_id"],
             "picSrc": ""
         }
-        doc_reference = db.collection("restaurant").document(session["userId"]).collection("foodItem").document()
+        doc_reference = db.collection("restaurant").document(session["user_id"]).collection("foodItem").document()
         doc_reference.set(foodItem)
-        doc_reference1 = db.collection("restaurant").document(session["userId"]).collection("foodItem").document(doc_reference.id).update({"foodItemId":doc_reference.id})
+        doc_reference1 = db.collection("restaurant").document(session["user_id"]).collection("foodItem").document(doc_reference.id).update({"foodItemId":doc_reference.id})
         # return {"ok":"True"},200
         
     except:
         session['food_item_addition_msg'] = "Error adding food item text data in database"
         return redirect(url_for('addFoodItem'))
     try:
-        storage_file_path = "restaurant/"+session["userId"]+"_"+doc_reference.id+".jpg"
+        storage_file_path = "restaurant/"+session["user_id"]+"_"+doc_reference.id+".jpg"
         blob = bucket.blob(storage_file_path)
         blob.upload_from_file(local_file_obj,content_type="image/jpeg")
-        doc_reference = db.collection("restaurant").document(session["userId"]).collection("foodItem").document(doc_reference.id).update({"picSrc":storage_file_path})
+        doc_reference = db.collection("restaurant").document(session["user_id"]).collection("foodItem").document(doc_reference.id).update({"picSrc":storage_file_path})
         session['food_item_addition_msg']="Food item text and photo successfully added in database."
         return redirect(url_for('createMenu'))
     except Exception as e:
@@ -1049,6 +1040,39 @@ def pastOrder():
         session.modified = True
         return render_template('pastOrderRestaurant.html',pastOrderList=pastOrderList)
 
+@app.route('/nearbyDeliveryAgents')
+@check_token
+def nearbyDeliveryAgents():
+
+    if session['sessionUser']['userType']!='restaurant':
+        return redirect(url_for('logout'))
+
+    areaId=session['sessionUser']['areaId']
+
+    nearbyDeliveryAgentsList=[]
+
+    doc_refrence = db.collection('deliveryAgent').stream()
+
+    for doc in doc_refrence:
+        temp_dict=doc.to_dict()
+        if temp_dict['areaId']==areaId:
+            nearbyDeliveryAgentsList.append(temp_dict)
+
+    return {"ok":nearbyDeliveryAgentsList},200
+
+@app.route('/updateArea')
+@check_token
+def updateArea():
+
+    if session['sessionUser']['userType']!='deliveryAgent':
+        return redirect(url_for('logout'))
+
+    deliveryAgentId=session['userId']
+    newAreaId=""
+
+    db.collection('deliveryAgent').document(deliveryAgentId).update({'areaId':newAreaId})
+
+    return {"ok":"ok"},200
     
 if __name__ == "__main__":
     # cache.init_app(app)
