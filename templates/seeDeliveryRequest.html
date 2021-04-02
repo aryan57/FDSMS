@@ -24,6 +24,7 @@
           {% if not deliveryRequestList %}
               <h1>There are no Delivery Request in List</h1>
           {% else %}
+              <h1>Delivery Requests</h1>
             <div class="mdc-data-table">
               <div class="mdc-data-table__table-container">
                 <table class="mdc-data-table__table" aria-label="Dessert calories">
@@ -33,8 +34,8 @@
                       <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Customer Name</th>
                       <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Order Cost</th>
                       <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Delivery Area</th>
-                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col"></th>
-                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col"></th>
+                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Accept Request</th>
+                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">More Details</th>
                     </tr>
                   </thead>
                   <tbody class="mdc-data-table__content">
@@ -54,7 +55,7 @@
                         <td class="mdc-data-table__cell">
                           <a href= {{url_for('moreDetailsDeliveryRequest', id_to_change=loop.index)}} id="anchor-link-nodesign">
                             <button class="mdc-button mdc-button--raised" name="submit">
-                              <span class="mdc-button__label">More Details</span>
+                              <span class="mdc-button__label">Details</span>
                             </button>
                           </a>
                         </td>
@@ -67,14 +68,5 @@
           {% endif %}
         </div>
       </div>
-      {% if user['userType'] == 'customer' %}
-        <div class='row justify-content-center'>
-          <div class='col-auto align-self-center'>
-            <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-              <span class="mdc-button__label">Order</span>
-            </button>
-          </div> 
-        </div>
-      {% endif %}
     </div>
 {% endblock %}

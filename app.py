@@ -1097,9 +1097,9 @@ def addPendingOrderId():
 
     return {"ok":"ok"},200
 
-@app.route('/getPickupOrdersForADeliveryAgent')
+@app.route('/seeDeliveryRequest')
 @check_token
-def getAvailablePickupOrdersForADeliveryAgent():
+def seeDeliveryRequest():
 
     if session['sessionUser']['userType']!='deliveryAgent':
         return redirect(url_for('logout'))
@@ -1115,10 +1115,10 @@ def getAvailablePickupOrdersForADeliveryAgent():
         if temp_dict['isPending']==True: # it will be true , just doing it to be on the safe side
             temp_dict['restaurant']=db.collection('restaurant').document(temp_dict['restaurantId']).get().to_dict()
             temp_dict['customer']=db.collection('customer').document(temp_dict['customerId']).get().to_dict()
-            temp_dict['area']=db.collection('area').document(temp_dict['areaId']).get().to_dict()
+            temp_dict['area']=db.collection('area').document(areaId).get().to_dict()
             deliveryRequestList.append(temp_dict)
 
-    return {"ok":deliveryRequestList},200
+    return render_template("seeDeliveryRequest.html", deliveryRequestList = deliveryRequestList)
 
 @app.route('/acceptDeliveryRequest')
 @check_token

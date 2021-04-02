@@ -43,9 +43,11 @@
         </button>
       </div>
       <div class='col-auto align-self-center'>
-        <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-          <span class="mdc-button__label">See Delivery Request</span>
-        </button>
+        <a href={{url_for('seeDeliveryRequest')}} id="anchor-link-nodesign">
+          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+            <span class="mdc-button__label">See Delivery Request</span>
+          </button>
+        </a>
       </div>
     </div>
     <div class='row justify-content-center'>
