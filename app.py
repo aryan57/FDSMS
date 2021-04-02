@@ -1118,6 +1118,24 @@ def getAvailablePickupOrdersForADeliveryAgent():
             deliveryRequestList.append(temp_dict)
 
     return {"ok":deliveryRequestList},200
+
+@app.route('/acceptDeliveryRequest')
+@check_token
+def acceptDeliveryRequest():
+    
+    if session['sessionUser']['userType']!='deliveryAgent':
+        return redirect(url_for('logout'))
+
+    return {"ok":"ok"},200
+
+@app.route('/moreDetailsDeliveryRequest')
+@check_token
+def moreDetailsDeliveryRequest():
+
+    if session['sessionUser']['userType']!='deliveryAgent':
+        return redirect(url_for('logout'))
+
+    return {"ok":"ok"},200
     
 if __name__ == "__main__":
     # cache.init_app(app)
