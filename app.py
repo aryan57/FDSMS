@@ -1077,11 +1077,48 @@ def updateArea():
         return redirect(url_for('logout'))
 
     deliveryAgentId=session['userId']
-    newAreaId=""
+    newAreaId="" #get from front end
 
     db.collection('deliveryAgent').document(deliveryAgentId).update({'areaId':newAreaId})
 
     return {"ok":"ok"},200
+
+@app.route('/addPendingOrderId')
+@check_token
+def addPendingOrderId():
+
+    if session['sessionUser']['userType']!='restaurant':
+        return redirect(url_for('logout'))
+
+    pendingOrderId="" #get from front end
+    areaId=session['sessionUser']['areaId']
+
+    db.collection('area').document(areaId).update({'availableOrderIdForPickup':firestore.ArrarUnion([pendingOrderId])})
+
+    return {"ok":"ok"},200
+
+@app.route('/getPickupOrdersForADeliveryAgent')
+@check_token
+def getAvailablePickupOrdersForADeliveryAgent():
+
+    if session['sessionUser']['userType']!='deliveryAgent':
+        return redirect(url_for('logout'))
+
+    areaId=session['sessionUser']['areaId']
+
+    orderIdForADeliveryAgent=db.collection('area').document(areaId).get().to_dict()['availableOrderIdForPickup']
+    deliveryRequestList=[]
+
+    for orderId in orderIdForADeliveryAgent:
+        temp_dict=db.collection('order').document(orderId).get().to_dict()
+
+        if temp_dict['isPending']==True: # it will be true , just doing it to be on the safe side
+            temp_dict['restaurant']=db.collection('restaurant').document(temp_dict['restaurantId']).get().to_dict()
+            temp_dict['customer']=db.collection('customer').document(temp_dict['customerId']).get().to_dict()
+            temp_dict['area']=db.collection('area').document(temp_dict['areaId']).get().to_dict()
+            deliveryRequestList.append(temp_dict)
+
+    return {"ok":deliveryRequestList},200
     
 if __name__ == "__main__":
     # cache.init_app(app)
