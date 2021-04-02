@@ -1104,6 +1104,9 @@ def getAvailablePickupOrdersForADeliveryAgent():
         temp_dict=db.collection('order').document(orderId).get().to_dict()
 
         if temp_dict['isPending']==True: # it will be true , just doing it to be on the safe side
+            temp_dict['restaurant']=db.collection('restaurant').document(temp_dict['restaurantId']).get().to_dict()
+            temp_dict['customer']=db.collection('customer').document(temp_dict['customerId']).get().to_dict()
+            temp_dict['area']=db.collection('area').document(temp_dict['areaId']).get().to_dict()
             deliveryRequestList.append(temp_dict)
 
     return {"ok":deliveryRequestList},200
