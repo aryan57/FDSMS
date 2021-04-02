@@ -36,9 +36,9 @@
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Date of Birth</th>
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Email ID</th>
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Phone Number</th>
-                    {% if user['user_type']=='admin' %}
+                    {% if user['userType']=='admin' %}
                       <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Delete User</th>
-                    {% elif user['user_type']=='restaurant' %}
+                    {% elif user['userType']=='restaurant' %}
                     {% endif %}
                   </tr>
                 </thead>
@@ -52,7 +52,7 @@
                       <td class="mdc-data-table__cell">{{deliveryAgent['dateOfBirth']}}</td>
                       <td class="mdc-data-table__cell">{{deliveryAgent['email']}}</td>
                       <td class="mdc-data-table__cell">{{deliveryAgent['mobileNumber']}}</td>
-                      {% if user['user_type']=='admin' %}
+                      {% if user['userType']=='admin' %}
                         <td class="mdc-data-table__cell">
                           <a href={{url_for('deleteUser', user_type="deliveryAgent", delete_id=loop.index)}} id="anchor-link-nodesign">
                             <button class="mdc-button mdc-button--raised" name="submit" type="submit">
@@ -60,7 +60,7 @@
                             </button>
                           </a>
                         </td>
-                      {% elif user['user_type']=='restaurant' %}
+                      {% elif user['userType']=='restaurant' %}
                       {% endif %}
                     </tr>
                   {% endfor %} 
