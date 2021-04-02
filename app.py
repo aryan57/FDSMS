@@ -1035,6 +1035,33 @@ def pastOrder():
     if(userType=="restaurant"):
         return render_template('pastOrderRestaurant.html',pastOrderList=pastOrderList)
 
+@app.route('/nearbyDeliveryAgents')
+@check_token
+def nearbyDeliveryAgents():
+
+    areaId=session['']
+
+    nearbyDeliveryAgentsList=[]
+
+    doc_refrence = db.collection('deliveryAgent').stream()
+
+    for doc in doc_refrence:
+        temp_dict=doc.to_dict()
+        if temp_dict['areaId']==areaId:
+            nearbyDeliveryAgentsList.append(temp_dict)
+
+    return {"ok":nearbyDeliveryAgentsList},200
+
+@app.route('/updateArea')
+@check_token
+def updateArea():
+
+    deliveryAgentId=session['sessionUser']['areaId']
+    newAreaId="123"
+
+    db.collection('deliveryAgent').document(deliveryAgentId).update({'areaId':newAreaId})
+
+    return {"ok":"ok"},200
     
 if __name__ == "__main__":
     # cache.init_app(app)
