@@ -1095,12 +1095,18 @@ def getAvailablePickupOrdersForADeliveryAgent():
     if session['sessionUser']['userType']!='deliveryAgent':
         return redirect(url_for('logout'))
 
-    deliveryAgentId=session['userId']
     areaId=session['sessionUser']['areaId']
 
-    availablePickupOrdersForADeliveryAgent=db.collection('area').document(areaId).get().to_dict()['availableOrderIdForPickup']
+    orderIdForADeliveryAgent=db.collection('area').document(areaId).get().to_dict()['availableOrderIdForPickup']
+    deliveryRequestList=[]
 
-    return {"ok":availablePickupOrdersForADeliveryAgent},200
+    for orderId in orderIdForADeliveryAgent:
+        temp_dict=db.collection('order').document(orderId).get().to_dict()
+
+        if temp_dict['isPending']==True: # it will be true , just doing it to be on the safe side
+            deliveryRequestList.append(temp_dict)
+
+    return {"ok":deliveryRequestList},200
     
 if __name__ == "__main__":
     # cache.init_app(app)
