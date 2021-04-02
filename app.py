@@ -1087,6 +1087,20 @@ def addPendingOrderId():
     db.collection('area').document(areaId).update({'availableOrderIdForPickup':firestore.ArrarUnion([pendingOrderId])})
 
     return {"ok":"ok"},200
+
+@app.route('/getPickupOrdersForADeliveryAgent')
+@check_token
+def getAvailablePickupOrdersForADeliveryAgent():
+
+    if session['sessionUser']['userType']!='deliveryAgent':
+        return redirect(url_for('logout'))
+
+    deliveryAgentId=session['userId']
+    areaId=session['sessionUser']['areaId']
+
+    availablePickupOrdersForADeliveryAgent=db.collection('area').document(areaId).get().to_dict()['availableOrderIdForPickup']
+
+    return {"ok":availablePickupOrdersForADeliveryAgent},200
     
 if __name__ == "__main__":
     # cache.init_app(app)
