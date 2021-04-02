@@ -56,7 +56,7 @@
                       </td>
                       <td class="mdc-data-table__cell">{{restaurant['email']}}</td>
                       <td class="mdc-data-table__cell">
-                        <a href={{url_for('allFoodItem11', restaurantUserId = restaurant['user_id'] )}} id="anchor-link-nodesign">
+                        <a href={{url_for('allFoodItem11', restaurantUserId = restaurant['userId'] )}} id="anchor-link-nodesign">
                           <button class="mdc-button mdc-button--raised" name="submit" type="submit">
                             <span class="mdc-button__label">Open Menu</span>
                           </button>
@@ -64,7 +64,7 @@
                       </td>
                       {% if user['user_type'] == "customer" %}
                         <td class="mdc-data-table__cell">
-                          <a href={{url_for('allFoodItem11', restaurantUserId = restaurant['user_id'] )}} id="anchor-link-nodesign">
+                          <a href={{url_for('allFoodItem11', restaurantUserId = restaurant['userId'] )}} id="anchor-link-nodesign">
                             <button class="mdc-button mdc-button--raised" name="submit" type="submit">
                               <span class="mdc-button__label">Click Here</span>
                             </button>

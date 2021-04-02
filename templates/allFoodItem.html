@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block main %}
-  {% if user['user_type']  == 'customer' %}
+  {% if user['userType']  == 'customer' %}
   <form action={{url_for('order')}} method="POST">
   {% endif %}
     <div class='container-fluid' >
@@ -36,9 +36,9 @@
                       <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Rating</th>
                       <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Price</th>
                       <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recommended</th>
-                      {% if user['user_type'] == "customer" %}
+                      {% if user['userType'] == "customer" %}
                         <th class="mdc-data-table__header-cell bg-info" role="columnheader" scope="col">Frequency</th>
-                      {% elif user['user_type'] == "admin" %}
+                      {% elif user['userType'] == "admin" %}
                         <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recommend</th>
                       {% endif %}
                     </tr>
@@ -54,11 +54,11 @@
                             Yes
                           {% endif %}
                         </td>
-                        {% if user['user_type'] == 'customer' %}
+                        {% if user['userType'] == 'customer' %}
                           <td class="col-2 mdc-data-table__cell">
                             <input type="number" class="mdc-text-field__input" aria-labelledby="my-label-id" value="0" name={{loop.index}} required min="0">
                           </td>
-                        {% elif user['user_type'] == "admin" %}
+                        {% elif user['userType'] == "admin" %}
                           <td class="mdc-data-table__cell">
                             <a href= {{url_for('changeRecommendFoodItem', id_to_change=loop.index)}} id="anchor-link-nodesign">
                               <button class="mdc-button mdc-button--raised" name="submit">
@@ -76,7 +76,7 @@
           {% endif %}
         </div>
       </div>
-      {% if user['user_type'] == 'customer' %}
+      {% if user['userType'] == 'customer' %}
         <div class='row justify-content-center'>
           <div class='col-auto align-self-center'>
             <button class="mdc-button mdc-button--raised" name="submit" type="submit">
@@ -86,7 +86,7 @@
         </div>
       {% endif %}
     </div>
-  {% if user['user_type'] == 'customer' %}
+  {% if user['userType'] == 'customer' %}
   </form>
   {% endif %}
   <script>
