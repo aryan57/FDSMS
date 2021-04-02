@@ -35,7 +35,7 @@
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recommended</th>
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Email Id</th>
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Menu</th>
-                    {% if user['user_type'] == "customer" %}
+                    {% if user['userType'] == "customer" %}
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Order Now</th>
                     {% endif %}
                   </tr>
@@ -59,7 +59,7 @@
                           </button>
                         </a>
                       </td>
-                      {% if user['user_type'] == "customer" %}
+                      {% if user['userType'] == "customer" %}
                         <td class="mdc-data-table__cell">
                           <a href={{url_for('allFoodItem11', restaurantUserId = restaurant['user_id'] )}} id="anchor-link-nodesign">
                             <button class="mdc-button mdc-button--raised" name="submit" type="submit">
