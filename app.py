@@ -230,12 +230,12 @@ def token():
         # user2 = pyrebase_pb.auth().get_account_info(user['idToken'])
         user_type = db.collection('type').document(user["localId"]).get().to_dict()["type"]
         json_data = db.collection(user_type).document(user["localId"]).get().to_dict()
-        session['session_user']= json_data
-        session['session_user']['user_type']=user_type
+        session['sessionUser']= json_data
+        session['sessionUser']['userType']=user_type
         session['jwt_token']=user['idToken']
         session['refresh_token']=user['refreshToken']
-        session['user_id']=user['localId']
-        print(session['session_user']['user_type'])
+        session['userId']=user['localId']
+        print(session['sessionUser']['userType'])
         if user_type=="customer" : 
             return redirect(url_for('customerDashboard'))
         elif user_type == "restaurant" : 
@@ -307,8 +307,8 @@ def deliveryAgentSignup():
 @app.route('/customerDashboard')
 @check_token
 def customerDashboard():
-    user=session['session_user']
-    if user['user_type'] == 'customer':
+    user=session['sessionUser']
+    if user['userType'] == 'customer':
         return render_template('customerDashboard.html', user=user)
     else:
         return redirect(url_for('logout'))
@@ -316,8 +316,8 @@ def customerDashboard():
 @app.route('/restaurantDashboard')
 @check_token
 def restaurantDashboard():
-    user=session['session_user']
-    if user['user_type'] == 'restaurant':
+    user=session['sessionUser']
+    if user['userType'] == 'restaurant':
         return render_template('restaurantDashboard.html', user=user)
     else:
         return redirect(url_for('logout'))
@@ -325,8 +325,8 @@ def restaurantDashboard():
 @app.route('/deliveryAgentDashboard')
 @check_token
 def deliveryAgentDashboard():
-    user=session['session_user']
-    if user['user_type'] == 'deliveryAgent':
+    user=session['sessionUser']
+    if user['userType'] == 'deliveryAgent':
         return render_template('deliveryAgentDashboard.html', user=user)
     else:
         return redirect(url_for('logout'))
@@ -335,8 +335,8 @@ def deliveryAgentDashboard():
 @check_token
 def adminDashboard():
     print(type(session))
-    user=session['session_user']
-    if user['user_type'] == 'admin':
+    user=session['sessionUser']
+    if user['userType'] == 'admin':
         return render_template('adminDashboard.html', user=user)
     else:
         return redirect(url_for('logout'))
@@ -344,7 +344,7 @@ def adminDashboard():
 @app.route('/personalData')
 @check_token
 def personalData():
-    user=session['session_user']
+    user=session['sessionUser']
     return render_template('personalData.html', user=user)
 
 @app.route('/logout')
@@ -357,11 +357,11 @@ def logout():
 @app.route('/createMenu')
 @check_token
 def createMenu():
-    user = session['session_user']
+    user = session['sessionUser']
     print(user)
-    if not user['user_type'] == 'restaurant':
+    if not user['userType'] == 'restaurant':
         return redirect(url_for('logout'))
-    currentRestaurantMenuId=session['user_id']
+    currentRestaurantMenuId=session['userId']
     foodItemList=[]
     docs=db.collection('restaurant').document(currentRestaurantMenuId).collection('foodItem').stream()
     for doc in docs:
@@ -380,8 +380,8 @@ def createMenu():
 @app.route('/addFoodItem')
 @check_token
 def addFoodItem():
-    user = session['session_user']
-    if user['user_type'] == 'restaurant':
+    user = session['sessionUser']
+    if user['userType'] == 'restaurant':
         message=session['food_item_addition_msg']
         session['food_item_addition_msg']="False"
         return render_template('addFoodItem.html', user=user, message=message)
@@ -391,8 +391,8 @@ def addFoodItem():
 @app.route('/finishMenu')
 @check_token
 def finishMenu():
-    user = session['session_user']
-    if user['user_type']=='restaurant':
+    user = session['sessionUser']
+    if user['userType']=='restaurant':
         return render_template('finishMenu.html', user=user)
     else:
         return redirect(url_for('logout'))
@@ -437,15 +437,15 @@ def foodItemAdder():
 @app.route('/allRestaurant')
 @check_token
 def allRestaurant():
-    user=session['session_user']
-    if not user['user_type'] == 'admin' and not user['user_type'] == 'customer':
+    user=session['sessionUser']
+    if not user['userType'] == 'admin' and not user['userType'] == 'customer':
         return redirect(url_for('logout'))
     session['restaurantList']=[]
     
     docs=db.collection('restaurant').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
-        temp_dict['user_id']= doc.id
+        temp_dict['userId']= doc.id
         session['restaurantList'].append(temp_dict)
     restaurantList=session['restaurantList']
     return render_template('allRestaurant.html', user=user, restaurantList=restaurantList)
@@ -453,28 +453,28 @@ def allRestaurant():
 @app.route('/allCustomers')
 @check_token
 def allCustomers():
-    user=session['session_user']
-    if not user['user_type']=="admin":
+    user=session['sessionUser']
+    if not user['userType']=="admin":
         return redirect(url_for('logout'))
     session['customerList']=[]
     docs=db.collection('customer').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
-        temp_dict['user_id']= doc.id
+        temp_dict['userId']= doc.id
         session['customerList'].append(temp_dict)
     return render_template('allCustomers.html', user=user)
 
 @app.route('/allDeliveryAgents')
 @check_token
 def allDeliveryAgents():
-    user=session['session_user']
-    if not user['user_type']=="admin" and not user['user_type']=='restaurant':
+    user=session['sessionUser']
+    if not user['userType']=="admin" and not user['userType']=='restaurant':
         return redirect(url_for('logout'))
     session['deliveryAgentList']=[]
     docs=db.collection('deliveryAgent').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
-        temp_dict['user_id']= doc.id
+        temp_dict['userId']= doc.id
         session['deliveryAgentList'].append(temp_dict)
     return render_template('allDeliveryAgents.html', user=user)
 
@@ -489,8 +489,8 @@ def allFoodItem11(restaurantUserId):
 @check_token
 def allFoodItem():
 
-    user=session['session_user']
-    if not user['user_type']=='customer' and not user['user_type']=='admin':
+    user=session['sessionUser']
+    if not user['userType']=='customer' and not user['userType']=='admin':
         return redirect(url_for('logout'))
 
     foodItemList=[]
@@ -554,24 +554,24 @@ def delete_collection(coll_ref, batch_size):
 @check_token
 def deleteUser(user_type, delete_id):
     # print(request.args.get(user_type))
-    if not session['session_user']['user_type'] == "admin":
+    if not session['sessionUser']['userType'] == "admin":
         return redirect(url_for('logout'))
     to_delete = int(delete_id)
     to_delete=to_delete-1
     if user_type == "restaurant":
         user_deleted=session['restaurantList'].pop(to_delete)
         session.modified = True
-        deleteUserFromDatabase(user_deleted['user_id'])
+        deleteUserFromDatabase(user_deleted['userId'])
         return redirect(url_for('allRestaurant'))
     elif user_type == "customer":
         user_deleted = session['customerList'].pop(to_delete)
         session.modified = True
-        deleteUserFromDatabase(user_deleted['user_id'])
+        deleteUserFromDatabase(user_deleted['userId'])
         return redirect(url_for('allCustomers'))
     elif user_type == 'deliveryAgent':
         user_deleted = session['deliveryAgentList'].pop(to_delete)
         session.modified = True
-        deleteUserFromDatabase(user_deleted['user_id'])
+        deleteUserFromDatabase(user_deleted['userId'])
         return redirect(url_for('allDeliveryAgents'))
     
     
@@ -595,7 +595,7 @@ def order():
             'orderList': orderList, 
             'deliveryCharge': 50,
             'isPending': True,
-            'customerId': session['user_id'],
+            'customerId': session['userId'],
             'restaurantId': foodItemList[0]['restaurantId'],
             'offerId': None,
             'discountValue':0,
@@ -653,7 +653,7 @@ def placeOrder():
 @app.route('/recentOrderCustomer')
 @check_token
 def recentOrderCustomer():
-    user = session['session_user']
+    user = session['sessionUser']
     customerId=user['customerId']
     listOrderId = db.collection('customer').document(customerId).get().to_dict()['pendingOrderId']
     docs = db.collection('order').stream()
@@ -670,7 +670,7 @@ def recentOrderCustomer():
 @app.route('/recentOrderRestaurant')
 @check_token
 def recentOrderRestaurant():
-    user=session['session_user']
+    user=session['sessionUser']
     restaurantId = user['restaurantId']
     listOrderId = db.collection('restaurant').document(restaurantId).get().to_dict()['pendingOrderId']
     docs = db.collection('order').stream()
@@ -772,7 +772,7 @@ def moreDetailsOrder(orderId):
 @app.route('/useOffer<toUse>')
 @check_token
 def useOffer(toUse):
-    user=session['user_id']
+    user=session['userId']
     toUse=int(toUse)
     toUse=toUse-1
     session['currentOrderCreating']['offerId']=session['offerList'][toUse]['offerId']
@@ -787,19 +787,19 @@ def removeOfferFromOrder():
 @app.route('/redirectDashboard')
 @check_token
 def redirectDashboard():
-    if session['session_user']['user_type']=='customer':
+    if session['sessionUser']['userType']=='customer':
         return redirect(url_for('customerDashboard'))
-    elif session['session_user']['user_type']=='restaurant':
+    elif session['sessionUser']['userType']=='restaurant':
         return redirect(url_for('restaurantDashboard'))
-    elif session['session_user']['user_type']=='deliveryAgent':
+    elif session['sessionUser']['userType']=='deliveryAgent':
         return redirect(url_for('deliverAgentDashboard'))
-    elif session['session_user']['user_type']=='admin':
+    elif session['sessionUser']['userType']=='admin':
         return redirect(url_for('adminDashboard'))
     
 @app.route('/deleteFoodItem<foodItemId>')
 @check_token
 def deleteFoodItem(foodItemId):
-    restaurantId=session['user_id']
+    restaurantId=session['userId']
 
     #command_to delete the id
     try:
@@ -880,14 +880,14 @@ def changeRecommendFoodItem(id_to_change):
 @app.route('/recommendedRestaurant')
 @check_token
 def recommendedRestaurant():
-    user=session['session_user']
-    if not user['user_type'] == 'customer':
+    user=session['sessionUser']
+    if not user['userType'] == 'customer':
         return redirect(url_for('logout'))
     session['restaurantList']=[]
     docs=db.collection('restaurant').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
-        temp_dict['user_id']= doc.id
+        temp_dict['userId']= doc.id
         session['restaurantList'].append(temp_dict)
     restaurantList=[]
     for restaurant in session['restaurantList']:
@@ -900,10 +900,10 @@ def recommendedRestaurant():
 @app.route('/createOffer')
 @check_token
 def createOffer():
-    user = session['session_user']
-    if not user['user_type'] == 'admin':
+    user = session['sessionUser']
+    if not user['userType'] == 'admin':
         return redirect(url_for('logout'))
-    currentAdminId=session['user_id']
+    currentAdminId=session['userId']
     offerList=[]
     # Add statement for getting a docs for the offers
     docs=db.collection('offer').stream()
@@ -922,8 +922,8 @@ def createOffer():
 @app.route('/addOffer')
 @check_token
 def addOffer():
-    user = session['session_user']
-    if user['user_type'] == 'admin':
+    user = session['sessionUser']
+    if user['userType'] == 'admin':
         message=session['offerAdditionMessage']
         session['offerAdditionMessage']="False"
         return render_template('addOffer.html', user=user, message=message)
@@ -1002,7 +1002,7 @@ def giveOffer(toGive):
 @app.route('/offerListCustomer')
 @check_token
 def offerListCustomer():
-    user=session['user_id']
+    user=session['userId']
     session['offerList']=[]
     docs = db.collection('customer').document(user).collection('promotionalOfferId').stream()
     for doc in docs:
@@ -1016,8 +1016,8 @@ def offerListCustomer():
 @app.route('/pastOrder')
 @check_token
 def pastOrder():
-    userId=session['user_id']
-    userType=session['userType']
+    userId=session['userId']
+    userType=session['sessionUser']['userType']
 
     pastOrderList=[]
 
