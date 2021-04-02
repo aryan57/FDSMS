@@ -78,7 +78,6 @@ def restaurantsignup():
             "restaurantId" : user.uid,
             "restaurantPicSrc" : storage_file_path,
             "pendingOrderId": [],
-            "completedOrderId": [],
             "email" : email,
             "isRecommended" : False
         }
@@ -592,7 +591,7 @@ def order():
     cost = 0
     orderList = []
     for i in range(len(foodItemList)):
-        if(request.form[str(i+1)]):
+        if not int(request.form[str(i+1)]) == 0:
             print(foodItemList[i]['name'])
             foodItemList[i]['frequency'] = int(request.form[str(i+1)])
             foodItemList[i]['pricePerItem'] = int(foodItemList[i]['pricePerItem'])
@@ -711,7 +710,7 @@ def orderDetailRestaurant(orderId):
     currentOrder['discountValue']=discount
     session['currentOrderUpdating']=currentOrder
     final=max(currentOrder['orderValue']+ currentOrder['deliveryCharge']- discount,0)
-    return render_template('orderDetailsRestaurant.html',  orderList=orderList, customerName=customerName, restaurantName=restaurantName, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final, updateLevel=currentOrder['updateLevel'])
+    return render_template('orderDetailsRestaurant.html', currentOrder = currentOrder, orderList=orderList, customerName=customerName, restaurantName=restaurantName, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final, updateLevel=currentOrder['updateLevel'])
 
 
 @app.route('/updateStatus0<val>')
@@ -1035,13 +1034,19 @@ def pastOrder():
         temp_dict=doc.to_dict()
         if not temp_dict['isPending'] :
             if userType=='customer' and userId==temp_dict['customerId']:
+                temp_dict['restaurantName']=db.collection('restaurant').document(temp_dict['restaurantId']).get().to_dict()['name']
                 pastOrderList.append(temp_dict)
             elif userType=='restaurant' and userId==temp_dict['restaurantId']:
+                temp_dict['customerName']=db.collection('customer').document(temp_dict['customerId']).get().to_dict()['name']
                 pastOrderList.append(temp_dict)
 
     if(userType=="customer"):
+        session['presentOrderCustomer']= pastOrderList
+        session.modified = True
         return render_template('pastOrderCustomer.html',pastOrderList=pastOrderList)
     if(userType=="restaurant"):
+        session['presentOrderRestaurant']= pastOrderList
+        session.modified = True
         return render_template('pastOrderRestaurant.html',pastOrderList=pastOrderList)
 
     
