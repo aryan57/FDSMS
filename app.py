@@ -744,7 +744,14 @@ def getEstimatedTime():
     return redirect(url_for('recentOrderRestaurant'))
     # return {"ok":"ok"},200
 
-        
+@app.route('/updateStatus1')
+@check_token
+def updateStatus1():
+    return render_template('foodPrepared.html')
+
+
+
+
 @app.route('/moreDetailsOrder<orderId>')
 @check_token
 def moreDetailsOrder(orderId):
@@ -1055,10 +1062,12 @@ def nearbyDeliveryAgents():
 
     for doc in doc_refrence:
         temp_dict=doc.to_dict()
-        if temp_dict['areaId']==areaId:
+        if temp_dict['areaId']==areaId and temp_dict['isAvailable']:
+            temp_dict['areaId'] = db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
             nearbyDeliveryAgentsList.append(temp_dict)
+    print(nearbyDeliveryAgentsList)
 
-    return {"ok":nearbyDeliveryAgentsList},200
+    return render_template('nearbyDeliveryAgent.html', nearbyDeliveryAgentsList = nearbyDeliveryAgentsList)
 
 @app.route('/updateArea')
 @check_token
