@@ -749,7 +749,20 @@ def getEstimatedTime():
 def updateStatus1():
     return render_template('foodPrepared.html')
 
+@app.route('/addPendingOrderId')
+@check_token
+def addPendingOrderId():
 
+    if session['sessionUser']['userType']!='restaurant':
+        return redirect(url_for('logout'))
+
+    pendingOrderId=session['currentOrderUpdating']['orderId'] #get from front end
+    areaId=session['sessionUser']['areaId']
+
+    db.collection('area').document(areaId).update({'availableOrderIdForPickup':firestore.ArrayUnion([pendingOrderId])})
+    db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'updateMessage': "Food is Prepared"})
+    db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'updateLevel': 2})
+    return redirect(url_for('recentOrderRestaurant'))
 
 
 @app.route('/moreDetailsOrder<orderId>')
@@ -1063,7 +1076,7 @@ def nearbyDeliveryAgents():
     for doc in doc_refrence:
         temp_dict=doc.to_dict()
         if temp_dict['areaId']==areaId and temp_dict['isAvailable']:
-            temp_dict['areaId'] = db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
+            temp_dict['area'] = db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
             nearbyDeliveryAgentsList.append(temp_dict)
     print(nearbyDeliveryAgentsList)
 
@@ -1080,20 +1093,6 @@ def updateArea():
     newAreaId="" #get from front end
 
     db.collection('deliveryAgent').document(deliveryAgentId).update({'areaId':newAreaId})
-
-    return {"ok":"ok"},200
-
-@app.route('/addPendingOrderId')
-@check_token
-def addPendingOrderId():
-
-    if session['sessionUser']['userType']!='restaurant':
-        return redirect(url_for('logout'))
-
-    pendingOrderId="" #get from front end
-    areaId=session['sessionUser']['areaId']
-
-    db.collection('area').document(areaId).update({'availableOrderIdForPickup':firestore.ArrarUnion([pendingOrderId])})
 
     return {"ok":"ok"},200
 
