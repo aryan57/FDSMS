@@ -744,7 +744,14 @@ def getEstimatedTime():
     return redirect(url_for('recentOrderRestaurant'))
     # return {"ok":"ok"},200
 
-        
+@app.route('/updateStatus1')
+@check_token
+def updateStatus1():
+    return render_template('foodPrepared.html')
+
+
+
+
 @app.route('/moreDetailsOrder<orderId>')
 @check_token
 def moreDetailsOrder(orderId):
@@ -1055,10 +1062,12 @@ def nearbyDeliveryAgents():
 
     for doc in doc_refrence:
         temp_dict=doc.to_dict()
-        if temp_dict['areaId']==areaId:
+        if temp_dict['areaId']==areaId and temp_dict['isAvailable']:
+            temp_dict['areaId'] = db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
             nearbyDeliveryAgentsList.append(temp_dict)
+    print(nearbyDeliveryAgentsList)
 
-    return {"ok":nearbyDeliveryAgentsList},200
+    return render_template('nearbyDeliveryAgent.html', nearbyDeliveryAgentsList = nearbyDeliveryAgentsList)
 
 @app.route('/updateArea')
 @check_token
@@ -1068,9 +1077,64 @@ def updateArea():
         return redirect(url_for('logout'))
 
     deliveryAgentId=session['userId']
-    newAreaId=""
+    newAreaId="" #get from front end
 
     db.collection('deliveryAgent').document(deliveryAgentId).update({'areaId':newAreaId})
+
+    return {"ok":"ok"},200
+
+@app.route('/addPendingOrderId')
+@check_token
+def addPendingOrderId():
+
+    if session['sessionUser']['userType']!='restaurant':
+        return redirect(url_for('logout'))
+
+    pendingOrderId="" #get from front end
+    areaId=session['sessionUser']['areaId']
+
+    db.collection('area').document(areaId).update({'availableOrderIdForPickup':firestore.ArrarUnion([pendingOrderId])})
+
+    return {"ok":"ok"},200
+
+@app.route('/getPickupOrdersForADeliveryAgent')
+@check_token
+def getAvailablePickupOrdersForADeliveryAgent():
+
+    if session['sessionUser']['userType']!='deliveryAgent':
+        return redirect(url_for('logout'))
+
+    areaId=session['sessionUser']['areaId']
+
+    orderIdForADeliveryAgent=db.collection('area').document(areaId).get().to_dict()['availableOrderIdForPickup']
+    deliveryRequestList=[]
+
+    for orderId in orderIdForADeliveryAgent:
+        temp_dict=db.collection('order').document(orderId).get().to_dict()
+
+        if temp_dict['isPending']==True: # it will be true , just doing it to be on the safe side
+            temp_dict['restaurant']=db.collection('restaurant').document(temp_dict['restaurantId']).get().to_dict()
+            temp_dict['customer']=db.collection('customer').document(temp_dict['customerId']).get().to_dict()
+            temp_dict['area']=db.collection('area').document(temp_dict['areaId']).get().to_dict()
+            deliveryRequestList.append(temp_dict)
+
+    return {"ok":deliveryRequestList},200
+
+@app.route('/acceptDeliveryRequest')
+@check_token
+def acceptDeliveryRequest():
+    
+    if session['sessionUser']['userType']!='deliveryAgent':
+        return redirect(url_for('logout'))
+
+    return {"ok":"ok"},200
+
+@app.route('/moreDetailsDeliveryRequest')
+@check_token
+def moreDetailsDeliveryRequest():
+
+    if session['sessionUser']['userType']!='deliveryAgent':
+        return redirect(url_for('logout'))
 
     return {"ok":"ok"},200
     

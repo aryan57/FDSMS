@@ -1,0 +1,26 @@
+{% extends 'topBarAdded.html' %}
+
+{% block title %}
+  <title>Food Prepared</title>
+{% endblock %}
+
+{% block main %}
+  <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-auto align-self-center">
+            <a href={{url_for('nearbyDeliveryAgents')}} id='anchor-link-nodesign'>
+                <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+                    <span class="mdc-button__label">Nearby Delivery Agent</span>
+                </button>
+            </a>
+        </div>
+        <div class="col-auto align-self-center">
+            <a href={{url_for('nearbyDeliveryAgents')}} id='anchor-link-nodesign'>
+                <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+                    <span class="mdc-button__label">Send Delivery Request</span>
+                </button>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
