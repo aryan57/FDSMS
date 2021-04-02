@@ -93,8 +93,10 @@
               <span class="mdc-notched-outline__trailing"></span>
             </span>
             <select class="form-select gender-form form-select-lg mb-2" aria-label="Default select example" name="area" required>
-              <option selected value="Delhi">Area</option>
-              <option value="Delhi">Delhi</option>
+              <option selected value="Other">Area</option>
+              {% for area in area_dict %}
+              <option value={{ area['areaId'] }}>{{ area['name'] }}</option>
+              {% endfor %}
               <option value="Other">Other</option>
             </select>   
           </label>
