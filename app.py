@@ -274,19 +274,35 @@ def adminLogin():
 def customerSignup():
     message=session['sign_message']
     session['sign_message']="False"
-    return render_template('customerSignup.html', message=message)
+    doc_refrence = db.collection('area').stream()
+    area_dict=[]
+    for doc in doc_refrence:
+        temp_dict=doc.to_dict()
+        area_dict.append(temp_dict)
+
+    return render_template('customerSignup.html', message=message,area_dict=area_dict)
 
 @app.route('/restaurantSignup')
 def restaurantSignup():
     message=session['sign_message']
     session['sign_message']="False"
-    return render_template('restaurantSignup.html', message=message)
+    doc_refrence = db.collection('area').stream()
+    area_dict=[]
+    for doc in doc_refrence:
+        temp_dict=doc.to_dict()
+        area_dict.append(temp_dict)
+    return render_template('restaurantSignup.html', message=message,area_dict=area_dict)
 
 @app.route('/deliveryAgentSignup')
 def deliveryAgentSignup():
     message=session['sign_message']
     session['sign_message']="False"
-    return render_template('deliveryAgentSignup.html', message=message)
+    doc_refrence = db.collection('area').stream()
+    area_dict=[]
+    for doc in doc_refrence:
+        temp_dict=doc.to_dict()
+        area_dict.append(temp_dict)
+    return render_template('deliveryAgentSignup.html', message=message,area_dict=area_dict)
 
 @app.route('/customerDashboard')
 @check_token
@@ -997,24 +1013,28 @@ def offerListCustomer():
     # print(offerList)
     return render_template('allOfferCustomer.html', offerList=offerList)
 
-@app.route('/getPendingOrder')
+@app.route('/pastOrder')
 @check_token
-def getPendingOrder():
+def pastOrder():
     userId=session['user_id']
     userType=session['userType']
 
-    pendingOrderId=[]
+    pastOrderList=[]
 
     docs = db.collection('order').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
-        if temp_dict['isPending'] :
+        if not temp_dict['isPending'] :
             if userType=='customer' and userId==temp_dict['customerId']:
-                pendingOrderId.append(doc.id)
+                pastOrderList.append(temp_dict)
             elif userType=='restaurant' and userId==temp_dict['restaurantId']:
-                pendingOrderId.append(doc.id)
+                pastOrderList.append(temp_dict)
 
-    return {"ok":"ok"},200
+    if(userType=="customer"):
+        return render_template('pastOrderCustomer.html',pastOrderList=pastOrderList)
+    if(userType=="restaurant"):
+        return render_template('pastOrderRestaurant.html',pastOrderList=pastOrderList)
+
     
 if __name__ == "__main__":
     # cache.init_app(app)
