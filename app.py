@@ -1076,7 +1076,7 @@ def updateArea():
 
 @app.route('/addPendingOrderId')
 @check_token
-def updateArea():
+def addPendingOrderId():
 
     if session['sessionUser']['userType']!='restaurant':
         return redirect(url_for('logout'))
