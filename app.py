@@ -1068,9 +1068,23 @@ def updateArea():
         return redirect(url_for('logout'))
 
     deliveryAgentId=session['userId']
-    newAreaId=""
+    newAreaId="" #get from front end
 
     db.collection('deliveryAgent').document(deliveryAgentId).update({'areaId':newAreaId})
+
+    return {"ok":"ok"},200
+
+@app.route('/addPendingOrderId')
+@check_token
+def updateArea():
+
+    if session['sessionUser']['userType']!='restaurant':
+        return redirect(url_for('logout'))
+
+    pendingOrderId="" #get from front end
+    areaId=session['sessionUser']['areaId']
+
+    db.collection('area').document(areaId).update({'availableOrderIdForPickup':firestore.ArrarUnion([pendingOrderId])})
 
     return {"ok":"ok"},200
     
