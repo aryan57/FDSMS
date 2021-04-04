@@ -870,7 +870,7 @@ def changeRecommendFoodItem(id_to_change):
     id=int(id_to_change)
     id=id-1
     if session['current_menu_viewed'][id]['isRecommended'] == False:
-        session['restaurantList'][id]['isRecommended'] = True
+        session['current_menu_viewed'][id]['isRecommended'] = True
         session.modified = True
     else :
         session['current_menu_viewed'][id]['isRecommended'] = False
