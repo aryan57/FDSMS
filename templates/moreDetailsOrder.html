@@ -203,36 +203,45 @@
       </div>
     </div>
     {% if updateLevel >=5 %}
-    <div class='row justify-content-center'>
-      <div class='col-3 align-self-center'>
-        <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-1">
-          <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">star</i>
-          <span class="mdc-notched-outline">
-            <span class="mdc-notched-outline__leading"></span>
-            <span class="mdc-notched-outline__notch">
-              <span class="mdc-floating-label" id="my-label-id">Restaurant Rating</span>
+    <form action={{url_for('ratingCustomer')}} method="POST" enctype="multipart/form-data">
+      <div class='row justify-content-center'>
+        <div class='col-3 align-self-center'>
+          <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-1">
+            <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">star</i>
+            <span class="mdc-notched-outline">
+              <span class="mdc-notched-outline__leading"></span>
+              <span class="mdc-notched-outline__notch">
+                <span class="mdc-floating-label" id="my-label-id">Restaurant Rating</span>
+              </span>
+              <span class="mdc-notched-outline__trailing"></span>
             </span>
-            <span class="mdc-notched-outline__trailing"></span>
-          </span>
-          <input type="number" class="mdc-text-field__input" aria-labelledby="my-label-id" name="restaurantRating" max=5 min=0 required>
-        </label>
+            <input type="number" class="mdc-text-field__input" aria-labelledby="my-label-id" name="restaurantRating" max=5 min=0 required>
+          </label>
+        </div>
       </div>
-    </div>
-    <div class='row justify-content-center'>
-      <div class='col-3 align-self-center'>
-        <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-2">
-          <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">star</i>
-          <span class="mdc-notched-outline">
-            <span class="mdc-notched-outline__leading"></span>
-            <span class="mdc-notched-outline__notch">
-              <span class="mdc-floating-label" id="my-label-id">Delivery Agent Rating</span>
+      <div class='row justify-content-center'>
+        <div class='col-3 align-self-center'>
+          <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-2">
+            <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">star</i>
+            <span class="mdc-notched-outline">
+              <span class="mdc-notched-outline__leading"></span>
+              <span class="mdc-notched-outline__notch">
+                <span class="mdc-floating-label" id="my-label-id">Delivery Agent Rating</span>
+              </span>
+              <span class="mdc-notched-outline__trailing"></span>
             </span>
-            <span class="mdc-notched-outline__trailing"></span>
-          </span>
-          <input type="number" class="mdc-text-field__input" aria-labelledby="my-label-id" name="deliveryAgentRating" max=5 min=0 required>
-        </label>
+            <input type="number" class="mdc-text-field__input" aria-labelledby="my-label-id" name="deliveryAgentRating" max=5 min=0 required>
+          </label>
+        </div>
       </div>
-    </div>
+      <div class="row justify-content-center">
+        <div class="col-auto align-self-center">
+          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+            <span class="mdc-button__label">Submit</span>
+          </button>
+        </div>
+      </div>
+    </form>
     {% endif %}
   </div>
 
