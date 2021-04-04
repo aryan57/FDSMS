@@ -1344,7 +1344,7 @@ def ratingCustomer():
 
     db.collection('rating').document(restaurantRatingId).set(restaurantRatingObject)
 
-    return {"ok","ok"},200
+    return {"ok":"ok"},200
 
 if __name__ == "__main__":
     # cache.init_app(app)
