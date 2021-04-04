@@ -1,0 +1,92 @@
+{% extends 'topBarAdded.html' %}
+
+{% block title %}
+  <title>Offer Details</title>
+  <link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/timeline.css')}}>
+{% endblock %}
+
+{% block topBarButtons %}
+  <a href={{url_for('logout')}} id="anchor-link-nodesign">
+    <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+      <span class="mdc-button__label">Logout</span>
+    </button>
+  </a>
+  <button class="mdc-button" disabled>
+    <span class="mdc-button__ripple"></span>
+    <span class="mdc-button__label"></span>
+  </button>
+{% endblock %}
+
+{% block main %}
+<div class='container-fluid'>
+  <div class='row justify-content-center'>
+    <div class='col-auto align-self-center'>
+      Customer Name: {{customerName}}    
+    </div>
+  </div>
+  <div class='row justify-content-center'>
+    <div class='col-auto align-self-center'>
+      Restaurant Name: {{restaurantName}}    
+    </div>
+  </div>
+  <div class='row justify-content-center'>
+    <div class='col-auto align-self-center'>
+      Address: {{address}}    
+    </div>
+  </div>
+  <div class='row justify-content-center'>
+    <div class='col-auto align-self-center'>
+      <div class="mdc-data-table">
+        <div class="mdc-data-table__table-container">
+          <table class="mdc-data-table__table" aria-label="Dessert calories">
+            <thead>
+              <tr class="mdc-data-table__header-row">
+                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
+                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Price</th>
+                <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Frequency</th>
+                <th class="mdc-data-table__header-cell bg-info" role="columnheader" scope="col">Total Price</th>
+              </tr>
+            </thead>
+            <tbody class="mdc-data-table__content">
+              {% for foodItem in orderList %}
+                <tr class="mdc-data-table__row">
+                  <th class="mdc-data-table__cell" scope="row">{{foodItem['name']}}</th>
+                  <td class="mdc-data-table__cell">{{foodItem['pricePerItem']}}</td>
+                  <td class="mdc-data-table__cell">{{foodItem['frequency']}}</td>
+                  <td class="mdc-data-table__cell">{{foodItem['pricePerItem'] * foodItem['frequency']}}</td>
+                </tr>
+              {% endfor %} 
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+    <div class='row justify-content-center'>
+      <div class='col-auto align-self-center'>
+        <div class="mdc-data-table">
+          <div class="mdc-data-table__table-container">
+            <table class="mdc-data-table__table" aria-label="Dessert calories">
+              <thead>
+                <tr class="mdc-data-table__header-row">
+                  <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Base Cost</th>
+                  <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Discount</th>
+                  <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Delivery Charges</th>
+                  <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Total to Pay</th>
+                </tr>
+              </thead>
+              <tbody class="mdc-data-table__content">
+                <tr class="mdc-data-table__row">
+                  <th class="mdc-data-table__cell" scope="row">{{cost}}</th>
+                  <td class="mdc-data-table__cell">{{discount}}</td>
+                  <td class="mdc-data-table__cell">{{deliveryCharge}}</td>
+                  <td class="mdc-data-table__cell">{{final}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+{% endblock %}

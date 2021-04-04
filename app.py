@@ -1151,6 +1151,11 @@ def markLocation():
     # return {"ok":"ok"},200
     return render_template("markLocation.html", areaList = areaList, currentArea = currentArea)
 
+@app.route('/orderDetailDeliveryAgent<orderId>')
+@check_token
+def orderDetailDeliveryAgent(orderId):
+    return render_template('orderDetailsRestaurant.html')
+
 
 if __name__ == "__main__":
     # cache.init_app(app)
