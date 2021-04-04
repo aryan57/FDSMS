@@ -1181,6 +1181,7 @@ def acceptDeliveryRequest():
         "timePickUp" : timeToReachRestaurant,
         "deliveryTime" : timeToReachCustomer
     }
+    db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'deliveryAgentId': session['userId']})
     db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'updateMessage': "Order Accepted by Delivery Agent"})
     db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'updateLevel': 3})
     db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'orderUpdates' : firestore.ArrayUnion([updateOrderDic])})

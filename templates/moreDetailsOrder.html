@@ -3,6 +3,7 @@
 {% block title %}
   <title>Offer Details</title>
   <link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/timeline.css')}}>
+  <link rel="stylesheet" type="text/css" href={{ url_for('static', filename='css/stars.css')}}>
 {% endblock %}
 
 {% block topBarButtons %}
@@ -201,9 +202,42 @@
         </div>       
       </div>
     </div>
+    {% if updateLevel >=5 %}
+    <div class='row justify-content-center'>
+      <div class='col-3 align-self-center'>
+        <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-1">
+          <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">star</i>
+          <span class="mdc-notched-outline">
+            <span class="mdc-notched-outline__leading"></span>
+            <span class="mdc-notched-outline__notch">
+              <span class="mdc-floating-label" id="my-label-id">Restaurant Rating</span>
+            </span>
+            <span class="mdc-notched-outline__trailing"></span>
+          </span>
+          <input type="number" class="mdc-text-field__input" aria-labelledby="my-label-id" name="restaurantRating" max=5 min=0 required>
+        </label>
+      </div>
+    </div>
+    <div class='row justify-content-center'>
+      <div class='col-3 align-self-center'>
+        <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-2">
+          <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">star</i>
+          <span class="mdc-notched-outline">
+            <span class="mdc-notched-outline__leading"></span>
+            <span class="mdc-notched-outline__notch">
+              <span class="mdc-floating-label" id="my-label-id">Delivery Agent Rating</span>
+            </span>
+            <span class="mdc-notched-outline__trailing"></span>
+          </span>
+          <input type="number" class="mdc-text-field__input" aria-labelledby="my-label-id" name="deliveryAgentRating" max=5 min=0 required>
+        </label>
+      </div>
+    </div>
+    {% endif %}
   </div>
 
   <script>
-
+    const textField = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-1'));
+    const textField1 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-2'));
   </script>
 {% endblock %}
