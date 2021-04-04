@@ -833,7 +833,7 @@ def moreDetailsOrder(orderId):
         discount=min(int(int(currentOrder['orderValue'])*int(offerUsed['discount'])/100), int(offerUsed['upperLimit']))
     currentOrder['discountValue']=discount
     final=max(currentOrder['orderValue']+ currentOrder['deliveryCharge']- discount,0)
-    return render_template('moreDetailsOrder.html',  orderList=orderList, customerName=customerName, restaurantName=restaurantName, offerUsed=offerUsed, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final, updateLevel=currentOrder['updateLevel'], orderUpdate = currentOrder['orderUpdates'], )
+    return render_template('moreDetailsOrder.html',  orderList=orderList, customerName=customerName, restaurantName=restaurantName, offerUsed=offerUsed, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final, updateLevel=currentOrder['updateLevel'], orderUpdate = currentOrder['orderUpdates'],restaurantId=currentOrder['restaurantId'],customerId= currentOrder['customerId'])
 
 @app.route('/useOffer<toUse>')
 @check_token
