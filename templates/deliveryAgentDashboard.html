@@ -38,9 +38,11 @@
         </a>
       </div>
       <div class='col-auto align-self-center'>
-        <button class="mdc-button mdc-button--raised" name="submit" type="submit">
-          <span class="mdc-button__label">Mark Location</span>
-        </button>
+        <a href={{url_for('markLocation')}} id="anchor-link-nodesign">
+          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+            <span class="mdc-button__label">Mark Location</span>
+          </button>
+        </a>
       </div>
       <div class='col-auto align-self-center'>
         <a href={{url_for('seeDeliveryRequest')}} id="anchor-link-nodesign">

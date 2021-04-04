@@ -1,0 +1,45 @@
+{% extends 'topBarAdded.html' %}
+
+{% block title %}
+  <title>Customer Signup</title>
+{% endblock %}
+
+{% block main %}
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-auto align-self-center">
+        <h1>Area Update</h1>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-auto align-self-center">
+        <p>Present Area Location: {{currentArea}}</p>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-auto align-self-center">
+        <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon">
+          <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">home</i>
+          <span class="mdc-notched-outline">
+            <span class="mdc-notched-outline__leading"></span>
+            <span class="mdc-notched-outline__trailing"></span>
+          </span>
+          <select class="form-select gender-form form-select-lg mb-2" aria-label="Default select example" name="area" required>
+            <option selected value="Other">Area</option>
+            {% for area in areaList %}
+            <option value={{ area}}>{{ area }}</option>
+            {% endfor %}
+            <option value="Other">Other</option>
+          </select>   
+        </label>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-auto align-self-center">
+        <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+          <span class="mdc-button__label">Update</span>
+        </button>
+      </div>
+    </div>
+  </div>
+{% endblock %}
