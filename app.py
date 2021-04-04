@@ -1304,7 +1304,7 @@ def ratingDeliveryAgent():
     return {"ok","ok"},200
     
 
-@app.route('/ratingCustomer')
+@app.route('/ratingCustomer', methods=['POST', 'GET'])
 @check_token
 def ratingCustomer():
     
