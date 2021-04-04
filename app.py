@@ -587,22 +587,22 @@ def order():
     orderList = []
     for i in range(len(foodItemList)):
         if not int(request.form[str(i+1)]) == 0:
-            print(foodItemList[i]['name'])
+            # print(foodItemList[i]['name'])
             foodItemList[i]['frequency'] = int(request.form[str(i+1)])
             foodItemList[i]['pricePerItem'] = int(foodItemList[i]['pricePerItem'])
             orderList.append(foodItemList[i])
             cost += int(foodItemList[i]['pricePerItem']) * int(foodItemList[i]['frequency'])
             
     session['currentOrderCreating'] = {
-            'orderValue': cost, 
             'orderList': orderList, 
-            'deliveryCharge': 50,
             'isPending': True,
             'customerId': session['userId'],
             'restaurantId': foodItemList[0]['restaurantId'],
             'offerId': None,
+            'orderValue': cost, 
             'discountValue':0,
-            'paidValue': cost+50,
+            'paidValue': 0,
+            'deliveryCharge': 50,
             'orderDateTime': "",
             'deliveryAgentId' : "",
             'updateLevel' :0,
@@ -626,8 +626,11 @@ def orderDetails():
     else: 
         offerUsed=db.collection('customer').document(currentOrder['customerId']).collection('promotionalOfferId').document(currentOrder['offerId']).get().to_dict()
         discount=min(int(int(currentOrder['orderValue'])*int(offerUsed['discount'])/100), int(offerUsed['upperLimit']))
-    currentOrder['discountValue']=discount
+
     final=max(currentOrder['orderValue']+ currentOrder['deliveryCharge']- discount,0)
+    currentOrder['paidValue']=final
+    currentOrder['discountValue']=discount
+
     return render_template('orderDetails.html', orderList=orderList, customerName=customerName, restaurantName=restaurantName, offerUsed=offerUsed, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final)
 
 @app.route('/placeOrder')
@@ -702,7 +705,6 @@ def orderDetailRestaurant(orderId):
     restaurantName = db.collection('restaurant').document(currentOrder['restaurantId']).get().to_dict()['name']
     orderList=currentOrder['orderList']
     discount=currentOrder['discountValue']
-    currentOrder['discountValue']=discount
     session['currentOrderUpdating']=currentOrder
     final=max(currentOrder['orderValue']+ currentOrder['deliveryCharge']- discount,0)
     return render_template('orderDetailsRestaurant.html', currentOrder = currentOrder, orderList=orderList, customerName=customerName, restaurantName=restaurantName, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final, updateLevel=currentOrder['updateLevel'])
