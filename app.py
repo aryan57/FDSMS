@@ -1137,7 +1137,21 @@ def moreDetailsDeliveryRequest():
         return redirect(url_for('logout'))
 
     return {"ok":"ok"},200
-    
+
+@app.route('/markLocation')
+@check_token
+def markLocation():
+
+    if session['sessionUser']['userType']!='deliveryAgent':
+        return redirect(url_for('logout'))
+    areaList = []
+    areaList.append("Chandigarh")
+    areaList.append("Delhi")
+    currentArea = "Delhi"
+    # return {"ok":"ok"},200
+    return render_template("markLocation.html", areaList = areaList, currentArea = currentArea)
+
+
 if __name__ == "__main__":
     # cache.init_app(app)
     app.run(debug=True)
