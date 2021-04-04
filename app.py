@@ -799,6 +799,7 @@ def useOffer(toUse):
     toUse=int(toUse)
     toUse=toUse-1
     session['currentOrderCreating']['offerId']=session['offerList'][toUse]['offerId']
+    session.modified = True
     return redirect(url_for('orderDetails'))
 
 @app.route('/removeOfferFromOrder')
@@ -1075,9 +1076,9 @@ def nearbyDeliveryAgents():
 
     nearbyDeliveryAgentsList=[]
 
-    doc_refrence = db.collection('deliveryAgent').stream()
+    doc_reference = db.collection('deliveryAgent').stream()
 
-    for doc in doc_refrence:
+    for doc in doc_reference:
         temp_dict=doc.to_dict()
         if temp_dict['areaId']==areaId:
             temp_dict['areaName'] = db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
@@ -1130,16 +1131,35 @@ def acceptDeliveryRequest():
     
     if session['sessionUser']['userType']!='deliveryAgent':
         return redirect(url_for('logout'))
+    
+    timeToReachRestaurant = request.form['timeToRestaurant']
+    timeToReachCustomer = request.form['timeToCustomer']
+    updateOrderDic = {
+        "timePickUp" : timeToReachRestaurant
+        "deliveryTime" : timeToReachCustomer
+    }
+    db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'updateMessage': "Order Accepted by Delivery Agent"})
+    db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'updateLevel': 3})
+    db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'orderUpdates' : firestore.ArrayUnion([updateOrderDic])})
 
-    return {"ok":"ok"},200
+    return redirect(url_for(''' function to the same page for the details '''))
 
-@app.route('/moreDetailsDeliveryRequest')
+@app.route('/moreDetailsDeliveryRequest<status>')
 @check_token
-def moreDetailsDeliveryRequest():
+def moreDetailsDeliveryRequest(status):
 
     if session['sessionUser']['userType']!='deliveryAgent':
         return redirect(url_for('logout'))
-
+    showButton = True
+    
+    if status == "Accept":
+        showButton = False
+       # add code to show the input fields else the button to accept
+    
+    
+    #add code to get the data from the database
+    
+    #return render template with a boolean to input fields or button
     return {"ok":"ok"},200
 
 @app.route('/markLocation')
