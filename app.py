@@ -75,16 +75,27 @@ def restaurantsignup():
         session['sign_message']="error creating user in firebase"
         return redirect(url_for('restaurantSignup'))
     try:
+
+        rating_reference = db.collection('rating').document()
+        rating_json_data= {
+            "noOfInputs":0,
+            "sum":0.0,
+            "rating":0.0,
+            "ratingId":rating_reference.id
+        }
+        rating_reference.set(rating_json_data)
+
         json_data = {
             "name" : name,
             "areaId" : area,
-            "ratingId": "",
+            "ratingId": rating_reference.id,
             "restaurantId" : user.uid,
             "restaurantPicSrc" : storage_file_path,
             "pendingOrderId": [],
             "email" : email,
             "isRecommended" : False
         }
+
         db.collection("restaurant").document(user.uid).set(json_data)
         db.collection("type").document(user.uid).set({"type" : "restaurant"})
         
@@ -129,6 +140,16 @@ def deliveryAgentsignup():
         return redirect(url_for('deliveryAgentSignup'))
     
     try:
+
+        rating_reference = db.collection('rating').document()
+        rating_json_data= {
+            "noOfInputs":0,
+            "sum":0.0,
+            "rating":0.0,
+            "ratingId":rating_reference.id
+        }
+        rating_reference.set(rating_json_data)
+
         json_data = {
             "name" : name,
             "dateOfBirth" : dob,
@@ -138,7 +159,7 @@ def deliveryAgentsignup():
             "gender" : gender,
             "areaId" : area,
             "deliveryAgentId" : user.uid,
-            "ratingId" : "",
+            "ratingId" : rating_reference.id,
             "isAvailable" : True
         }
         db.collection("deliveryAgent").document(user.uid).set(json_data)
@@ -186,6 +207,16 @@ def customersignup():
     
     # add data in fire-store
     try:
+
+        rating_reference = db.collection('rating').document()
+        rating_json_data= {
+            "noOfInputs":0,
+            "sum":0.0,
+            "rating":0.0,
+            "ratingId":rating_reference.id
+        }
+        rating_reference.set(rating_json_data)
+
         json_data = {
             "name" : name,
             "dateOfBirth" : dob,
@@ -194,7 +225,7 @@ def customersignup():
             "gender" : gender,
             "areaId" : area,
             "customerId":user.uid,
-            "ratingId":"",
+            "ratingId":rating_reference.id,
             "picSrc": storage_file_path,
             "pendingOrderId": []
         }
@@ -587,22 +618,22 @@ def order():
     orderList = []
     for i in range(len(foodItemList)):
         if not int(request.form[str(i+1)]) == 0:
-            print(foodItemList[i]['name'])
+            # print(foodItemList[i]['name'])
             foodItemList[i]['frequency'] = int(request.form[str(i+1)])
             foodItemList[i]['pricePerItem'] = int(foodItemList[i]['pricePerItem'])
             orderList.append(foodItemList[i])
             cost += int(foodItemList[i]['pricePerItem']) * int(foodItemList[i]['frequency'])
             
     session['currentOrderCreating'] = {
-            'orderValue': cost, 
             'orderList': orderList, 
-            'deliveryCharge': 50,
             'isPending': True,
             'customerId': session['userId'],
             'restaurantId': foodItemList[0]['restaurantId'],
             'offerId': None,
+            'orderValue': cost, 
             'discountValue':0,
-            'paidValue': cost+50,
+            'paidValue': 0,
+            'deliveryCharge': 50,
             'orderDateTime': "",
             'deliveryAgentId' : "",
             'updateLevel' :0,
@@ -626,8 +657,11 @@ def orderDetails():
     else: 
         offerUsed=db.collection('customer').document(currentOrder['customerId']).collection('promotionalOfferId').document(currentOrder['offerId']).get().to_dict()
         discount=min(int(int(currentOrder['orderValue'])*int(offerUsed['discount'])/100), int(offerUsed['upperLimit']))
-    currentOrder['discountValue']=discount
+
     final=max(currentOrder['orderValue']+ currentOrder['deliveryCharge']- discount,0)
+    currentOrder['paidValue']=final
+    currentOrder['discountValue']=discount
+
     return render_template('orderDetails.html', orderList=orderList, customerName=customerName, restaurantName=restaurantName, offerUsed=offerUsed, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final)
 
 @app.route('/placeOrder')
@@ -702,7 +736,6 @@ def orderDetailRestaurant(orderId):
     restaurantName = db.collection('restaurant').document(currentOrder['restaurantId']).get().to_dict()['name']
     orderList=currentOrder['orderList']
     discount=currentOrder['discountValue']
-    currentOrder['discountValue']=discount
     session['currentOrderUpdating']=currentOrder
     final=max(currentOrder['orderValue']+ currentOrder['deliveryCharge']- discount,0)
     return render_template('orderDetailsRestaurant.html', currentOrder = currentOrder, orderList=orderList, customerName=customerName, restaurantName=restaurantName, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final, updateLevel=currentOrder['updateLevel'])
@@ -1247,6 +1280,64 @@ def currentOrderDeliveryAgent():
     if session['currentOrderDeliveryAgent'] == None:
         return redirect(url_for('moreDetailsDeliveryRequest', status="NoOrder"))
     return redirect(url_for('moreDetailsDeliveryRequest', status = "Details")) 
+@app.route('/ratingDeliveryAgent')
+@check_token
+def ratingDeliveryAgent():
+    
+    if session['sessionUser']['userType']!='deliveryAgent':
+        return redirect(url_for('logout'))
+
+    customerId="" #get from front end
+    rating="" #get from front end,must be out of 5
+    rating=int(rating)
+
+    ratingId=db.collection('customer').document(customerId).get().to_dict()['ratingId']
+    ratingObject=db.collection('rating').document(ratingId).get().to_dict()
+
+    ratingObject['noOfInputs'] = ratingObject['noOfInputs'] + 1
+    ratingObject['sum'] = ratingObject['sum'] + rating
+    ratingObject['rating'] = ratingObject['sum']/ratingObject['noOfInputs']
+
+    db.collection('rating').document(ratingId).set(ratingObject)
+
+    return {"ok","ok"},200
+    
+
+@app.route('/ratingCustomer')
+@check_token
+def ratingCustomer():
+    
+    if session['sessionUser']['userType']!='customer':
+        return redirect(url_for('logout'))
+
+    deliveryAgentId="" #get from front end
+    deliveryAgentRating="" #get from front end,must be out of 5
+    deliveryAgentRating=int(deliveryAgentRating)
+
+    deliveryAgentRatingId=db.collection('deliveryAgent').document(deliveryAgentId).get().to_dict()['ratingId']
+    deliveryAgentRatingObject=db.collection('rating').document(deliveryAgentRatingId).get().to_dict()
+
+    deliveryAgentRatingObject['noOfInputs'] = deliveryAgentRatingObject['noOfInputs'] + 1
+    deliveryAgentRatingObject['sum'] = deliveryAgentRatingObject['sum'] + deliveryAgentRating
+    deliveryAgentRatingObject['rating'] = deliveryAgentRatingObject['sum']/deliveryAgentRatingObject['noOfInputs']
+
+    db.collection('rating').document(deliveryAgentRatingId).set(deliveryAgentRatingObject)
+
+
+    restaurantId="" #get from front end
+    restaurantRating="" #get from front end,must be out of 5
+    restaurantRating=int(restaurantRating)
+
+    restaurantRatingId=db.collection('restaurant').document(restaurantId).get().to_dict()['ratingId']
+    restaurantRatingObject=db.collection('rating').document(restaurantRatingId).get().to_dict()
+
+    restaurantRatingObject['noOfInputs'] = restaurantRatingObject['noOfInputs'] + 1
+    restaurantRatingObject['sum'] = restaurantRatingObject['sum'] + restaurantRating
+    restaurantRatingObject['rating'] = restaurantRatingObject['sum']/restaurantRatingObject['noOfInputs']
+
+    db.collection('rating').document(restaurantRatingId).set(restaurantRatingObject)
+
+    return {"ok","ok"},200
 
 if __name__ == "__main__":
     # cache.init_app(app)
