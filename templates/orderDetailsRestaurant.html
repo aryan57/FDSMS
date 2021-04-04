@@ -124,8 +124,16 @@
           </a>
         </div>
       </div>
-    {% elif updateLevel ==2 %}
     {% elif updateLevel ==3 %}
+    <div class='row justify-content-center'>
+      <div class='col-auto align-self-center'>
+        <a href = {{url_for('updateStatus3')}} id="anchor-link-nodesign">
+          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+            <span class="mdc-button__label">Out for Delivery</span>
+          </button>
+        </a>
+      </div>
+    </div>
     {% endif %}
   {% endif %}
 </div>

@@ -753,6 +753,16 @@ def getEstimatedTime():
 def updateStatus1():
     return render_template('foodPrepared.html')
 
+@app.route('/updateStatus3')
+@check_token
+def updateStatus3():
+    currentOrder = session['currentOrderUpdating']
+    db.collection('order').document(currentOrder['orderId']).update({'updateMessage': "Out for Delivery"})
+    db.collection('order').document(currentOrder['orderId']).update({'updateLevel': 4})
+    return redirect(url_for('recentOrderRestaurant'))
+    
+
+
 @app.route('/addPendingOrderId')
 @check_token
 def addPendingOrderId():
@@ -1122,10 +1132,10 @@ def seeDeliveryRequest():
             temp_dict['customer']=db.collection('customer').document(temp_dict['customerId']).get().to_dict()
             temp_dict['area']=db.collection('area').document(areaId).get().to_dict()
             deliveryRequestList.append(temp_dict)
-
+    session['currentDeliveryRequest'] = deliveryRequestList
     return render_template("seeDeliveryRequest.html", deliveryRequestList = deliveryRequestList)
 
-@app.route('/acceptDeliveryRequest')
+@app.route('/acceptDeliveryRequest', methods=['POST', 'GET'])
 @check_token
 def acceptDeliveryRequest():
     
@@ -1135,14 +1145,14 @@ def acceptDeliveryRequest():
     timeToReachRestaurant = request.form['timeToRestaurant']
     timeToReachCustomer = request.form['timeToCustomer']
     updateOrderDic = {
-        "timePickUp" : timeToReachRestaurant
+        "timePickUp" : timeToReachRestaurant,
         "deliveryTime" : timeToReachCustomer
     }
-    db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'updateMessage': "Order Accepted by Delivery Agent"})
-    db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'updateLevel': 3})
-    db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'orderUpdates' : firestore.ArrayUnion([updateOrderDic])})
+    db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'updateMessage': "Order Accepted by Delivery Agent"})
+    db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'updateLevel': 3})
+    db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'orderUpdates' : firestore.ArrayUnion([updateOrderDic])})
 
-    return redirect(url_for(''' function to the same page for the details '''))
+    return redirect(url_for('moreDetailsDeliveryRequest', status = "Details"))
 
 @app.route('/moreDetailsDeliveryRequest<status>')
 @check_token
@@ -1150,17 +1160,44 @@ def moreDetailsDeliveryRequest(status):
 
     if session['sessionUser']['userType']!='deliveryAgent':
         return redirect(url_for('logout'))
-    showButton = True
-    
-    if status == "Accept":
-        showButton = False
-       # add code to show the input fields else the button to accept
-    
-    
-    #add code to get the data from the database
-    
-    #return render template with a boolean to input fields or button
-    return {"ok":"ok"},200
+    if status != "NoOrder":
+        session['currentOrderDeliveryAgent'] = db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).get().to_dict()
+    showButton=3
+    if status == "NoOrder":
+        printTable = False
+    else: 
+        printTable = True
+        if status == "Accept":
+            showButton = 1
+        elif status == "Details" and session['currentOrderDeliveryAgent']['updateLevel'] == 4 :
+            showButton = 2
+        elif status == "Details" and session['currentOrderDeliveryAgent']['updateLevel']==2:
+            showButton = 0
+        else:
+            showButton = 3
+            
+    currentOrder = None
+    customerName = None
+    restaurantName = None
+    address = None
+    orderList = None
+    cost = None
+    discount = None
+    deliveryCharge = None
+    final = None
+    if status != "NoOrder":
+        currentOrder = session['currentOrderDeliveryAgent']
+        customerName = db.collection('customer').document(currentOrder['customerId']).get().to_dict()['name']
+        restaurantName = db.collection('restaurant').document(currentOrder['restaurantId']).get().to_dict()['name']
+        address = "There is no address currently in the database"
+        orderList = currentOrder['orderList']
+        cost = currentOrder['orderValue']
+        discount = int(currentOrder['discountValue'])
+    # print(discount)
+        deliveryCharge = currentOrder['deliveryCharge']
+        final = currentOrder['paidValue']
+
+    return render_template('moreDetailsDeliveryAgent.html', customerName=customerName, restaurantName=restaurantName, address = address, orderList=orderList, cost= cost, discount=discount, deliveryCharge=deliveryCharge, final= final, showButton = showButton, printTable = printTable)
 
 @app.route('/markLocation')
 @check_token
@@ -1180,8 +1217,36 @@ def markLocation():
 @app.route('/orderDetailDeliveryAgent<orderId>')
 @check_token
 def orderDetailDeliveryAgent(orderId):
-    return render_template('orderDetailsRestaurant.html')
+    orderId=int(orderId)
+    orderId = orderId-1
+    session['currentOrderDeliveryAgent']=session['currentDeliveryRequest'][orderId]
+    
+    return redirect(url_for('moreDetailsDeliveryRequest', status = "Details"))
 
+@app.route('/acceptOrderForDelivery')
+@check_token
+def acceptOrderForDelivery():
+    return redirect(url_for('moreDetailsDeliveryRequest', status = "Accept"))
+    
+@app.route('/updateStatus4')
+@check_token
+def updateStatus4():
+    currentOrder = session['currentOrderDeliveryAgent']
+    db.collection('order').document(currentOrder['orderId']).update({'updateMessage': "OrderDelivered"})
+    db.collection('order').document(currentOrder['orderId']).update({'updateLevel': 5})
+    db.collection('order').document(currentOrder['orderId']).update({'isPending': False})
+    db.collection('customer').document(currentOrder['customerId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
+    db.collection('restaurant').document(currentOrder['restaurantId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
+    session['currentOrderDeliveryAgent']=None
+    session.modified=True
+    return redirect(url_for('deliveryAgentDashboard'))
+
+@app.route('/currentOrderDeliveryAgent')
+@check_token
+def currentOrderDeliveryAgent():
+    if session['currentOrderDeliveryAgent'] == None:
+        return redirect(url_for('moreDetailsDeliveryRequest', status="NoOrder"))
+    return redirect(url_for('moreDetailsDeliveryRequest', status = "Details")) 
 
 if __name__ == "__main__":
     # cache.init_app(app)

@@ -19,6 +19,21 @@
 
 {% block main %}
 <div class='container-fluid'>
+  {% if not printTable %}
+    <div class='row justify-content-center'>
+      <div class='col-auto align-self-center'>
+        <h1>There are no current order selected</h1>
+      </div>
+    </div>
+  {% else %}
+
+  {% if showButton == 1 %}
+    <div class='row justify-content-center'>
+      <div class='col-auto align-self-center'>
+        <p>Enter the estimated times below to accept</p>
+      </div>
+    </div>
+  {% endif %}
   <div class='row justify-content-center'>
     <div class='col-auto align-self-center'>
       Customer Name: {{customerName}}    
@@ -88,5 +103,72 @@
         </div>
       </div>
     </div>
+    {% if showButton == 0 %}
+    <div class='row justify-content-center'>
+      <div class='col-auto align-self-center'>
+        <a href={{url_for('acceptOrderForDelivery')}} id='anchor-link-nodesign'> 
+          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+            <span class="mdc-button__label">Accept</span>
+          </button>
+        </a>
+      </div>
+    </div>
+    {% elif showButton == 1 %}
+    <form action={{url_for('acceptDeliveryRequest')}} method="POST">
+      <div class="row justify-content-center">
+        <div class="col-6 align-self-center">          
+          <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-1">
+            <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">takeout_dining</i>
+            <span class="mdc-notched-outline">
+              <span class="mdc-notched-outline__leading"></span>
+              <span class="mdc-notched-outline__notch">
+                <span class="mdc-floating-label" id="my-label-id">Estimated time to reach Restaurant</span>
+              </span>
+              <span class="mdc-notched-outline__trailing"></span>
+            </span>
+            <input type="text" class="mdc-text-field__input" aria-labelledby="my-label-id" name="timeToRestaurant" required>
+          </label>
+        </div>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-6 align-self-center">          
+          <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-2">
+            <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">delivery_dining</i>
+            <span class="mdc-notched-outline">
+              <span class="mdc-notched-outline__leading"></span>
+              <span class="mdc-notched-outline__notch">
+                <span class="mdc-floating-label" id="my-label-id">Estimated time to deliver</span>
+              </span>
+              <span class="mdc-notched-outline__trailing"></span>
+            </span>
+            <input type="text" class="mdc-text-field__input" aria-labelledby="my-label-id" name="timeToCustomer" required>
+          </label>
+        </div>
+      </div>
+      <div class='row justify-content-center'>
+        <div class='col-auto align-self-center'>
+          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+            <span class="mdc-button__label">Submit</span>
+          </button>
+        </div>
+      </div>
+    </form>
+    {% elif showButton == 2 %}
+    <div class = 'row justify-content-center'>
+      <div class= 'col-auto align-self-center'>
+        <a href={{url_for('updateStatus4')}} id = 'anchor-link-nodesign'>
+          <button class="mdc-button mdc-button--raised" name="submit" type="submit">
+            <span class="mdc-button__label">Order Delivered</span>
+          </button>
+        </a>
+      </div>
+    </div>
+    {% endif %}
+    {% endif %}
 </div>
+
+<script>
+  const textField = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-1'));
+  const textField1 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-2'));
+</script>
 {% endblock %}

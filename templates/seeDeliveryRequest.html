@@ -34,7 +34,7 @@
                       <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Customer Name</th>
                       <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Order Cost</th>
                       <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Delivery Area</th>
-                      <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Accept Request</th>
+                      <!-- <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Accept Request</th> -->
                       <th class="mdc-data-table__header-cell" role="columnheader" scope="col">More Details</th>
                     </tr>
                   </thead>
@@ -45,15 +45,15 @@
                         <td class="mdc-data-table__cell">{{deliveryRequest['customer']['name']}}</td>
                         <td class="mdc-data-table__cell">{{deliveryRequest['orderValue']}}</td>
                         <td class="mdc-data-table__cell">{{deliveryRequest['area']['name']}}</td>
-                        <td class="mdc-data-table__cell">
+                        <!-- <td class="mdc-data-table__cell">
                           <a href= {{url_for('acceptDeliveryRequest', id_to_change=loop.index )}} id="anchor-link-nodesign">
                             <button class="mdc-button mdc-button--raised" name="submit">
                               <span class="mdc-button__label">Accept</span>
                             </button>
                           </a>
-                        </td>
+                        </td> -->
                         <td class="mdc-data-table__cell">
-                          <a href= {{url_for('moreDetailsDeliveryRequest', id_to_change=loop.index)}} id="anchor-link-nodesign">
+                          <a href= {{url_for('orderDetailDeliveryAgent', orderId=loop.index)}} id="anchor-link-nodesign">
                             <button class="mdc-button mdc-button--raised" name="submit">
                               <span class="mdc-button__label">Details</span>
                             </button>
