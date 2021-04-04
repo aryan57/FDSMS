@@ -38,6 +38,10 @@ def check_token(f):
             session['jwt_token'] = pyrebase_pb.auth().refresh(session['refresh_token'])['idToken']
             user = auth.verify_id_token(session['jwt_token'])
             request.user = user
+            userType=session['sessionUser']['userType']
+            session['sessionUser'] = db.collection(session['sessionUser']['userType']).document(session['userId']).get().to_dict()
+            session['sessionUser']['userType']=userType
+            session.modified=True
         except:
             session['sign_message']="Invalid Token Provided. Trying Logging again."
             return redirect(url_for('login'))
@@ -285,9 +289,9 @@ def customerSignup():
 def restaurantSignup():
     message=session['sign_message']
     session['sign_message']="False"
-    doc_refrence = db.collection('area').stream()
+    doc_reference = db.collection('area').stream()
     area_dict=[]
-    for doc in doc_refrence:
+    for doc in doc_reference:
         temp_dict=doc.to_dict()
         area_dict.append(temp_dict)
     return render_template('restaurantSignup.html', message=message,area_dict=area_dict)
@@ -296,9 +300,9 @@ def restaurantSignup():
 def deliveryAgentSignup():
     message=session['sign_message']
     session['sign_message']="False"
-    doc_refrence = db.collection('area').stream()
+    doc_reference = db.collection('area').stream()
     area_dict=[]
-    for doc in doc_refrence:
+    for doc in doc_reference:
         temp_dict=doc.to_dict()
         area_dict.append(temp_dict)
     return render_template('deliveryAgentSignup.html', message=message,area_dict=area_dict)
@@ -811,7 +815,7 @@ def redirectDashboard():
     elif session['sessionUser']['userType']=='restaurant':
         return redirect(url_for('restaurantDashboard'))
     elif session['sessionUser']['userType']=='deliveryAgent':
-        return redirect(url_for('deliverAgentDashboard'))
+        return redirect(url_for('deliveryAgentDashboard'))
     elif session['sessionUser']['userType']=='admin':
         return redirect(url_for('adminDashboard'))
     
@@ -1075,14 +1079,14 @@ def nearbyDeliveryAgents():
 
     for doc in doc_refrence:
         temp_dict=doc.to_dict()
-        if temp_dict['areaId']==areaId and temp_dict['isAvailable']:
-            temp_dict['area'] = db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
+        if temp_dict['areaId']==areaId:
+            temp_dict['areaName'] = db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
             nearbyDeliveryAgentsList.append(temp_dict)
-    print(nearbyDeliveryAgentsList)
+    # print(nearbyDeliveryAgentsList)
 
     return render_template('nearbyDeliveryAgent.html', nearbyDeliveryAgentsList = nearbyDeliveryAgentsList)
 
-@app.route('/updateArea')
+@app.route('/updateArea', methods=['POST', 'GET'])
 @check_token
 def updateArea():
 
@@ -1090,11 +1094,11 @@ def updateArea():
         return redirect(url_for('logout'))
 
     deliveryAgentId=session['userId']
-    newAreaId="" #get from front end
-
+    newAreaId=request.form['area']
+    print(newAreaId)
     db.collection('deliveryAgent').document(deliveryAgentId).update({'areaId':newAreaId})
 
-    return {"ok":"ok"},200
+    return redirect(url_for('deliveryAgentDashboard'))
 
 
 @app.route('/seeDeliveryRequest')
@@ -1144,12 +1148,14 @@ def markLocation():
 
     if session['sessionUser']['userType']!='deliveryAgent':
         return redirect(url_for('logout'))
-    areaList = []
-    areaList.append("Chandigarh")
-    areaList.append("Delhi")
-    currentArea = "Delhi"
-    # return {"ok":"ok"},200
-    return render_template("markLocation.html", areaList = areaList, currentArea = currentArea)
+    doc_reference = db.collection('area').stream()
+    area_dict=[]
+    for doc in doc_reference:
+        temp_dict=doc.to_dict()
+        area_dict.append(temp_dict)
+        
+    currentArea = db.collection('area').document(session['sessionUser']['areaId']).get().to_dict()
+    return render_template("markLocation.html", area_dict = area_dict, currentArea = currentArea)
 
 
 if __name__ == "__main__":
