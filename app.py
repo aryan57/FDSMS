@@ -1177,6 +1177,11 @@ def markLocation():
     currentArea = db.collection('area').document(session['sessionUser']['areaId']).get().to_dict()
     return render_template("markLocation.html", area_dict = area_dict, currentArea = currentArea)
 
+@app.route('/orderDetailDeliveryAgent<orderId>')
+@check_token
+def orderDetailDeliveryAgent(orderId):
+    return render_template('orderDetailsRestaurant.html')
+
 
 if __name__ == "__main__":
     # cache.init_app(app)
