@@ -1311,8 +1311,9 @@ def ratingCustomer():
     if session['sessionUser']['userType']!='customer':
         return redirect(url_for('logout'))
 
-    deliveryAgentId="" #get from front end
-    deliveryAgentRating="" #get from front end,must be out of 5
+
+    deliveryAgentId=session['currentOrderCreating']['deliveryAgentId']
+    deliveryAgentRating=request.form['deliveryAgentRating']
     deliveryAgentRating=int(deliveryAgentRating)
 
     deliveryAgentRatingId=db.collection('deliveryAgent').document(deliveryAgentId).get().to_dict()['ratingId']
@@ -1325,8 +1326,8 @@ def ratingCustomer():
     db.collection('rating').document(deliveryAgentRatingId).set(deliveryAgentRatingObject)
 
 
-    restaurantId="" #get from front end
-    restaurantRating="" #get from front end,must be out of 5
+    restaurantId=session['currentOrderCreating']['restaurantId']
+    restaurantRating=request.form['restaurantRating']
     restaurantRating=int(restaurantRating)
 
     restaurantRatingId=db.collection('restaurant').document(restaurantId).get().to_dict()['ratingId']
