@@ -169,7 +169,8 @@ def deliveryAgentsignup():
             "areaId" : area,
             "deliveryAgentId" : user.uid,
             "ratingId" : rating_reference.id,
-            "isAvailable" : True
+            "isAvailable" : True,
+            "currentOrderId":""
         }
         db.collection("deliveryAgent").document(user.uid).set(json_data)
         db.collection("type").document(user.uid).set({"type" : "deliveryAgent"})
@@ -1385,7 +1386,7 @@ def currentOrderDeliveryAgent():
         return redirect(url_for('logout'))
     user=session['sessionUser']
     currentOrderId = db.collection(user['userType']).document(session['userId']).get().to_dict()['currentOrderId']
-    if currentOrderId == None:
+    if currentOrderId == "":
         return redirect(url_for('moreDetailsDeliveryRequest', status = "NoOrder"))
     else: 
         session['currentOrderDeliveryAgent'] = db.collection('order').document(currentOrderId).get().to_dict()
