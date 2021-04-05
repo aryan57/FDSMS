@@ -248,13 +248,17 @@ def customersignup():
         session['sign_message']="error uploading photo in firebase storage"
         return redirect(url_for('customerSignup'))
 
-@app.route("/temp")
-def temp():
+@check_token
+def getImageURL(path):
     # blob = bucket.blob("customer/"+"YQ2pF5uHW7ZCvfpIzUD1sTcZL5n2"+".jpg")
-    blob = bucket.blob("restaurant/"+"oDtSvO2uB8UE6889JHPRFTLvHJY2"+".jpg")
+    # blob = bucket.blob("customer/"+"MELPH5EA7XXzPz80vw3bKhiN46b2.jpg")
+    blob = bucket.blob(path)
 
     imagePublicURL = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
-    return {"imageLink":imagePublicURL},200
+
+
+    # return render_template('temp.html',imagePublicURL=imagePublicURL)
+    return imagePublicURL
 
 
 
