@@ -189,6 +189,7 @@ def customersignup():
     mobile = request.form['mobile']
     dob = request.form['dob']
     name = request.form['name']
+    address = request.form['address']
     local_file_obj = request.files['local_file_path']
     storage_file_path = ""
     if area=='Other':
@@ -227,7 +228,8 @@ def customersignup():
             "customerId":user.uid,
             "ratingId":rating_reference.id,
             "picSrc": storage_file_path,
-            "pendingOrderId": []
+            "pendingOrderId": [],
+            "address" : address
         }
         db.collection("customer").document(user.uid).set(json_data)
         db.collection("type").document(user.uid).set({"type" : "customer"})
@@ -401,6 +403,7 @@ def createMenu():
     for doc in docs:
         temp_dict=doc.to_dict()
         print(temp_dict)
+        temp_dict['foodItemId'] = doc.id
         # temp_dict['food_item_id']= doc.id
         foodItemList.append(temp_dict)
     try:
@@ -449,8 +452,7 @@ def foodItemAdder():
         }
         doc_reference = db.collection("restaurant").document(session["userId"]).collection("foodItem").document()
         doc_reference.set(foodItem)
-        # doc_reference1 = db.collection("restaurant").document(session["userId"]).collection("foodItem").document(doc_reference.id).update({"foodItemId":doc_reference.id})
-        # return {"ok":"True"},200
+        db.collection("restaurant").document(session["userId"]).collection("foodItem").document(doc_reference.id).update({"foodItemId":doc_reference.id})
         
     except:
         session['food_item_addition_msg'] = "Error adding food item text data in database"
@@ -480,6 +482,8 @@ def allRestaurant():
     for doc in docs:
         temp_dict=doc.to_dict()
         temp_dict['userId']= doc.id
+        temp_dict['areaName']=db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
+        temp_dict['ratingValue']= db.collection('rating').document(temp_dict['ratingId']).get().to_dict()['rating']
         session['restaurantList'].append(temp_dict)
     restaurantList=session['restaurantList']
     return render_template('allRestaurant.html', user=user, restaurantList=restaurantList)
@@ -495,6 +499,8 @@ def allCustomers():
     for doc in docs:
         temp_dict=doc.to_dict()
         temp_dict['userId']= doc.id
+        temp_dict['areaName']=db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
+        temp_dict['ratingValue']= db.collection('rating').document(temp_dict['ratingId']).get().to_dict()['rating']
         session['customerList'].append(temp_dict)
     return render_template('allCustomers.html', user=user)
 
@@ -509,6 +515,8 @@ def allDeliveryAgents():
     for doc in docs:
         temp_dict=doc.to_dict()
         temp_dict['userId']= doc.id
+        temp_dict['areaName']=db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
+        temp_dict['ratingValue']= db.collection('rating').document(temp_dict['ratingId']).get().to_dict()['rating']
         session['deliveryAgentList'].append(temp_dict)
     return render_template('allDeliveryAgents.html', user=user)
 
@@ -1291,7 +1299,7 @@ def currentOrderDeliveryAgent():
         print('hello')
         return redirect(url_for('moreDetailsDeliveryRequest', status="NoOrder"))
     return redirect(url_for('moreDetailsDeliveryRequest', status = "Details")) 
-@app.route('/ratingDeliveryAgent')
+@app.route('/ratingDeliveryAgent', methods=['POST', 'GET'])
 @check_token
 def ratingDeliveryAgent():
     

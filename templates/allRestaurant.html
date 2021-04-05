@@ -47,8 +47,8 @@
                   {% for restaurant in restaurantList %}
                     <tr class="mdc-data-table__row">
                       <th class="mdc-data-table__cell" scope="row">{{restaurant['name']}}</th>
-                      <td class="mdc-data-table__cell">{{restaurant['ratingId']}}</td>
-                      <td class="mdc-data-table__cell">{{restaurant['areaId']}}</td>
+                      <td class="mdc-data-table__cell">{{restaurant['ratingValue']}}</td>
+                      <td class="mdc-data-table__cell">{{restaurant['areaName']}}</td>
                       <td class="mdc-data-table__cell">
                         {% if restaurant['isRecommended'] %}
                           Yes

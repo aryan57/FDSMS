@@ -44,8 +44,8 @@
                   {% for customer in session['customerList'] %}
                     <tr class="mdc-data-table__row">
                       <th class="mdc-data-table__cell" scope="row">{{customer['name']}}</th>
-                      <td class="mdc-data-table__cell">{{customer['ratingId']}}</td>
-                      <td class="mdc-data-table__cell">{{customer['areaId']}}</td>
+                      <td class="mdc-data-table__cell">{{customer['ratingValue']}}</td>
+                      <td class="mdc-data-table__cell">{{customer['areaName']}}</td>
                       <td class="mdc-data-table__cell">{{customer['gender']}}</td>
                       <td class="mdc-data-table__cell">{{customer['dateOfBirth']}}</td>
                       <td class="mdc-data-table__cell">{{customer['email']}}</td>

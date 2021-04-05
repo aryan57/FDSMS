@@ -46,8 +46,8 @@
                   {% for deliveryAgent in session['deliveryAgentList'] %}
                     <tr class="mdc-data-table__row">
                       <th class="mdc-data-table__cell" scope="row">{{deliveryAgent['name']}}</th>
-                      <td class="mdc-data-table__cell">{{deliveryAgent['ratingId']}}</td>
-                      <td class="mdc-data-table__cell">{{deliveryAgent['areaId']}}</td>
+                      <td class="mdc-data-table__cell">{{deliveryAgent['ratingValue']}}</td>
+                      <td class="mdc-data-table__cell">{{deliveryAgent['areaName']}}</td>
                       <td class="mdc-data-table__cell">{{deliveryAgent['gender']}}</td>
                       <td class="mdc-data-table__cell">{{deliveryAgent['dateOfBirth']}}</td>
                       <td class="mdc-data-table__cell">{{deliveryAgent['email']}}</td>
