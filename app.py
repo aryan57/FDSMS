@@ -15,6 +15,12 @@ app.config['DEBUG'] = True
 app.config['TEMPLATES_AUTO_RELOAD']=True
 app.secret_key ='a very very very long string'
 
+# for bitly short link
+bitly_headers = {
+    'Authorization': 'Bearer bb812cf74a73b3507a9dd88c44e4ad9cca9dbb0b',
+    'Content-Type': 'application/json',
+}
+
 cred = credentials.Certificate('fbAdminConfig.json')
 firebase = firebase_admin.initialize_app(cred,json.load(open('fbConfig.json')))
 pyrebase_pb = pyrebase.initialize_app(json.load(open('fbConfig.json')))
@@ -251,15 +257,22 @@ def customersignup():
 
 @check_token
 def getImageURL(path):
-    # blob = bucket.blob("customer/"+"YQ2pF5uHW7ZCvfpIzUD1sTcZL5n2"+".jpg")
-    # blob = bucket.blob("customer/"+"MELPH5EA7XXzPz80vw3bKhiN46b2.jpg")
     blob = bucket.blob(path)
 
     imagePublicURL = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
 
+    bitly_data = '{ "long_url": '+'"'+imagePublicURL+'", "domain": "bit.ly", "group_guid": "Bl1p4sQJxCm" }'
 
-    # return render_template('temp.html',imagePublicURL=imagePublicURL)
-    return imagePublicURL
+    try:
+        response = requests.post('https://api-ssl.bitly.com/v4/shorten', headers=bitly_headers, data=bitly_data)
+        response=response.json()
+    except Exception as e:
+        # print(e)
+        pass
+
+    shortURL=response['link']
+
+    return shortURL
 
 
 
