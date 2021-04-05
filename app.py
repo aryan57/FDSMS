@@ -1332,6 +1332,7 @@ def ratingDeliveryAgent():
     db.collection('customer').document(currentOrder['customerId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
     db.collection('restaurant').document(currentOrder['restaurantId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
     db.collection('deliveryAgent').document(currentOrder['deliveryAgentId']).update({'isAvailable' : True})
+    db.collection('deliveryAgent').document(currentOrder['deliveryAgent']).update({'currentOrderId': None})
     session['currentOrderDeliveryAgent']=None
     session.modified=True
     return redirect(url_for('deliveryAgentDashboard'))
@@ -1346,6 +1347,7 @@ def ratingCustomer():
 
 
     orderId=session['customerCurrentOrderChanging']['orderId']
+    db.collection('order').document(orderId).update({'updateLevel': 6})
     deliveryAgentId = db.collection("order").document(orderId).get().to_dict()['deliveryAgentId']
     deliveryAgentRating=request.form['deliveryAgentRating']
     deliveryAgentRating=int(deliveryAgentRating)
@@ -1375,7 +1377,7 @@ def ratingCustomer():
 
     db.collection('rating').document(restaurantRatingId).set(restaurantRatingObject)
 
-    return {"ok":"ok"},200
+    return redirect(url_for('pastOrder'))
 
 if __name__ == "__main__":
     # cache.init_app(app)

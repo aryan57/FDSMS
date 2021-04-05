@@ -45,7 +45,6 @@
                 <thead>
                   <tr class="mdc-data-table__header-row">
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Name</th>
-                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Rating</th>
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Price</th>
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Recommended</th>
                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Delete Item</th>
@@ -55,7 +54,6 @@
                   {% for foodItem in menuList %}
                     <tr class="mdc-data-table__row">
                       <th class="mdc-data-table__cell" scope="row">{{foodItem['name']}}</th>
-                      <td class="mdc-data-table__cell">{{foodItem['ratingId']}}</td>
                       <td class="mdc-data-table__cell">{{foodItem['pricePerItem']}}</td>
                       <td class="mdc-data-table__cell">
                         {% if foodItem['isRecommended'] %}
