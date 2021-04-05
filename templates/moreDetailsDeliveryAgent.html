@@ -162,7 +162,7 @@
             <span class="mdc-notched-outline">
               <span class="mdc-notched-outline__leading"></span>
               <span class="mdc-notched-outline__notch">
-                <span class="mdc-floating-label" id="my-label-id">Delivery Agent Rating</span>
+                <span class="mdc-floating-label" id="my-label-id">Customer Rating</span>
               </span>
               <span class="mdc-notched-outline__trailing"></span>
             </span>
@@ -183,8 +183,17 @@
 </div>
 
 <script>
-  const textField = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-1'));
-  const textField1 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-2'));
-  const textField2 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-3'));
+
+  let showButton = {{showButton}}
+
+  if(showButton == 2)
+  {
+    const textField2 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-3'));
+  }
+  else if(showButton==1)
+  {
+    const textField = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-1'));
+    const textField1 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-2'));
+  }
 </script>
 {% endblock %}

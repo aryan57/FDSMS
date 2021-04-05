@@ -107,6 +107,7 @@ def restaurantsignup():
         blob = bucket.blob(storage_file_path)
         blob.upload_from_file(local_file_obj,content_type="image/jpeg")
         session['sign_message']="Restaurant SignedUp. Please Login"
+        db.collection('area').document(area).update({"restaurantId" : firestore.ArrayUnion([user.uid])})
         return redirect(url_for('login'))
     except Exception as e:
         print(e)
@@ -264,14 +265,16 @@ def token():
     try:
         user = pyrebase_pb.auth().sign_in_with_email_and_password(email, password)
         # user2 = pyrebase_pb.auth().get_account_info(user['idToken'])
-        user_type = db.collection('type').document(user["localId"]).get().to_dict()["type"]
+        try:
+            user_type = db.collection('type').document(user["localId"]).get().to_dict()["type"]
+        except Exception as e:
+            print(e)
         json_data = db.collection(user_type).document(user["localId"]).get().to_dict()
         session['sessionUser']= json_data
         session['sessionUser']['userType']=user_type
         session['jwt_token']=user['idToken']
         session['refresh_token']=user['refreshToken']
         session['userId']=user['localId']
-        print(session['sessionUser']['userType'])
         if user_type=="customer" : 
             return redirect(url_for('customerDashboard'))
         elif user_type == "restaurant" : 
@@ -446,7 +449,6 @@ def foodItemAdder():
             "name" : name,
             "pricePerItem" : price,
             "isRecommended": False,
-            "ratingId": "",
             "restaurantId" : session["userId"],
             "picSrc": ""
         }
@@ -540,7 +542,7 @@ def allFoodItem():
     for doc in docs:
         temp_dict=doc.to_dict()
         # print(temp_dict)
-        temp_dict['food_item_id']= doc.id
+        # temp_dict['food_item_id']= doc.id
         foodItemList.append(temp_dict)
     session['current_menu_viewed']=foodItemList
     return render_template('allFoodItem.html', user=user,foodItemList=foodItemList)
@@ -1195,6 +1197,9 @@ def acceptDeliveryRequest():
     db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'updateMessage': "Order Accepted by Delivery Agent"})
     db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'updateLevel': 3})
     db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'orderUpdates' : firestore.ArrayUnion([updateOrderDic])})
+    db.collection('area').document(session['sessionUser']['areaId']).update({'availableOrderIdForPickup' : firestore.ArrayRemove([session['currentOrderDeliveryAgent']['orderId']])})
+    db.collection('deliveryAgent').document(session['userId']).update({"isAvailable" : not session['sessionUser']['isAvailable']})
+    db.collection('delvieryAgent').document(session['userId']).set({"currentOrderId" : session['currentOrderDeliveryAgent']['orderId']})
 
     return redirect(url_for('moreDetailsDeliveryRequest', status = "Details"))
 
@@ -1277,11 +1282,12 @@ def acceptOrderForDelivery():
 @check_token
 def updateStatus4():
     currentOrder = session['currentOrderDeliveryAgent']
-    db.collection('order').document(currentOrder['orderId']).update({'updateMessage': "OrderDelivered"})
+    db.collection('order').document(currentOrder['orderId']).update({'updateMessage': "Order Delivered"})
     db.collection('order').document(currentOrder['orderId']).update({'updateLevel': 5})
     db.collection('order').document(currentOrder['orderId']).update({'isPending': False})
     db.collection('customer').document(currentOrder['customerId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
     db.collection('restaurant').document(currentOrder['restaurantId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
+    db.collection('deliveryAgent').document(currentOrder['deliveryAgentId']).update({'currentOrderId' : firestore.FieldValue.delete()})
     session['currentOrderDeliveryAgent']=None
     session.modified=True
     return redirect(url_for('deliveryAgentDashboard'))
@@ -1289,16 +1295,15 @@ def updateStatus4():
 @app.route('/currentOrderDeliveryAgent')
 @check_token
 def currentOrderDeliveryAgent():
-    try:
-        if not 'currentOrderDeliveryAgent' in session.keys() :
-            return redirect(url_for('moreDetailsDeliveryRequest', status="NoOrder"))
-        elif session['curretnOrderDeliveryAgent']  == None:
-            return redirect(url_for('moreDetailsDeliveryRequest', status="NoOrder"))
-    except Exception as e:
-        print(e)
-        print('hello')
-        return redirect(url_for('moreDetailsDeliveryRequest', status="NoOrder"))
-    return redirect(url_for('moreDetailsDeliveryRequest', status = "Details")) 
+    
+    user=session['sessionUser']
+    currentOrderId = db.collection(user['userType']).document(session['userId']).get().to_dict()['currentOrderId']
+    if currentOrderId == None:
+        return redirect(url_for('moreDetailsDeliveryRequest', status = "NoOrder"))
+    else: 
+        session['currentOrderDeliveryAgent'] = db.collection('order').document(currentOrderId).get().to_dict()
+        return redirect(url_for('moreDetailsDeliveryRequest', status = "Details")) 
+    
 @app.route('/ratingDeliveryAgent', methods=['POST', 'GET'])
 @check_token
 def ratingDeliveryAgent():
