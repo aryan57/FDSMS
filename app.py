@@ -409,9 +409,9 @@ def createMenu():
     print(user)
     if not user['userType'] == 'restaurant':
         return redirect(url_for('logout'))
-    currentRestaurantMenuId=session['userId']
+    currResMenuId=session['userId']
     foodItemList=[]
-    docs=db.collection('restaurant').document(currentRestaurantMenuId).collection('foodItem').stream()
+    docs=db.collection('restaurant').document(currResMenuId).collection('foodItem').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
         # print(temp_dict)
@@ -420,10 +420,10 @@ def createMenu():
         temp_dict['pic'] = getImageURL(temp_dict['picSrc'])
         foodItemList.append(temp_dict)
     try:
-        message=session['food_item_addition_msg']
-        session['food_item_addition_msg']="False"
+        message=session['foodMessage']
+        session['foodMessage']="False"
     except: 
-        session['food_item_addition_msg']="False"
+        session['foodMessage']="False"
         message="False"
     return render_template('createMenu.html', user=user, menuList=foodItemList, message=message)
 
@@ -432,8 +432,8 @@ def createMenu():
 def addFoodItem():
     user = session['sessionUser']
     if user['userType'] == 'restaurant':
-        message=session['food_item_addition_msg']
-        session['food_item_addition_msg']="False"
+        message=session['foodMessage']
+        session['foodMessage']="False"
         return render_template('addFoodItem.html', user=user, message=message)
     else:
         return redirect(url_for('logout'))
@@ -469,18 +469,18 @@ def foodItemAdder():
         db.collection("restaurant").document(session["userId"]).collection("foodItem").document(doc_reference.id).update({"foodItemId":doc_reference.id})
         
     except:
-        session['food_item_addition_msg'] = "Error adding food item text data in database"
+        session['foodMessage'] = "Error adding food item text data in database"
         return redirect(url_for('addFoodItem'))
     try:
         storage_file_path = "restaurant/"+session["userId"]+"_"+doc_reference.id+".jpg"
         blob = bucket.blob(storage_file_path)
         blob.upload_from_file(local_file_obj,content_type="image/jpeg")
         doc_reference = db.collection("restaurant").document(session["userId"]).collection("foodItem").document(doc_reference.id).update({"picSrc":storage_file_path})
-        session['food_item_addition_msg']="Food item text and photo successfully added in database."
+        session['foodMessage']="Food item text and photo successfully added in database."
         return redirect(url_for('createMenu'))
     except Exception as e:
         print(e)
-        session['food_item_addition_msg']="error uploading photo in firebase storage"
+        session['foodMessage']="error uploading photo in firebase storage"
         return redirect(url_for('addFoodItem'))
 
     
@@ -490,7 +490,7 @@ def allRestaurant():
     user=session['sessionUser']
     if not user['userType'] == 'admin' and not user['userType'] == 'customer':
         return redirect(url_for('logout'))
-    session['restaurantList']=[]
+    restaurantList=[]
     
     docs=db.collection('restaurant').stream()
     for doc in docs:
@@ -499,8 +499,8 @@ def allRestaurant():
         temp_dict['areaName']=db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
         temp_dict['ratingValue']= db.collection('rating').document(temp_dict['ratingId']).get().to_dict()['rating']
         temp_dict['pic'] = getImageURL(temp_dict['picSrc'])
-        session['restaurantList'].append(temp_dict)
-    restaurantList=session['restaurantList']
+        restaurantList.append(temp_dict)
+    session['restaurantList']=restaurantList
     return render_template('allRestaurant.html', user=user, restaurantList=restaurantList)
 
 @app.route('/allCustomers')
@@ -542,7 +542,7 @@ def allDeliveryAgents():
 def allFoodItem11(restaurantUserId):
     if not session['sessionUser']['userType'] == 'customer' and not session['sessionUser']['userType'] == 'admin':
         return redirect(url_for('logout'))
-    session['currentRestaurantMenuId']=restaurantUserId
+    session['currResMenuId']=restaurantUserId
     return redirect(url_for('allFoodItem'))
 
 
@@ -555,14 +555,13 @@ def allFoodItem():
         return redirect(url_for('logout'))
 
     foodItemList=[]
-    docs=db.collection('restaurant').document(session['currentRestaurantMenuId']).collection('foodItem').stream()
+    docs=db.collection('restaurant').document(session['currResMenuId']).collection('foodItem').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
-        # print(temp_dict)
-        # temp_dict['food_item_id']= doc.id
         temp_dict['pic'] = getImageURL(temp_dict['picSrc'])
         foodItemList.append(temp_dict)
-    session['current_menu_viewed']=foodItemList
+    session['currentMenu']=foodItemList
+    session.modified=True
     return render_template('allFoodItem.html', user=user,foodItemList=foodItemList)
 
 def deleteUserFromDatabase(to_delete):
@@ -640,7 +639,7 @@ def deleteUser(user_type, delete_id):
 @app.route('/order', methods=['POST','GET'])
 @check_token
 def order():
-    foodItemList = session['current_menu_viewed']
+    foodItemList = session['currentMenu']
     
     cost = 0
     orderList = []
@@ -745,6 +744,7 @@ def recentOrderRestaurant():
     for doc in docs:
         if doc.id in listOrderId:
             temp = doc.to_dict()
+            print(temp['customerId'])
             temp['customerName']=db.collection('customer').document(temp['customerId']).get().to_dict()['name']
             recentOrderList.append(temp)
     session['presentOrderRestaurant'] = recentOrderList
@@ -919,10 +919,10 @@ def deleteFoodItem(foodItemId):
     #command_to delete the id
     try:
         db.collection("restaurant").document(restaurantId).collection('foodItem').document(foodItemId).delete()
-        session['food_item_addition_msg']="food item deletion from databse is successful"
+        session['foodMessage']="food item deletion from databse is successful"
     except Exception as e:
         # print(e)
-        session['food_item_addition_msg']="Error deleting food item from databse"
+        session['foodMessage']="Error deleting food item from databse"
 
     return redirect(url_for('createMenu'))
 
@@ -969,15 +969,15 @@ def changeRecommendFoodItem(id_to_change):
         return redirect(url_for('logout'))
     id=int(id_to_change)
     id=id-1
-    if session['current_menu_viewed'][id]['isRecommended'] == False:
-        session['current_menu_viewed'][id]['isRecommended'] = True
+    if session['currentMenu'][id]['isRecommended'] == False:
+        session['currentMenu'][id]['isRecommended'] = True
         session.modified = True
     else :
-        session['current_menu_viewed'][id]['isRecommended'] = False
+        session['currentMenu'][id]['isRecommended'] = False
         session.modified = True
 
-    foodItemId=session['current_menu_viewed'][id]['foodItemId']
-    restaurantId=session['current_menu_viewed'][id]['restaurantId']
+    foodItemId=session['currentMenu'][id]['foodItemId']
+    restaurantId=session['currentMenu'][id]['restaurantId']
 
     isRecommended=""
     try:
