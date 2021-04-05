@@ -1197,9 +1197,10 @@ def acceptDeliveryRequest():
     db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'updateMessage': "Order Accepted by Delivery Agent"})
     db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'updateLevel': 3})
     db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'orderUpdates' : firestore.ArrayUnion([updateOrderDic])})
+    print(session['currentOrderDeliveryAgent']['orderId'])
     db.collection('area').document(session['sessionUser']['areaId']).update({'availableOrderIdForPickup' : firestore.ArrayRemove([session['currentOrderDeliveryAgent']['orderId']])})
     db.collection('deliveryAgent').document(session['userId']).update({"isAvailable" : not session['sessionUser']['isAvailable']})
-    db.collection('delvieryAgent').document(session['userId']).set({"currentOrderId" : session['currentOrderDeliveryAgent']['orderId']})
+    db.collection('deliveryAgent').document(session['userId']).set({"currentOrderId" : session['currentOrderDeliveryAgent']['orderId']})
 
     return redirect(url_for('moreDetailsDeliveryRequest', status = "Details"))
 
@@ -1287,7 +1288,7 @@ def updateStatus4():
     db.collection('order').document(currentOrder['orderId']).update({'isPending': False})
     db.collection('customer').document(currentOrder['customerId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
     db.collection('restaurant').document(currentOrder['restaurantId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
-    db.collection('deliveryAgent').document(currentOrder['deliveryAgentId']).update({'currentOrderId' : firestore.FieldValue.delete()})
+    db.collection('deliveryAgent').document(currentOrder['deliveryAgentId']).update({'currentOrderId' : None})
     session['currentOrderDeliveryAgent']=None
     session.modified=True
     return redirect(url_for('deliveryAgentDashboard'))
