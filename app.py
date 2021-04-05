@@ -13,6 +13,7 @@ from requests.exceptions import HTTPError
 app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['TEMPLATES_AUTO_RELOAD']=True
+app.config['SESSION_TYPE']="filesystem"
 app.secret_key ='a very very very long string'
 
 cred = credentials.Certificate('fbAdminConfig.json')
@@ -500,6 +501,7 @@ def allRestaurant():
         temp_dict['pic'] = getImageURL(temp_dict['picSrc'])
         restaurantList.append(temp_dict)
     session['restaurantList']=restaurantList
+    session.modified=True
     return render_template('allRestaurant.html', user=user, restaurantList=restaurantList)
 
 @app.route('/allCustomers')
@@ -509,6 +511,7 @@ def allCustomers():
     if not user['userType']=="admin":
         return redirect(url_for('logout'))
     session['customerList']=[]
+    session.modified = True
     docs=db.collection('customer').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
@@ -526,6 +529,7 @@ def allDeliveryAgents():
     if not user['userType']=="admin" and not user['userType']=='restaurant':
         return redirect(url_for('logout'))
     session['deliveryAgentList']=[]
+    session.modified = True
     docs=db.collection('deliveryAgent').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
@@ -699,6 +703,7 @@ def placeOrder():
     db.collection('order').document(doc_reference.id).update({ 'orderId' : doc_reference.id})
     orderId=doc_reference.id
     session['currentOrderCreating']["orderId"] = orderId
+    session.modified = True
     # add restaurant array
     restaurantId=currentOrder['restaurantId']
     restaurantDocReference = db.collection('restaurant').document(restaurantId)
@@ -765,6 +770,7 @@ def orderDetailRestaurant(orderId):
     orderList=currentOrder['orderList']
     discount=currentOrder['discountValue']
     session['currentOrderUpdating']=currentOrder
+    session.modified = True
     final=max(currentOrder['orderValue']+ currentOrder['deliveryCharge']- discount,0)
     return render_template('orderDetailsRestaurant.html', currentOrder = currentOrder, orderList=orderList, customerName=customerName, restaurantName=restaurantName, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final, updateLevel=currentOrder['updateLevel'])
 
@@ -894,6 +900,7 @@ def removeOfferFromOrder():
     if session['sessionUser']['userType'] != 'customer':
         return redirect(url_for('logout'))
     session['currentOrderCreating']['offerId']=None
+    session.modified = True
     return redirect(url_for('orderDetails'))
 
 @app.route('/redirectDashboard')
@@ -1097,6 +1104,7 @@ def allOffer(customer_id):
         temp_dict['offerId']= doc.id
         offerList.append(temp_dict)
     session['offerList'] = offerList
+    session.modified = True
     print(offerList)
     return render_template('allOfferAdmin.html', offerList=offerList)
 
@@ -1142,6 +1150,7 @@ def offerListCustomer():
         
         offerList.append(temp_dict)
     session['offerList']=offerList
+    session.modified = True
     # print(offerList)
     return render_template('allOfferCustomer.html', offerList=offerList)
 
@@ -1234,6 +1243,7 @@ def seeDeliveryRequest():
             temp_dict['area']=db.collection('area').document(areaId).get().to_dict()
             deliveryRequestList.append(temp_dict)
     session['currentDeliveryRequest'] = deliveryRequestList
+    session.modified = True
     return render_template("seeDeliveryRequest.html", deliveryRequestList = deliveryRequestList)
 
 @app.route('/acceptDeliveryRequest', methods=['POST', 'GET'])
@@ -1253,7 +1263,7 @@ def acceptDeliveryRequest():
     db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'updateMessage': "Order Accepted by Delivery Agent"})
     db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'updateLevel': 3})
     db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).update({'orderUpdates' : firestore.ArrayUnion([updateOrderDic])})
-    print(session['currentOrderDeliveryAgent']['orderId'])
+    # print(session['currentOrderDeliveryAgent']['orderId'])
     db.collection('area').document(session['sessionUser']['areaId']).update({'availableOrderIdForPickup' : firestore.ArrayRemove([session['currentOrderDeliveryAgent']['orderId']])})
     db.collection('deliveryAgent').document(session['userId']).update({"isAvailable" : not session['sessionUser']['isAvailable']})
     db.collection('deliveryAgent').document(session['userId']).update({"currentOrderId" : session['currentOrderDeliveryAgent']['orderId']})
@@ -1269,6 +1279,7 @@ def moreDetailsDeliveryRequest(status):
     print(status)
     if status != "NoOrder":
         session['currentOrderDeliveryAgent'] = db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).get().to_dict()
+        session.modified = True
     showButton=3
     if status == "NoOrder":
         printTable = False
@@ -1328,7 +1339,7 @@ def orderDetailDeliveryAgent(orderId):
     orderId=int(orderId)
     orderId = orderId-1
     session['currentOrderDeliveryAgent']=session['currentDeliveryRequest'][orderId]
-    
+    session.modified = True
     return redirect(url_for('moreDetailsDeliveryRequest', status = "Details"))
 
 @app.route('/acceptOrderForDelivery')
@@ -1365,6 +1376,7 @@ def currentOrderDeliveryAgent():
         return redirect(url_for('moreDetailsDeliveryRequest', status = "NoOrder"))
     else: 
         session['currentOrderDeliveryAgent'] = db.collection('order').document(currentOrderId).get().to_dict()
+        session.modified = True
         return redirect(url_for('moreDetailsDeliveryRequest', status = "Details")) 
     
 @app.route('/ratingDeliveryAgent', methods=['POST', 'GET'])
