@@ -1296,7 +1296,7 @@ def moreDetailsDeliveryRequest(status):
         currentOrder = session['currentOrderDeliveryAgent']
         customerName = db.collection('customer').document(currentOrder['customerId']).get().to_dict()['name']
         restaurantName = db.collection('restaurant').document(currentOrder['restaurantId']).get().to_dict()['name']
-        address = "There is no address currently in the database"
+        address = db.collection('customer').document(currentOrder['customerId']).get().to_dict()['address']
         orderList = currentOrder['orderList']
         cost = currentOrder['orderValue']
         discount = int(currentOrder['discountValue'])
