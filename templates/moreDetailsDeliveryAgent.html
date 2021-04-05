@@ -154,21 +154,37 @@
       </div>
     </form>
     {% elif showButton == 2 %}
-    <div class = 'row justify-content-center'>
-      <div class= 'col-auto align-self-center'>
-        <a href={{url_for('updateStatus4')}} id = 'anchor-link-nodesign'>
+    <form action={{url_for('ratingDeliveryAgent')}} method="POST" enctype="multipart/form-data">
+      <div class='row justify-content-center'>
+        <div class='col-3 align-self-center'>
+          <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon text-field-3">
+            <i class="material-icons mdc-text-field__icon mdc-text-field__icon--leading" tabindex="0" role="button">star</i>
+            <span class="mdc-notched-outline">
+              <span class="mdc-notched-outline__leading"></span>
+              <span class="mdc-notched-outline__notch">
+                <span class="mdc-floating-label" id="my-label-id">Delivery Agent Rating</span>
+              </span>
+              <span class="mdc-notched-outline__trailing"></span>
+            </span>
+            <input type="number" class="mdc-text-field__input" aria-labelledby="my-label-id" name="deliveryAgentRating" max=5 min=0 required>
+          </label>
+        </div>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-auto align-self-center">
           <button class="mdc-button mdc-button--raised" name="submit" type="submit">
             <span class="mdc-button__label">Order Delivered</span>
           </button>
-        </a>
+        </div>
       </div>
-    </div>
+    </form>
     {% endif %}
-    {% endif %}
+  {% endif %}
 </div>
 
 <script>
   const textField = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-1'));
   const textField1 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-2'));
+  const textField2 = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field.text-field-3'));
 </script>
 {% endblock %}
