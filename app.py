@@ -1310,8 +1310,16 @@ def ratingDeliveryAgent():
     ratingObject['rating'] = ratingObject['sum']/ratingObject['noOfInputs']
 
     db.collection('rating').document(ratingId).set(ratingObject)
-
-    return {"ok","ok"},200
+    
+    currentOrder = session['currentOrderDeliveryAgent']
+    db.collection('order').document(currentOrder['orderId']).update({'updateMessage': "OrderDelivered"})
+    db.collection('order').document(currentOrder['orderId']).update({'updateLevel': 5})
+    db.collection('order').document(currentOrder['orderId']).update({'isPending': False})
+    db.collection('customer').document(currentOrder['customerId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
+    db.collection('restaurant').document(currentOrder['restaurantId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
+    session['currentOrderDeliveryAgent']=None
+    session.modified=True
+    return redirect(url_for('deliveryAgentDashboard'))
     
 
 @app.route('/ratingCustomer', methods=['POST', 'GET'])
