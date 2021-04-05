@@ -90,7 +90,7 @@ def restaurantsignup():
             "areaId" : area,
             "ratingId": rating_reference.id,
             "restaurantId" : user.uid,
-            "restaurantPicSrc" : storage_file_path,
+            "picSrc" : storage_file_path,
             "pendingOrderId": [],
             "email" : email,
             "isRecommended" : False
@@ -390,6 +390,8 @@ def personalData():
     user=session['sessionUser']
     user['areaName']=db.collection('area').document(user['areaId']).get().to_dict()['name']
     user['ratingValue']=db.collection('rating').document(user['ratingId']).get().to_dict()['rating']
+    path = user['picSrc']
+    user['profilePicture'] = getImageURL(path)
     return render_template('personalData.html', user=user)
 
 @app.route('/logout')
@@ -411,9 +413,10 @@ def createMenu():
     docs=db.collection('restaurant').document(currentRestaurantMenuId).collection('foodItem').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
-        print(temp_dict)
-        temp_dict['foodItemId'] = doc.id
+        # print(temp_dict)
+        # temp_dict['foodItemId'] = doc.id
         # temp_dict['food_item_id']= doc.id
+        temp_dict['pic'] = getImageURL(temp_dict['picSrc'])
         foodItemList.append(temp_dict)
     try:
         message=session['food_item_addition_msg']
@@ -492,6 +495,7 @@ def allRestaurant():
         temp_dict['userId']= doc.id
         temp_dict['areaName']=db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
         temp_dict['ratingValue']= db.collection('rating').document(temp_dict['ratingId']).get().to_dict()['rating']
+        temp_dict['pic'] = getImageURL(temp_dict['picSrc'])
         session['restaurantList'].append(temp_dict)
     restaurantList=session['restaurantList']
     return render_template('allRestaurant.html', user=user, restaurantList=restaurantList)
@@ -509,6 +513,7 @@ def allCustomers():
         temp_dict['userId']= doc.id
         temp_dict['areaName']=db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
         temp_dict['ratingValue']= db.collection('rating').document(temp_dict['ratingId']).get().to_dict()['rating']
+        temp_dict['pic'] = getImageURL(temp_dict['picSrc'])
         session['customerList'].append(temp_dict)
     return render_template('allCustomers.html', user=user)
 
@@ -525,6 +530,7 @@ def allDeliveryAgents():
         temp_dict['userId']= doc.id
         temp_dict['areaName']=db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
         temp_dict['ratingValue']= db.collection('rating').document(temp_dict['ratingId']).get().to_dict()['rating']
+        temp_dict['pic'] = getImageURL(temp_dict['picSrc'])
         session['deliveryAgentList'].append(temp_dict)
     return render_template('allDeliveryAgents.html', user=user)
 
@@ -549,6 +555,7 @@ def allFoodItem():
         temp_dict=doc.to_dict()
         # print(temp_dict)
         # temp_dict['food_item_id']= doc.id
+        temp_dict['pic'] = getImageURL(temp_dict['picSrc'])
         foodItemList.append(temp_dict)
     session['current_menu_viewed']=foodItemList
     return render_template('allFoodItem.html', user=user,foodItemList=foodItemList)
@@ -976,6 +983,7 @@ def recommendedRestaurant():
     for doc in docs:
         temp_dict=doc.to_dict()
         temp_dict['userId']= doc.id
+        temp_dict['pic'] = getImageURL(temp_dict['picSrc'])
         session['restaurantList'].append(temp_dict)
     restaurantList=[]
     for restaurant in session['restaurantList']:

@@ -37,3 +37,17 @@ body{
     margin-top: 0.5rem!important;
 }
 
+.profilePicture{
+    width: 40%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tablePicture{
+    width: 150px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
