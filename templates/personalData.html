@@ -13,8 +13,8 @@
       </div>
     </div>
     <div class='row justify-content-center'>
-      <div class='col-auto justify-content-center align-self-center'>
-        <img src={{imagePath}}>
+      <div class='col-auto align-self-center'>
+        <img class='profilePicture' src={{user['profilePicture']}}>
       </div>
     </div>
     <div class='row justify-content-center'>
@@ -52,14 +52,6 @@
     {% if user['userType'] == 'customer' %}
     <div class='row justify-content-center'>
       <div class='col-auto justify-content-start align-self-center'>
-        Address: 
-      </div>
-      <div class='col-auto justify-content-end align-self-center'>
-        {{user['address']}}
-      </div>
-    </div>
-    <div class='row justify-content-center'>
-      <div class='col-auto justify-content-start align-self-center'>
         Gender: 
       </div>
       <div class='col-auto justify-content-end align-self-center'>
@@ -80,6 +72,14 @@
       </div>
       <div class='col-auto justify-content-end align-self-center'>
         {{user['mobileNumber']}}
+      </div>
+    </div>
+    <div class='row justify-content-center'>
+      <div class='col-auto justify-content-start align-self-center'>
+        Address: 
+      </div>
+      <div class='col-auto justify-content-end align-self-center'>
+        {{user['address']}}
       </div>
     </div>
     {% elif user['userType'] == 'deliveryAgent' %}
@@ -108,5 +108,9 @@
       </div>
     </div>
     {% endif %}
+    <div class='row justify-content-center'>
+      <div class='col-auto justify-content-start align-self-center' style="margin-bottom : 30px;">
+      </div>
+    </div>
   </div>
 {% endblock %}
