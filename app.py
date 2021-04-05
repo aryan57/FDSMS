@@ -845,7 +845,10 @@ def moreDetailsOrder(orderId):
         discount=min(int(int(currentOrder['orderValue'])*int(offerUsed['discount'])/100), int(offerUsed['upperLimit']))
     currentOrder['discountValue']=discount
     final=max(currentOrder['orderValue']+ currentOrder['deliveryCharge']- discount,0)
-    return render_template('moreDetailsOrder.html',  orderList=orderList, customerName=customerName, restaurantName=restaurantName, offerUsed=offerUsed, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final, updateLevel=currentOrder['updateLevel'], orderUpdate = currentOrder['orderUpdates'],restaurantId=currentOrder['restaurantId'],customerId= currentOrder['customerId'])
+    deliveryAgentName=""
+    if currentOrder['deliveryAgentId'] != "":
+        deliveryAgentName=db.collection('deliveryAgent').document(currentOrder['deliveryAgentId']).get().to_dict()['name']
+    return render_template('moreDetailsOrder.html',  orderList=orderList, customerName=customerName, restaurantName=restaurantName, offerUsed=offerUsed, cost=currentOrder['orderValue'], deliveryCharge=currentOrder['deliveryCharge'], discount=discount, final=final, updateLevel=currentOrder['updateLevel'], orderUpdate = currentOrder['orderUpdates'],restaurantId=currentOrder['restaurantId'],customerId= currentOrder['customerId'], deliveryAgentName=deliveryAgentName)
 
 @app.route('/useOffer<toUse>')
 @check_token
@@ -1087,6 +1090,7 @@ def offerListCustomer():
     for doc in docs:
         temp_dict=doc.to_dict()
         temp_dict['offerId']= doc.id
+        
         session['offerList'].append(temp_dict)
     offerList=session['offerList']
     # print(offerList)
@@ -1137,6 +1141,7 @@ def nearbyDeliveryAgents():
         temp_dict=doc.to_dict()
         if temp_dict['areaId']==areaId:
             temp_dict['areaName'] = db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
+            temp_dict['ratingValue']= db.collection('rating').document(temp_dict['ratingId']).get().to_dict()['rating']
             nearbyDeliveryAgentsList.append(temp_dict)
     # print(nearbyDeliveryAgentsList)
 
