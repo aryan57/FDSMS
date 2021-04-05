@@ -447,7 +447,7 @@ def finishMenu():
 @app.route('/addFoodItem/adder', methods=['POST','GET'])
 @check_token
 def foodItemAdder():
-    if session['user']['userType'] != 'restaurant':
+    if session['sessionUser']['userType'] != 'restaurant':
         return redirect(url_for('logout'))
     name = request.form['name']
     price = request.form['price']
@@ -534,7 +534,7 @@ def allDeliveryAgents():
 @app.route('/allFoodItem11/<restaurantUserId>')
 @check_token
 def allFoodItem11(restaurantUserId):
-    if not session['user']['userType'] == 'customer' and not session['sessionUser']['userType'] == 'admin':
+    if not session['sessionUser']['userType'] == 'customer' and not session['sessionUser']['userType'] == 'admin':
         return redirect(url_for('logout'))
     session['currentRestaurantMenuId']=restaurantUserId
     return redirect(url_for('allFoodItem'))
@@ -766,7 +766,7 @@ def orderDetailRestaurant(orderId):
 @app.route('/updateStatus0<val>')
 @check_token
 def updateStatus0(val):
-    if session['user']['userType'] != 'restaurant':
+    if session['sessionUser']['userType'] != 'restaurant':
         return redirect(url_for('logout'))
     if val == "Reject":
         updateOrderDic = {'heading': "Rejected"}
@@ -783,7 +783,7 @@ def updateStatus0(val):
 @app.route('/getEstimatedTime', methods=['POST','GET'])
 @check_token
 def getEstimatedTime():
-    if session['user']['userType'] != 'restaurant':
+    if session['sessionUser']['userType'] != 'restaurant':
         return redirect(url_for('logout'))
     try:
         estimatedTime = request.form['time']
@@ -809,14 +809,14 @@ def getEstimatedTime():
 @app.route('/updateStatus1')
 @check_token
 def updateStatus1():
-    if session['user']['userType'] != 'restaurant':
+    if session['sessionUser']['userType'] != 'restaurant':
         return redirect(url_for('logout'))
     return render_template('foodPrepared.html')
 
 @app.route('/updateStatus3')
 @check_token
 def updateStatus3():
-    if session['user']['userType'] != 'restaurant':
+    if session['sessionUser']['userType'] != 'restaurant':
         return redirect(url_for('logout'))
     currentOrder = session['currentOrderUpdating']
     db.collection('order').document(currentOrder['orderId']).update({'updateMessage': "Out for Delivery"})
@@ -844,7 +844,7 @@ def addPendingOrderId():
 @app.route('/moreDetailsOrder<orderId>')
 @check_token
 def moreDetailsOrder(orderId):
-    if session['user']['userType'] != 'customer':
+    if session['sessionUser']['userType'] != 'customer':
         return redirect(url_for('logout'))
     orderId=int(orderId)
     if orderId > len(session['presentOrderCustomer']):
@@ -873,7 +873,7 @@ def moreDetailsOrder(orderId):
 @app.route('/useOffer<toUse>')
 @check_token
 def useOffer(toUse):
-    if session['user']['userType'] != 'customer':
+    if session['sessionUser']['userType'] != 'customer':
         return redirect(url_for('logout'))
     user=session['userId']
     toUse=int(toUse)
@@ -885,7 +885,7 @@ def useOffer(toUse):
 @app.route('/removeOfferFromOrder')
 @check_token
 def removeOfferFromOrder():
-    if session['user']['userType'] != 'customer':
+    if session['sessionUser']['userType'] != 'customer':
         return redirect(url_for('logout'))
     session['currentOrderCreating']['offerId']=None
     return redirect(url_for('orderDetails'))
@@ -905,7 +905,7 @@ def redirectDashboard():
 @app.route('/deleteFoodItem<foodItemId>')
 @check_token
 def deleteFoodItem(foodItemId):
-    if session['user']['userType'] != 'restaurant':
+    if session['sessionUser']['userType'] != 'restaurant':
         return redirect(url_for('logout'))
     restaurantId=session['userId']
 
@@ -922,7 +922,7 @@ def deleteFoodItem(foodItemId):
 @app.route('/changeRecommendRestaurant<id_to_change>')
 @check_token
 def changeRecommendRestaurant(id_to_change):
-    if session['user']['userType'] != 'admin':
+    if session['sessionUser']['userType'] != 'admin':
         return redirect(url_for('logout'))
     id=int(id_to_change)
     id=id-1
@@ -958,7 +958,7 @@ def changeRecommendRestaurant(id_to_change):
 @app.route('/changeRecommendFoodItem<id_to_change>')
 @check_token
 def changeRecommendFoodItem(id_to_change):
-    if session['user']['userType'] != 'admin':
+    if session['sessionUser']['userType'] != 'admin':
         return redirect(url_for('logout'))
     id=int(id_to_change)
     id=id-1
@@ -1034,7 +1034,7 @@ def createOffer():
 @app.route('/addOffer')
 @check_token
 def addOffer():
-    if session['user']['userType'] != 'admin':
+    if session['sessionUser']['userType'] != 'admin':
         return redirect(url_for('logout'))
     user = session['sessionUser']
     if user['userType'] == 'admin':
@@ -1047,7 +1047,7 @@ def addOffer():
 @app.route('/addOffer/adder', methods=['POST','GET'])
 @check_token
 def offerAdder():
-    if session['user']['userType'] != 'admin':
+    if session['sessionUser']['userType'] != 'admin':
         return redirect(url_for('logout'))
     name = request.form['name']
     discount = request.form['discount']
@@ -1076,7 +1076,7 @@ def offerAdder():
 @app.route('/allOffer<customer_id>')
 @check_token
 def allOffer(customer_id):
-    if session['user']['userType'] != 'admin':
+    if session['sessionUser']['userType'] != 'admin':
         return redirect(url_for('logout'))
     customer_id=int(customer_id)
     customer_id=customer_id-1
@@ -1096,7 +1096,7 @@ def allOffer(customer_id):
 @app.route('/giveOffer<toGive>')
 @check_token
 def giveOffer(toGive):
-    if session['user']['userType'] != 'admin':
+    if session['sessionUser']['userType'] != 'admin':
         return redirect(url_for('logout'))
     
     toGive=int(toGive)
@@ -1123,7 +1123,7 @@ def giveOffer(toGive):
 @app.route('/offerListCustomer')
 @check_token
 def offerListCustomer():
-    if session['user']['userType'] != 'customer':
+    if session['sessionUser']['userType'] != 'customer':
         return redirect(url_for('logout'))
     user=session['userId']
     session['offerList']=[]
@@ -1140,7 +1140,7 @@ def offerListCustomer():
 @app.route('/pastOrder')
 @check_token
 def pastOrder():
-    if not session['user']['userType'] == 'restaurant' and not session['user']['userType'] == 'customer':
+    if not session['sessionUser']['userType'] == 'restaurant' and not session['sessionUser']['userType'] == 'customer':
         return redirect(url_for('logout'))
     userId=session['userId']
     userType=session['sessionUser']['userType']
@@ -1315,7 +1315,7 @@ def markLocation():
 @app.route('/orderDetailDeliveryAgent<orderId>')
 @check_token
 def orderDetailDeliveryAgent(orderId):
-    if session['user']['userType'] != 'deliveryAgent':
+    if session['sessionUser']['userType'] != 'deliveryAgent':
         return redirect(url_for('logout'))
     orderId=int(orderId)
     orderId = orderId-1
@@ -1326,14 +1326,14 @@ def orderDetailDeliveryAgent(orderId):
 @app.route('/acceptOrderForDelivery')
 @check_token
 def acceptOrderForDelivery():
-    if session['user']['userType'] != 'deliveryAgent':
+    if session['sessionUser']['userType'] != 'deliveryAgent':
         return redirect(url_for('logout'))
     return redirect(url_for('moreDetailsDeliveryRequest', status = "Accept"))
     
 @app.route('/updateStatus4')
 @check_token
 def updateStatus4():
-    if session['user']['userType'] != 'deliveryAgent':
+    if session['sessionUser']['userType'] != 'deliveryAgent':
         return redirect(url_for('logout'))
     currentOrder = session['currentOrderDeliveryAgent']
     db.collection('order').document(currentOrder['orderId']).update({'updateMessage': "Order Delivered"})
@@ -1349,7 +1349,7 @@ def updateStatus4():
 @app.route('/currentOrderDeliveryAgent')
 @check_token
 def currentOrderDeliveryAgent():
-    if session['user']['userType'] != 'deliveryAgent':
+    if session['sessionUser']['userType'] != 'deliveryAgent':
         return redirect(url_for('logout'))
     user=session['sessionUser']
     currentOrderId = db.collection(user['userType']).document(session['userId']).get().to_dict()['currentOrderId']
