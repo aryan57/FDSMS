@@ -9,7 +9,7 @@ import datetime
 import requests
 from requests.exceptions import HTTPError
 # from flask_session import Session
-#addding a comment
+#This is the intialisation for the app, to be used
 app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['TEMPLATES_AUTO_RELOAD']=True
@@ -22,6 +22,7 @@ bitly_headers = {
     'Content-Type': 'application/json',
 }
 
+# Initialization of the firebase data, that will be our online database
 cred = credentials.Certificate('fbAdminConfig.json')
 firebase = firebase_admin.initialize_app(cred,json.load(open('fbConfig.json')))
 pyrebase_pb = pyrebase.initialize_app(json.load(open('fbConfig.json')))
@@ -30,7 +31,7 @@ bucket = storage.bucket()
 # storage = pyrebase_pb.storage()
 
 
-
+# This function will check the tokens of the user whether it is valid or not, preventing unauthorised uses
 def check_token(f):
     @wraps(f)
     def wrap(*args,**kwargs):
@@ -55,140 +56,98 @@ def check_token(f):
         return f(*args, **kwargs)
     return wrap
 
-@app.route('/api/userinfo')
+
+
+# This is a helper function to get the usable url for the image uploaded
 @check_token
-def userinfo():
-    return {'data'}, 200
+def getImageURL(path):
+    blob = bucket.blob(path)
 
-@app.route('/signup/resturant', methods=['POST', 'GET'])
-def restaurantsignup():
-    email = request.form['email']
-    password = request.form['password']
-    area = request.form['area']
-    name = request.form['name']
-    local_file_obj = request.files['local_file_path']
-    session['signMess']="Fail"
-    storage_file_path=""
-    if area=='Other':
-        session['signMess'] = "We currently don't have service in your area."
-        return redirect(url_for('restaurantSignup'))
+    imagePublicURL = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
+
+    bitly_data = '{ "long_url": '+'"'+imagePublicURL+'", "domain": "bit.ly", "group_guid": "Bl1p4sQJxCm" }'
+
     try:
-        user = auth.create_user(
-            email=email,
-            password=password
-        )
-        storage_file_path = "restaurant/"+user.uid+".jpg"
-    except:
-        session['signMess']="error creating user in firebase"
-        return redirect(url_for('restaurantSignup'))
-    try:
-
-        rating_reference = db.collection('rating').document()
-        rating_json_data= {
-            "noOfInputs":0,
-            "sum":0.0,
-            "rating":0.0,
-            "ratingId":rating_reference.id
-        }
-        rating_reference.set(rating_json_data)
-
-        json_data = {
-            "name" : name,
-            "areaId" : area,
-            "ratingId": rating_reference.id,
-            "restaurantId" : user.uid,
-            "picSrc" : storage_file_path,
-            "pendingOrderId": [],
-            "email" : email,
-            "isRecommended" : False
-        }
-
-        db.collection("restaurant").document(user.uid).set(json_data)
-        db.collection("type").document(user.uid).set({"type" : "restaurant"})
-        
-    except:
-        session['signMess']="error adding user text data in firestore"
-        return redirect(url_for('restaurantSignup'))
-    try:
-        
-        blob = bucket.blob(storage_file_path)
-        blob.upload_from_file(local_file_obj,content_type="image/jpeg")
-        session['signMess']="Restaurant SignedUp. Please Login"
-        db.collection('area').document(area).update({"restaurantId" : firestore.ArrayUnion([user.uid])})
-        return redirect(url_for('login'))
+        response = requests.post('https://api-ssl.bitly.com/v4/shorten', headers=bitly_headers, data=bitly_data)
+        response=response.json()
     except Exception as e:
-        print(e)
-        session['signMess']="error uploading photo in firebase storage"
-        return redirect(url_for('restaurantSignup'))
+        # print(e)
+        pass
 
-@app.route('/signup/deliveryAgent', methods=['POST', 'GET'])
-def deliveryAgentsignup():
+    shortURL=response['link']
+
+    return shortURL
+
+
+# This function is used to login the users to the databases, by taking their credentials and 
+# storing the data in the session, an redirecting them to their respected database.
+@app.route('/api/token', methods=['POST','GET'])
+def token():
     email = request.form['email']
     password = request.form['password']
-    gender = request.form['gender']
-    area = request.form['area']
-    mobile = request.form['mobile']
-    dob = request.form['dob']
-    name = request.form['name']
-    local_file_obj = request.files['local_file_path']
-    print(local_file_obj)
-    session['signMess']="Fail"
-    storage_file_path = ""
-    if area=='Other':
-        session['signMess'] = "We currently don't deliver in your area."
-        return redirect(url_for('deliveryAgentSignup'))
-
     try:
-        user = auth.create_user(
-            email=email,
-            password=password
-        )
-        storage_file_path = "deliveryAgent/"+user.uid+".jpg"
+        user = pyrebase_pb.auth().sign_in_with_email_and_password(email, password)
+        try:
+            user_type = db.collection('type').document(user["localId"]).get().to_dict()["type"]
+        except Exception as e:
+            print(e)
+        json_data = db.collection(user_type).document(user["localId"]).get().to_dict()
+        session['sessionUser']= json_data
+        session['sessionUser']['userType']=user_type
+        session['jwt_token']=user['idToken']
+        session['refresh_token']=user['refreshToken']
+        session['userId']=user['localId']
+        if user_type=="customer" : 
+            return redirect(url_for('customerDashboard'))
+        elif user_type == "restaurant" : 
+            return redirect(url_for('restaurantDashboard'))
+        elif user_type == "deliveryAgent" :
+            return redirect(url_for('deliveryAgentDashboard'))
+        elif user_type == "admin" :
+            return redirect(url_for('adminDashboard'))
     except:
-        session['signMess']="error creating user in firebase"
-        return redirect(url_for('deliveryAgentSignup'))
-    
-    try:
-
-        rating_reference = db.collection('rating').document()
-        rating_json_data= {
-            "noOfInputs":0,
-            "sum":0.0,
-            "rating":0.0,
-            "ratingId":rating_reference.id
-        }
-        rating_reference.set(rating_json_data)
-
-        json_data = {
-            "name" : name,
-            "dateOfBirth" : dob,
-            "mobileNumber" : mobile,
-            "picSrc" : storage_file_path,
-            "email" : email,
-            "gender" : gender,
-            "areaId" : area,
-            "deliveryAgentId" : user.uid,
-            "ratingId" : rating_reference.id,
-            "isAvailable" : True,
-            "currentOrderId":""
-        }
-        db.collection("deliveryAgent").document(user.uid).set(json_data)
-        db.collection("type").document(user.uid).set({"type" : "deliveryAgent"})
-    except:
-        session['signMess']="error adding user text data in firestore"
-        return redirect(url_for('deliveryAgentSignup'))
-    try:
-        
-        blob = bucket.blob(storage_file_path)
-        blob.upload_from_file(local_file_obj,content_type="image/jpeg")
-        session['signMess']="Delivery Agent SignedUp. Please Login"
+        session['signMess']="Please enter the correct credentials"
         return redirect(url_for('login'))
-    except:
-        session['signMess']="error uploading photo in firebase storage"
-        return redirect(url_for('deliveryAgentSignup'))
+
+# This is the app route for the index page
+@app.route('/')
+def index():
+    session['signMess']="False"
+    message=session['signMess']
+    return render_template('index.html', message=message)
+
+# This is the route for the signup page for the three options
+@app.route('/Signup')
+def signUp():
+    return render_template('signup.html')
+
+# This will render the login page for the user
+@app.route('/login')
+def login():
+    message=session['signMess']
+    session['signMess']="False"
+    return render_template('login.html', message=message)
+
+# Extra route for the adminLogin
+@app.route('/adminLogin')
+def adminLogin():
+    return render_template('adminLogin.html')
 
 
+# This will redirect the user to the customer signup page
+@app.route('/customerSignup')
+def customerSignup():
+    message=session['signMess']
+    session['signMess']="False"
+    doc_refrence = db.collection('area').stream()
+    area_dict=[]
+    for doc in doc_refrence:
+        temp_dict=doc.to_dict()
+        area_dict.append(temp_dict)
 
+    return render_template('customerSignup.html', message=message,area_dict=area_dict)
+
+# This function will store the information of the customer from the form and store it in the database in the specified format
 @app.route('/signup/customer', methods=['POST','GET'])
 def customersignup():
 
@@ -257,89 +216,8 @@ def customersignup():
         session['signMess']="error uploading photo in firebase storage"
         return redirect(url_for('customerSignup'))
 
-@check_token
-def getImageURL(path):
-    blob = bucket.blob(path)
 
-    imagePublicURL = blob.generate_signed_url(datetime.timedelta(seconds=300), method='GET')
-
-    bitly_data = '{ "long_url": '+'"'+imagePublicURL+'", "domain": "bit.ly", "group_guid": "Bl1p4sQJxCm" }'
-
-    try:
-        response = requests.post('https://api-ssl.bitly.com/v4/shorten', headers=bitly_headers, data=bitly_data)
-        response=response.json()
-    except Exception as e:
-        # print(e)
-        pass
-
-    shortURL=response['link']
-
-    return shortURL
-
-
-
-@app.route('/api/token', methods=['POST','GET'])
-def token():
-    email = request.form['email']
-    password = request.form['password']
-    try:
-        user = pyrebase_pb.auth().sign_in_with_email_and_password(email, password)
-        try:
-            user_type = db.collection('type').document(user["localId"]).get().to_dict()["type"]
-        except Exception as e:
-            print(e)
-        json_data = db.collection(user_type).document(user["localId"]).get().to_dict()
-        session['sessionUser']= json_data
-        session['sessionUser']['userType']=user_type
-        session['jwt_token']=user['idToken']
-        session['refresh_token']=user['refreshToken']
-        session['userId']=user['localId']
-        if user_type=="customer" : 
-            return redirect(url_for('customerDashboard'))
-        elif user_type == "restaurant" : 
-            return redirect(url_for('restaurantDashboard'))
-        elif user_type == "deliveryAgent" :
-            return redirect(url_for('deliveryAgentDashboard'))
-        elif user_type == "admin" :
-            return redirect(url_for('adminDashboard'))
-    except:
-        session['signMess']="Please enter the correct credentials"
-        return redirect(url_for('login'))
-
-@app.route('/')
-def index():
-    session['signMess']="False"
-    message=session['signMess']
-    return render_template('index.html', message=message)
-
-@app.route('/Signup')
-def signUp():
-    return render_template('signup.html')
-
-
-
-@app.route('/login')
-def login():
-    message=session['signMess']
-    session['signMess']="False"
-    return render_template('login.html', message=message)
-
-@app.route('/adminLogin')
-def adminLogin():
-    return render_template('adminLogin.html')
-
-@app.route('/customerSignup')
-def customerSignup():
-    message=session['signMess']
-    session['signMess']="False"
-    doc_refrence = db.collection('area').stream()
-    area_dict=[]
-    for doc in doc_refrence:
-        temp_dict=doc.to_dict()
-        area_dict.append(temp_dict)
-
-    return render_template('customerSignup.html', message=message,area_dict=area_dict)
-
+# This will redirect to the signup page for the restaurant
 @app.route('/restaurantSignup')
 def restaurantSignup():
     message=session['signMess']
@@ -351,6 +229,70 @@ def restaurantSignup():
         area_dict.append(temp_dict)
     return render_template('restaurantSignup.html', message=message,area_dict=area_dict)
 
+# This function will get the data from the signup page of the restaurant and store it in the database in the specified format, and fields
+@app.route('/signup/resturant', methods=['POST', 'GET'])
+def restaurantsignup():
+    email = request.form['email']
+    password = request.form['password']
+    area = request.form['area']
+    name = request.form['name']
+    local_file_obj = request.files['local_file_path']
+    session['signMess']="Fail"
+    storage_file_path=""
+    if area=='Other':
+        session['signMess'] = "We currently don't have service in your area."
+        return redirect(url_for('restaurantSignup'))
+    try:
+        user = auth.create_user(
+            email=email,
+            password=password
+        )
+        storage_file_path = "restaurant/"+user.uid+".jpg"
+    except:
+        session['signMess']="error creating user in firebase"
+        return redirect(url_for('restaurantSignup'))
+    try:
+
+        rating_reference = db.collection('rating').document()
+        rating_json_data= {
+            "noOfInputs":0,
+            "sum":0.0,
+            "rating":0.0,
+            "ratingId":rating_reference.id
+        }
+        rating_reference.set(rating_json_data)
+
+        json_data = {
+            "name" : name,
+            "areaId" : area,
+            "ratingId": rating_reference.id,
+            "restaurantId" : user.uid,
+            "picSrc" : storage_file_path,
+            "pendingOrderId": [],
+            "email" : email,
+            "isRecommended" : False
+        }
+
+        db.collection("restaurant").document(user.uid).set(json_data)
+        db.collection("type").document(user.uid).set({"type" : "restaurant"})
+        
+    except:
+        session['signMess']="error adding user text data in firestore"
+        return redirect(url_for('restaurantSignup'))
+    try:
+        
+        blob = bucket.blob(storage_file_path)
+        blob.upload_from_file(local_file_obj,content_type="image/jpeg")
+        session['signMess']="Restaurant SignedUp. Please Login"
+        db.collection('area').document(area).update({"restaurantId" : firestore.ArrayUnion([user.uid])})
+        return redirect(url_for('login'))
+    except Exception as e:
+        print(e)
+        session['signMess']="error uploading photo in firebase storage"
+        return redirect(url_for('restaurantSignup'))
+
+
+# This will redirect the user to the delivery agent signup page
 @app.route('/deliveryAgentSignup')
 def deliveryAgentSignup():
     message=session['signMess']
@@ -362,6 +304,75 @@ def deliveryAgentSignup():
         area_dict.append(temp_dict)
     return render_template('deliveryAgentSignup.html', message=message,area_dict=area_dict)
 
+# This function will get the details for the delivery agent and store it in the database
+@app.route('/signup/deliveryAgent', methods=['POST', 'GET'])
+def deliveryAgentsignup():
+    email = request.form['email']
+    password = request.form['password']
+    gender = request.form['gender']
+    area = request.form['area']
+    mobile = request.form['mobile']
+    dob = request.form['dob']
+    name = request.form['name']
+    local_file_obj = request.files['local_file_path']
+    print(local_file_obj)
+    session['signMess']="Fail"
+    storage_file_path = ""
+    if area=='Other':
+        session['signMess'] = "We currently don't deliver in your area."
+        return redirect(url_for('deliveryAgentSignup'))
+
+    try:
+        user = auth.create_user(
+            email=email,
+            password=password
+        )
+        storage_file_path = "deliveryAgent/"+user.uid+".jpg"
+    except:
+        session['signMess']="error creating user in firebase"
+        return redirect(url_for('deliveryAgentSignup'))
+    
+    try:
+
+        rating_reference = db.collection('rating').document()
+        rating_json_data= {
+            "noOfInputs":0,
+            "sum":0.0,
+            "rating":0.0,
+            "ratingId":rating_reference.id
+        }
+        rating_reference.set(rating_json_data)
+
+        json_data = {
+            "name" : name,
+            "dateOfBirth" : dob,
+            "mobileNumber" : mobile,
+            "picSrc" : storage_file_path,
+            "email" : email,
+            "gender" : gender,
+            "areaId" : area,
+            "deliveryAgentId" : user.uid,
+            "ratingId" : rating_reference.id,
+            "isAvailable" : True,
+            "currentOrderId":""
+        }
+        db.collection("deliveryAgent").document(user.uid).set(json_data)
+        db.collection("type").document(user.uid).set({"type" : "deliveryAgent"})
+    except:
+        session['signMess']="error adding user text data in firestore"
+        return redirect(url_for('deliveryAgentSignup'))
+    try:
+        
+        blob = bucket.blob(storage_file_path)
+        blob.upload_from_file(local_file_obj,content_type="image/jpeg")
+        session['signMess']="Delivery Agent SignedUp. Please Login"
+        return redirect(url_for('login'))
+    except:
+        session['signMess']="error uploading photo in firebase storage"
+        return redirect(url_for('deliveryAgentSignup'))
+
+
+# These will be the routes for the Dashboard for the users
 @app.route('/customerDashboard')
 @check_token
 def customerDashboard():
@@ -399,6 +410,8 @@ def adminDashboard():
     else:
         return redirect(url_for('logout'))
 
+
+# This will show the personal data of the users
 @app.route('/personalData')
 @check_token
 def personalData():
@@ -409,6 +422,7 @@ def personalData():
     user['profilePicture'] = getImageURL(path)
     return render_template('personalData.html', user=user)
 
+# This function will remove the data from the session and redirect to the login page
 @app.route('/logout')
 @check_token
 def logout():
@@ -416,6 +430,8 @@ def logout():
     session['signMess']="Successfully Logged Out"
     return redirect(url_for('login'))
 
+
+# This will show the menu for the restaurant and a button to add food items
 @app.route('/createMenu')
 @check_token
 def createMenu():
@@ -428,9 +444,6 @@ def createMenu():
     docs=db.collection('restaurant').document(currResMenuId).collection('foodItem').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
-        # print(temp_dict)
-        # temp_dict['foodItemId'] = doc.id
-        # temp_dict['food_item_id']= doc.id
         temp_dict['pic'] = getImageURL(temp_dict['picSrc'])
         foodItemList.append(temp_dict)
     try:
@@ -461,6 +474,8 @@ def finishMenu():
     else:
         return redirect(url_for('logout'))
 
+
+# This function will add the food item to the database in the restaurant
 @app.route('/addFoodItem/adder', methods=['POST','GET'])
 @check_token
 def foodItemAdder():
@@ -497,7 +512,7 @@ def foodItemAdder():
         session['foodMessage']="error uploading photo in firebase storage"
         return redirect(url_for('addFoodItem'))
 
-    
+# This will create a list of the restaurant 
 @app.route('/allRestaurant')
 @check_token
 def allRestaurant():
@@ -518,6 +533,7 @@ def allRestaurant():
     session.modified=True
     return render_template('allRestaurant.html', user=user, restaurantList=restaurantList)
 
+# This will create a list of all the customers
 @app.route('/allCustomers')
 @check_token
 def allCustomers():
@@ -536,6 +552,8 @@ def allCustomers():
         session['customerList'].append(temp_dict)
     return render_template('allCustomers.html', user=user)
 
+
+# This will create a list of all the delivery agents
 @app.route('/allDeliveryAgents')
 @check_token
 def allDeliveryAgents():
@@ -554,6 +572,8 @@ def allDeliveryAgents():
         session['deliveryAgentList'].append(temp_dict)
     return render_template('allDeliveryAgents.html', user=user)
 
+
+# This will show the food items in a restaurant, i.e. showing the menu of the restaurant
 @app.route('/allFoodItem11/<restaurantUserId>')
 @check_token
 def allFoodItem11(restaurantUserId):
@@ -580,6 +600,7 @@ def allFoodItem():
     session['currentMenu']=foodItemList
     session.modified=True
     return render_template('allFoodItem.html', user=user,foodItemList=foodItemList)
+
 
 def deleteUserFromDatabase(to_delete):
 
@@ -946,6 +967,8 @@ def deleteFoodItem(foodItemId):
 
     return redirect(url_for('createMenu'))
 
+
+# This will change the recommended status for the restaurant
 @app.route('/changeRecommendRestaurant<id_to_change>')
 @check_token
 def changeRecommendRestaurant(id_to_change):
@@ -982,6 +1005,8 @@ def changeRecommendRestaurant(id_to_change):
 
     return redirect(url_for('allRestaurant'))
 
+
+# This function will change the recommend status of the food item, will be used by admin
 @app.route('/changeRecommendFoodItem<id_to_change>')
 @check_token
 def changeRecommendFoodItem(id_to_change):
@@ -1016,6 +1041,8 @@ def changeRecommendFoodItem(id_to_change):
 
     return redirect(url_for('allFoodItem11', restaurantUserId = restaurantId ))
 
+
+# This function filters all the restaurant from the database that are recommended and stores them in the list and then later shows that list
 @app.route('/recommendedRestaurant')
 @check_token
 def recommendedRestaurant():
@@ -1040,7 +1067,7 @@ def recommendedRestaurant():
     
     return render_template('recommendedRestaurant.html', restaurantList=restaurantList, user=user)
         
-
+# This is the front page for the create offer module, and show all the offer created, and a button to create new offers
 @app.route('/createOffer')
 @check_token
 def createOffer():
@@ -1063,6 +1090,8 @@ def createOffer():
         message="False"
     return render_template('createOffer.html', user=user, offerList=offerList, message=message)
 
+
+# This function will show the page to add offer and will show the input fields
 @app.route('/addOffer')
 @check_token
 def addOffer():
@@ -1076,6 +1105,8 @@ def addOffer():
     else:
         return redirect(url_for('logout'))
 
+
+# This function will add the offers in the database that will be later used in the future
 @app.route('/addOffer/adder', methods=['POST','GET'])
 @check_token
 def offerAdder():
@@ -1105,6 +1136,7 @@ def offerAdder():
         session['offerAdditionMessage'] = "Error adding offer in database"
         return redirect(url_for('addOffer'))
 
+# This function will show all the offers to the customer in the frontend
 @app.route('/allOffer<customer_id>')
 @check_token
 def allOffer(customer_id):
@@ -1124,7 +1156,7 @@ def allOffer(customer_id):
     print(offerList)
     return render_template('allOfferAdmin.html', offerList=offerList)
 
-
+# This function will give offer to the customer in the backend.
 @app.route('/giveOffer<toGive>')
 @check_token
 def giveOffer(toGive):
@@ -1148,6 +1180,7 @@ def giveOffer(toGive):
     
     return redirect(url_for('allCustomers'))
 
+# This will show all the offers received by the customer from the admin
 @app.route('/offerListCustomer')
 @check_token
 def offerListCustomer():
@@ -1166,6 +1199,8 @@ def offerListCustomer():
     # print(offerList)
     return render_template('allOfferCustomer.html', offerList=offerList)
 
+
+# This function will show all the past orders and details to the restaurant and the customers
 @app.route('/pastOrder')
 @check_token
 def pastOrder():
@@ -1196,6 +1231,8 @@ def pastOrder():
         session.modified = True
         return render_template('pastOrderRestaurant.html',pastOrderList=pastOrderList)
 
+
+# This will show all the nearby delivery agent in the same area to the restaurant
 @app.route('/nearbyDeliveryAgents')
 @check_token
 def nearbyDeliveryAgents():
@@ -1206,7 +1243,7 @@ def nearbyDeliveryAgents():
     areaId=session['sessionUser']['areaId']
 
     nearbyDeliveryAgentsList=[]
-
+    # Retrieving the data from the database
     doc_reference = db.collection('deliveryAgent').stream()
 
     for doc in doc_reference:
@@ -1215,11 +1252,9 @@ def nearbyDeliveryAgents():
             temp_dict['areaName'] = db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
             temp_dict['ratingValue']= db.collection('rating').document(temp_dict['ratingId']).get().to_dict()['rating']
             nearbyDeliveryAgentsList.append(temp_dict)
-    # print(nearbyDeliveryAgentsList)
-
     return render_template('nearbyDeliveryAgent.html', nearbyDeliveryAgentsList = nearbyDeliveryAgentsList)
 
-
+# This function will show all the delivery request for the customer in the region that are sent by the restaurants
 @app.route('/seeDeliveryRequest')
 @check_token
 def seeDeliveryRequest():
@@ -1244,6 +1279,8 @@ def seeDeliveryRequest():
     session.modified = True
     return render_template("seeDeliveryRequest.html", deliveryRequestList = deliveryRequestList)
 
+# This function will accept delivery request with getting the expected time of arrival and delivery from the delivery agent
+# It will also update the status of the order to show to the customer
 @app.route('/acceptDeliveryRequest', methods=['POST', 'GET'])
 @check_token
 def acceptDeliveryRequest():
@@ -1268,13 +1305,16 @@ def acceptDeliveryRequest():
 
     return redirect(url_for('moreDetailsDeliveryRequest', status = "Details"))
 
+
+# This function will show the details of the order and based on the statuses, the information on the front end will change
 @app.route('/moreDetailsDeliveryRequest<status>')
 @check_token
 def moreDetailsDeliveryRequest(status):
 
     if session['sessionUser']['userType']!='deliveryAgent':
         return redirect(url_for('logout'))
-    print(status)
+    
+    # if the status is no order, no information is retrieved from the database, nor anything is displayed
     if status != "NoOrder":
         session['currentOrderDeliveryAgent'] = db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).get().to_dict()
         session.modified = True
@@ -1283,6 +1323,7 @@ def moreDetailsDeliveryRequest(status):
         printTable = False
     else: 
         printTable = True
+        # This showButton are to chose which button to show
         if status == "Accept":
             showButton = 1
         elif status == "Details" and session['currentOrderDeliveryAgent']['updateLevel'] == 4 :
@@ -1301,6 +1342,7 @@ def moreDetailsDeliveryRequest(status):
     discount = None
     deliveryCharge = None
     final = None
+    # Retrieving data from the database
     if status != "NoOrder":
         currentOrder = session['currentOrderDeliveryAgent']
         customerName = db.collection('customer').document(currentOrder['customerId']).get().to_dict()['name']
