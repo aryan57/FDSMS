@@ -1298,8 +1298,8 @@ def ratingDeliveryAgent():
     if session['sessionUser']['userType']!='deliveryAgent':
         return redirect(url_for('logout'))
 
-    customerId="" #get from front end
-    rating="" #get from front end,must be out of 5
+    customerId=session['currentOrderDeliveryAgent']['customerId']
+    rating=request.form['customerRating']
     rating=int(rating)
 
     ratingId=db.collection('customer').document(customerId).get().to_dict()['ratingId']
