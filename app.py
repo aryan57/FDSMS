@@ -1140,12 +1140,8 @@ def giveOffer(toGive):
         doc_reference = db.collection("customer").document(customerGettingOffer).collection("promotionalOfferId").document()
         offer_json_data['offerId']=doc_reference.id
         doc_reference.set(offer_json_data)
-        # doc_reference1 = db.collection("customer").document(customerGettingOffer).collection("foodItem").document(doc_reference.id).update({"foodItemId":doc_reference.id})
-        # return {"ok":"True"},200
         
     except:
-        # Error creating offer for customer in database
-        # return redirect(url_for('allOffer'))
         pass
     
     return redirect(url_for('allCustomers'))
@@ -1220,20 +1216,6 @@ def nearbyDeliveryAgents():
     # print(nearbyDeliveryAgentsList)
 
     return render_template('nearbyDeliveryAgent.html', nearbyDeliveryAgentsList = nearbyDeliveryAgentsList)
-
-@app.route('/updateArea', methods=['POST', 'GET'])
-@check_token
-def updateArea():
-
-    if session['sessionUser']['userType']!='deliveryAgent':
-        return redirect(url_for('logout'))
-
-    deliveryAgentId=session['userId']
-    newAreaId=request.form['area']
-    print(newAreaId)
-    db.collection('deliveryAgent').document(deliveryAgentId).update({'areaId':newAreaId})
-
-    return redirect(url_for('deliveryAgentDashboard'))
 
 
 @app.route('/seeDeliveryRequest')
@@ -1331,6 +1313,9 @@ def moreDetailsDeliveryRequest(status):
 
     return render_template('moreDetailsDeliveryAgent.html', customerName=customerName, restaurantName=restaurantName, address = address, orderList=orderList, cost= cost, discount=discount, deliveryCharge=deliveryCharge, final= final, showButton = showButton, printTable = printTable)
 
+
+# This function handles the change of location of the delivery agent
+# We show the list of all the location to the delivery agent
 @app.route('/markLocation')
 @check_token
 def markLocation():
@@ -1345,6 +1330,24 @@ def markLocation():
     currentArea = db.collection('area').document(session['sessionUser']['areaId']).get().to_dict()
     return render_template("markLocation.html", area_dict = area_dict, currentArea = currentArea)
 
+# This will update the area of the delivery agent in the database
+@app.route('/updateArea', methods=['POST', 'GET'])
+@check_token
+def updateArea():
+
+    if session['sessionUser']['userType']!='deliveryAgent':
+        return redirect(url_for('logout'))
+
+    deliveryAgentId=session['userId']
+    newAreaId=request.form['area']
+    print(newAreaId)
+    db.collection('deliveryAgent').document(deliveryAgentId).update({'areaId':newAreaId})
+
+    return redirect(url_for('deliveryAgentDashboard'))
+
+
+# This function will show the order details for the order that the delivery agent chooses from the table
+# will see the list from the one stored in session
 @app.route('/orderDetailDeliveryAgent<orderId>')
 @check_token
 def orderDetailDeliveryAgent(orderId):
@@ -1356,29 +1359,18 @@ def orderDetailDeliveryAgent(orderId):
     session.modified = True
     return redirect(url_for('moreDetailsDeliveryRequest', status = "Details"))
 
+
+# This will redirect the delivery agent to the page that will have two input fields for the estimated time
+# It is handled by using the basic string variable for different functions
 @app.route('/acceptOrderForDelivery')
 @check_token
 def acceptOrderForDelivery():
     if session['sessionUser']['userType'] != 'deliveryAgent':
         return redirect(url_for('logout'))
     return redirect(url_for('moreDetailsDeliveryRequest', status = "Accept"))
-    
-@app.route('/updateStatus4')
-@check_token
-def updateStatus4():
-    if session['sessionUser']['userType'] != 'deliveryAgent':
-        return redirect(url_for('logout'))
-    currentOrder = session['currentOrderDeliveryAgent']
-    db.collection('order').document(currentOrder['orderId']).update({'updateMessage': "Order Delivered"})
-    db.collection('order').document(currentOrder['orderId']).update({'updateLevel': 5})
-    db.collection('order').document(currentOrder['orderId']).update({'isPending': False})
-    db.collection('customer').document(currentOrder['customerId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
-    db.collection('restaurant').document(currentOrder['restaurantId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
-    db.collection('deliveryAgent').document(currentOrder['deliveryAgentId']).update({'currentOrderId' : None})
-    session['currentOrderDeliveryAgent']=None
-    session.modified=True
-    return redirect(url_for('deliveryAgentDashboard'))
 
+# This will show the current order of the delivery Agent
+# If there is no current order accepted, then no order will be shown, and a message will be displayed on the page
 @app.route('/currentOrderDeliveryAgent')
 @check_token
 def currentOrderDeliveryAgent():
@@ -1392,13 +1384,22 @@ def currentOrderDeliveryAgent():
         session['currentOrderDeliveryAgent'] = db.collection('order').document(currentOrderId).get().to_dict()
         session.modified = True
         return redirect(url_for('moreDetailsDeliveryRequest', status = "Details")) 
-    
+
+
+
+
+# The below functions are to take care of the rating, we are updating the rating document in the firebase database
+# The rating are ranged from 0 to 5 and are stored as double
+
+# This function rates the customer, and the rating is done by the deliveryagent
 @app.route('/ratingDeliveryAgent', methods=['POST', 'GET'])
 @check_token
 def ratingDeliveryAgent():
     
+    # To prevent un-accessed use through links
     if session['sessionUser']['userType']!='deliveryAgent':
         return redirect(url_for('logout'))
+
 
     customerId=session['currentOrderDeliveryAgent']['customerId']
     rating=request.form['customerRating']
@@ -1414,7 +1415,9 @@ def ratingDeliveryAgent():
     db.collection('rating').document(ratingId).set(ratingObject)
     
     currentOrder = session['currentOrderDeliveryAgent']
-    db.collection('order').document(currentOrder['orderId']).update({'updateMessage': "OrderDelivered"})
+    
+    # Update the order for the update done by the delivery agent and mention it as delivered
+    db.collection('order').document(currentOrder['orderId']).update({'updateMessage': "Order Delivered"})
     db.collection('order').document(currentOrder['orderId']).update({'updateLevel': 5})
     db.collection('order').document(currentOrder['orderId']).update({'isPending': False})
     db.collection('customer').document(currentOrder['customerId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
@@ -1426,6 +1429,9 @@ def ratingDeliveryAgent():
     return redirect(url_for('deliveryAgentDashboard'))
     
 
+# This will take the rating from the customer after the order is delivered
+# This can be accessed by going in past orders and more details in customer dashboard
+# Changing the rating of the restaurant and the delivery agent
 @app.route('/ratingCustomer', methods=['POST', 'GET'])
 @check_token
 def ratingCustomer():
