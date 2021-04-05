@@ -124,6 +124,7 @@ def deliveryAgentsignup():
     dob = request.form['dob']
     name = request.form['name']
     local_file_obj = request.files['local_file_path']
+    print(local_file_obj)
     session['sign_message']="Fail"
     storage_file_path = ""
     if area=='Other':
@@ -449,6 +450,8 @@ def finishMenu():
 @app.route('/addFoodItem/adder', methods=['POST','GET'])
 @check_token
 def foodItemAdder():
+    if session['user']['userType'] != 'restaurant':
+        return redirect(url_for('logout'))
     name = request.form['name']
     price = request.form['price']
     local_file_obj = request.files['local_file_path']
@@ -537,6 +540,8 @@ def allDeliveryAgents():
 @app.route('/allFoodItem11/<restaurantUserId>')
 @check_token
 def allFoodItem11(restaurantUserId):
+    if not session['user']['userType'] == 'customer' and not session['sessionUser']['userType'] == 'admin':
+        return redirect(url_for('logout'))
     session['currentRestaurantMenuId']=restaurantUserId
     return redirect(url_for('allFoodItem'))
 
@@ -768,6 +773,8 @@ def orderDetailRestaurant(orderId):
 @app.route('/updateStatus0<val>')
 @check_token
 def updateStatus0(val):
+    if session['user']['userType'] != 'restaurant':
+        return redirect(url_for('logout'))
     if val == "Reject":
         updateOrderDic = {'heading': "Rejected"}
         db.collection('order').document(session['currentOrderUpdating']['orderId']).update({'orderUpdates' : firestore.ArrayUnion([updateOrderDic])})
@@ -783,7 +790,8 @@ def updateStatus0(val):
 @app.route('/getEstimatedTime', methods=['POST','GET'])
 @check_token
 def getEstimatedTime():
-
+    if session['user']['userType'] != 'restaurant':
+        return redirect(url_for('logout'))
     try:
         estimatedTime = request.form['time']
         updateOrderDic = {
@@ -808,11 +816,15 @@ def getEstimatedTime():
 @app.route('/updateStatus1')
 @check_token
 def updateStatus1():
+    if session['user']['userType'] != 'restaurant':
+        return redirect(url_for('logout'))
     return render_template('foodPrepared.html')
 
 @app.route('/updateStatus3')
 @check_token
 def updateStatus3():
+    if session['user']['userType'] != 'restaurant':
+        return redirect(url_for('logout'))
     currentOrder = session['currentOrderUpdating']
     db.collection('order').document(currentOrder['orderId']).update({'updateMessage': "Out for Delivery"})
     db.collection('order').document(currentOrder['orderId']).update({'updateLevel': 4})
@@ -839,6 +851,8 @@ def addPendingOrderId():
 @app.route('/moreDetailsOrder<orderId>')
 @check_token
 def moreDetailsOrder(orderId):
+    if session['user']['userType'] != 'customer':
+        return redirect(url_for('logout'))
     orderId=int(orderId)
     if orderId > len(session['presentOrderCustomer']):
         return redirect(url_for('recentOrderCustomer'))
@@ -866,6 +880,8 @@ def moreDetailsOrder(orderId):
 @app.route('/useOffer<toUse>')
 @check_token
 def useOffer(toUse):
+    if session['user']['userType'] != 'customer':
+        return redirect(url_for('logout'))
     user=session['userId']
     toUse=int(toUse)
     toUse=toUse-1
@@ -876,6 +892,8 @@ def useOffer(toUse):
 @app.route('/removeOfferFromOrder')
 @check_token
 def removeOfferFromOrder():
+    if session['user']['userType'] != 'customer':
+        return redirect(url_for('logout'))
     session['currentOrderCreating']['offerId']=None
     return redirect(url_for('orderDetails'))
 
@@ -894,6 +912,8 @@ def redirectDashboard():
 @app.route('/deleteFoodItem<foodItemId>')
 @check_token
 def deleteFoodItem(foodItemId):
+    if session['user']['userType'] != 'restaurant':
+        return redirect(url_for('logout'))
     restaurantId=session['userId']
 
     #command_to delete the id
@@ -909,6 +929,8 @@ def deleteFoodItem(foodItemId):
 @app.route('/changeRecommendRestaurant<id_to_change>')
 @check_token
 def changeRecommendRestaurant(id_to_change):
+    if session['user']['userType'] != 'admin':
+        return redirect(url_for('logout'))
     id=int(id_to_change)
     id=id-1
 
@@ -943,6 +965,8 @@ def changeRecommendRestaurant(id_to_change):
 @app.route('/changeRecommendFoodItem<id_to_change>')
 @check_token
 def changeRecommendFoodItem(id_to_change):
+    if session['user']['userType'] != 'admin':
+        return redirect(url_for('logout'))
     id=int(id_to_change)
     id=id-1
     if session['current_menu_viewed'][id]['isRecommended'] == False:
@@ -1018,6 +1042,8 @@ def createOffer():
 @app.route('/addOffer')
 @check_token
 def addOffer():
+    if session['user']['userType'] != 'admin':
+        return redirect(url_for('logout'))
     user = session['sessionUser']
     if user['userType'] == 'admin':
         message=session['offerAdditionMessage']
@@ -1029,6 +1055,8 @@ def addOffer():
 @app.route('/addOffer/adder', methods=['POST','GET'])
 @check_token
 def offerAdder():
+    if session['user']['userType'] != 'admin':
+        return redirect(url_for('logout'))
     name = request.form['name']
     discount = request.form['discount']
     price = request.form['price']
@@ -1056,6 +1084,8 @@ def offerAdder():
 @app.route('/allOffer<customer_id>')
 @check_token
 def allOffer(customer_id):
+    if session['user']['userType'] != 'admin':
+        return redirect(url_for('logout'))
     customer_id=int(customer_id)
     customer_id=customer_id-1
     session['customerGettingOffer']=session['customerList'][customer_id]['customerId']
@@ -1074,6 +1104,9 @@ def allOffer(customer_id):
 @app.route('/giveOffer<toGive>')
 @check_token
 def giveOffer(toGive):
+    if session['user']['userType'] != 'admin':
+        return redirect(url_for('logout'))
+    
     toGive=int(toGive)
     toGive=toGive-1
 
@@ -1098,6 +1131,8 @@ def giveOffer(toGive):
 @app.route('/offerListCustomer')
 @check_token
 def offerListCustomer():
+    if session['user']['userType'] != 'customer':
+        return redirect(url_for('logout'))
     user=session['userId']
     session['offerList']=[]
     docs = db.collection('customer').document(user).collection('promotionalOfferId').stream()
@@ -1113,6 +1148,8 @@ def offerListCustomer():
 @app.route('/pastOrder')
 @check_token
 def pastOrder():
+    if not session['user']['userType'] == 'restaurant' and not session['user']['userType'] == 'customer':
+        return redirect(url_for('logout'))
     userId=session['userId']
     userType=session['sessionUser']['userType']
 
@@ -1272,7 +1309,6 @@ def moreDetailsDeliveryRequest(status):
 @app.route('/markLocation')
 @check_token
 def markLocation():
-
     if session['sessionUser']['userType']!='deliveryAgent':
         return redirect(url_for('logout'))
     doc_reference = db.collection('area').stream()
@@ -1287,6 +1323,8 @@ def markLocation():
 @app.route('/orderDetailDeliveryAgent<orderId>')
 @check_token
 def orderDetailDeliveryAgent(orderId):
+    if session['user']['userType'] != 'deliveryAgent':
+        return redirect(url_for('logout'))
     orderId=int(orderId)
     orderId = orderId-1
     session['currentOrderDeliveryAgent']=session['currentDeliveryRequest'][orderId]
@@ -1296,11 +1334,15 @@ def orderDetailDeliveryAgent(orderId):
 @app.route('/acceptOrderForDelivery')
 @check_token
 def acceptOrderForDelivery():
+    if session['user']['userType'] != 'deliveryAgent':
+        return redirect(url_for('logout'))
     return redirect(url_for('moreDetailsDeliveryRequest', status = "Accept"))
     
 @app.route('/updateStatus4')
 @check_token
 def updateStatus4():
+    if session['user']['userType'] != 'deliveryAgent':
+        return redirect(url_for('logout'))
     currentOrder = session['currentOrderDeliveryAgent']
     db.collection('order').document(currentOrder['orderId']).update({'updateMessage': "Order Delivered"})
     db.collection('order').document(currentOrder['orderId']).update({'updateLevel': 5})
@@ -1315,7 +1357,8 @@ def updateStatus4():
 @app.route('/currentOrderDeliveryAgent')
 @check_token
 def currentOrderDeliveryAgent():
-    
+    if session['user']['userType'] != 'deliveryAgent':
+        return redirect(url_for('logout'))
     user=session['sessionUser']
     currentOrderId = db.collection(user['userType']).document(session['userId']).get().to_dict()['currentOrderId']
     if currentOrderId == None:
