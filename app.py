@@ -1423,7 +1423,7 @@ def ratingDeliveryAgent():
     db.collection('customer').document(currentOrder['customerId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
     db.collection('restaurant').document(currentOrder['restaurantId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
     db.collection('deliveryAgent').document(currentOrder['deliveryAgentId']).update({'isAvailable' : True})
-    db.collection('deliveryAgent').document(currentOrder['deliveryAgentId']).update({'currentOrderId': None})
+    db.collection('deliveryAgent').document(currentOrder['deliveryAgentId']).update({'currentOrderId': ""})
     session['currentOrderDeliveryAgent']=None
     session.modified=True
     return redirect(url_for('deliveryAgentDashboard'))
