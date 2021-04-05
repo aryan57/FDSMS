@@ -29,10 +29,10 @@ def check_token(f):
     def wrap(*args,**kwargs):
         try:
             if session['jwt_token']==None:
-                session['sign_message']="No Token Provided. Try Logging In."
+                session['signMess']="No Token Provided. Try Logging In."
                 return redirect(url_for('login'))
         except:
-            session['sign_message']="No Token Provided. Try Logging In."
+            session['signMess']="No Token Provided. Try Logging In."
             return redirect(url_for('login'))
         try:
             session['jwt_token'] = pyrebase_pb.auth().refresh(session['refresh_token'])['idToken']
@@ -43,7 +43,7 @@ def check_token(f):
             session['sessionUser']['userType']=userType
             session.modified=True
         except:
-            session['sign_message']="Invalid Token Provided. Trying Logging again."
+            session['signMess']="Invalid Token Provided. Trying Logging again."
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return wrap
@@ -60,10 +60,10 @@ def restaurantsignup():
     area = request.form['area']
     name = request.form['name']
     local_file_obj = request.files['local_file_path']
-    session['sign_message']="Fail"
+    session['signMess']="Fail"
     storage_file_path=""
     if area=='Other':
-        session['sign_message'] = "We currently don't have service in your area."
+        session['signMess'] = "We currently don't have service in your area."
         return redirect(url_for('restaurantSignup'))
     try:
         user = auth.create_user(
@@ -72,7 +72,7 @@ def restaurantsignup():
         )
         storage_file_path = "restaurant/"+user.uid+".jpg"
     except:
-        session['sign_message']="error creating user in firebase"
+        session['signMess']="error creating user in firebase"
         return redirect(url_for('restaurantSignup'))
     try:
 
@@ -100,18 +100,18 @@ def restaurantsignup():
         db.collection("type").document(user.uid).set({"type" : "restaurant"})
         
     except:
-        session['sign_message']="error adding user text data in firestore"
+        session['signMess']="error adding user text data in firestore"
         return redirect(url_for('restaurantSignup'))
     try:
         
         blob = bucket.blob(storage_file_path)
         blob.upload_from_file(local_file_obj,content_type="image/jpeg")
-        session['sign_message']="Restaurant SignedUp. Please Login"
+        session['signMess']="Restaurant SignedUp. Please Login"
         db.collection('area').document(area).update({"restaurantId" : firestore.ArrayUnion([user.uid])})
         return redirect(url_for('login'))
     except Exception as e:
         print(e)
-        session['sign_message']="error uploading photo in firebase storage"
+        session['signMess']="error uploading photo in firebase storage"
         return redirect(url_for('restaurantSignup'))
 
 @app.route('/signup/deliveryAgent', methods=['POST', 'GET'])
@@ -125,10 +125,10 @@ def deliveryAgentsignup():
     name = request.form['name']
     local_file_obj = request.files['local_file_path']
     print(local_file_obj)
-    session['sign_message']="Fail"
+    session['signMess']="Fail"
     storage_file_path = ""
     if area=='Other':
-        session['sign_message'] = "We currently don't deliver in your area."
+        session['signMess'] = "We currently don't deliver in your area."
         return redirect(url_for('deliveryAgentSignup'))
 
     try:
@@ -138,7 +138,7 @@ def deliveryAgentsignup():
         )
         storage_file_path = "deliveryAgent/"+user.uid+".jpg"
     except:
-        session['sign_message']="error creating user in firebase"
+        session['signMess']="error creating user in firebase"
         return redirect(url_for('deliveryAgentSignup'))
     
     try:
@@ -167,16 +167,16 @@ def deliveryAgentsignup():
         db.collection("deliveryAgent").document(user.uid).set(json_data)
         db.collection("type").document(user.uid).set({"type" : "deliveryAgent"})
     except:
-        session['sign_message']="error adding user text data in firestore"
+        session['signMess']="error adding user text data in firestore"
         return redirect(url_for('deliveryAgentSignup'))
     try:
         
         blob = bucket.blob(storage_file_path)
         blob.upload_from_file(local_file_obj,content_type="image/jpeg")
-        session['sign_message']="Delivery Agent SignedUp. Please Login"
+        session['signMess']="Delivery Agent SignedUp. Please Login"
         return redirect(url_for('login'))
     except:
-        session['sign_message']="error uploading photo in firebase storage"
+        session['signMess']="error uploading photo in firebase storage"
         return redirect(url_for('deliveryAgentSignup'))
 
 
@@ -195,7 +195,7 @@ def customersignup():
     local_file_obj = request.files['local_file_path']
     storage_file_path = ""
     if area=='Other':
-        session['sign_message'] = "We currently don't deliver in your area."
+        session['signMess'] = "We currently don't deliver in your area."
         return redirect(url_for('customerSignup'))
     # create user
     try:
@@ -205,7 +205,7 @@ def customersignup():
         )
         storage_file_path = "customer/"+user.uid+".jpg"
     except:
-        session['sign_message']="error creating user in firebase"
+        session['signMess']="error creating user in firebase"
         return redirect(url_for('customerSignup'))
     
     # add data in fire-store
@@ -236,17 +236,17 @@ def customersignup():
         db.collection("customer").document(user.uid).set(json_data)
         db.collection("type").document(user.uid).set({"type" : "customer"})
     except:
-        session['sign_message']="error adding user text data in firestore"
+        session['signMess']="error adding user text data in firestore"
         return redirect(url_for('customerSignup'))
 
     # upload profile picture
     try:
         blob = bucket.blob(storage_file_path)
         blob.upload_from_file(local_file_obj,content_type="image/jpeg")
-        session['sign_message']='Signup was Succesful. Please Login'
+        session['signMess']='Signup was Succesful. Please Login'
         return redirect(url_for('login'))
     except:
-        session['sign_message']="error uploading photo in firebase storage"
+        session['signMess']="error uploading photo in firebase storage"
         return redirect(url_for('customerSignup'))
 
 @check_token
@@ -269,7 +269,6 @@ def token():
     password = request.form['password']
     try:
         user = pyrebase_pb.auth().sign_in_with_email_and_password(email, password)
-        # user2 = pyrebase_pb.auth().get_account_info(user['idToken'])
         try:
             user_type = db.collection('type').document(user["localId"]).get().to_dict()["type"]
         except Exception as e:
@@ -289,13 +288,13 @@ def token():
         elif user_type == "admin" :
             return redirect(url_for('adminDashboard'))
     except:
-        session['sign_message']="Please enter the correct credentials"
+        session['signMess']="Please enter the correct credentials"
         return redirect(url_for('login'))
 
 @app.route('/')
 def index():
-    session['sign_message']="False"
-    message=session['sign_message']
+    session['signMess']="False"
+    message=session['signMess']
     return render_template('index.html', message=message)
 
 @app.route('/Signup')
@@ -306,8 +305,8 @@ def signUp():
 
 @app.route('/login')
 def login():
-    message=session['sign_message']
-    session['sign_message']="False"
+    message=session['signMess']
+    session['signMess']="False"
     return render_template('login.html', message=message)
 
 @app.route('/adminLogin')
@@ -316,8 +315,8 @@ def adminLogin():
 
 @app.route('/customerSignup')
 def customerSignup():
-    message=session['sign_message']
-    session['sign_message']="False"
+    message=session['signMess']
+    session['signMess']="False"
     doc_refrence = db.collection('area').stream()
     area_dict=[]
     for doc in doc_refrence:
@@ -328,8 +327,8 @@ def customerSignup():
 
 @app.route('/restaurantSignup')
 def restaurantSignup():
-    message=session['sign_message']
-    session['sign_message']="False"
+    message=session['signMess']
+    session['signMess']="False"
     doc_reference = db.collection('area').stream()
     area_dict=[]
     for doc in doc_reference:
@@ -339,8 +338,8 @@ def restaurantSignup():
 
 @app.route('/deliveryAgentSignup')
 def deliveryAgentSignup():
-    message=session['sign_message']
-    session['sign_message']="False"
+    message=session['signMess']
+    session['signMess']="False"
     doc_reference = db.collection('area').stream()
     area_dict=[]
     for doc in doc_reference:
@@ -399,7 +398,7 @@ def personalData():
 @check_token
 def logout():
     session.clear()
-    session['sign_message']="Successfully Logged Out"
+    session['signMess']="Successfully Logged Out"
     return redirect(url_for('login'))
 
 @app.route('/createMenu')
@@ -1002,17 +1001,19 @@ def recommendedRestaurant():
     user=session['sessionUser']
     if not user['userType'] == 'customer':
         return redirect(url_for('logout'))
-    session['restaurantList']=[]
+    restaurantList=[]
+    tempRestaurantList=[]
     docs=db.collection('restaurant').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
         temp_dict['userId']= doc.id
         temp_dict['pic'] = getImageURL(temp_dict['picSrc'])
-        session['restaurantList'].append(temp_dict)
-    restaurantList=[]
-    for restaurant in session['restaurantList']:
+        tempRestaurantList.append(temp_dict)
+    for restaurant in tempRestaurantList:
         if restaurant['isRecommended']:
             restaurantList.append(restaurant)
+    session['restaurantList']=restaurantList
+    session.modified = True
     
     return render_template('recommendedRestaurant.html', restaurantList=restaurantList, user=user)
         
@@ -1089,14 +1090,13 @@ def allOffer(customer_id):
     customer_id=int(customer_id)
     customer_id=customer_id-1
     session['customerGettingOffer']=session['customerList'][customer_id]['customerId']
-    
-    session['offerList']=[]
+    offerList=[]
     docs = db.collection('offer').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
         temp_dict['offerId']= doc.id
-        session['offerList'].append(temp_dict)
-    offerList=session['offerList']
+        offerList.append(temp_dict)
+    session['offerList'] = offerList
     print(offerList)
     return render_template('allOfferAdmin.html', offerList=offerList)
 
@@ -1134,14 +1134,14 @@ def offerListCustomer():
     if session['sessionUser']['userType'] != 'customer':
         return redirect(url_for('logout'))
     user=session['userId']
-    session['offerList']=[]
+    offerList=[]
     docs = db.collection('customer').document(user).collection('promotionalOfferId').stream()
     for doc in docs:
         temp_dict=doc.to_dict()
         temp_dict['offerId']= doc.id
         
-        session['offerList'].append(temp_dict)
-    offerList=session['offerList']
+        offerList.append(temp_dict)
+    session['offerList']=offerList
     # print(offerList)
     return render_template('allOfferCustomer.html', offerList=offerList)
 
@@ -1394,7 +1394,7 @@ def ratingDeliveryAgent():
     db.collection('customer').document(currentOrder['customerId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
     db.collection('restaurant').document(currentOrder['restaurantId']).update({'pendingOrderId' : firestore.ArrayRemove([currentOrder['orderId']])})
     db.collection('deliveryAgent').document(currentOrder['deliveryAgentId']).update({'isAvailable' : True})
-    db.collection('deliveryAgent').document(currentOrder['deliveryAgent']).update({'currentOrderId': None})
+    db.collection('deliveryAgent').document(currentOrder['deliveryAgentId']).update({'currentOrderId': None})
     session['currentOrderDeliveryAgent']=None
     session.modified=True
     return redirect(url_for('deliveryAgentDashboard'))

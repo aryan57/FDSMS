@@ -6,11 +6,20 @@
 
 {% block main %}
 <div class='container-fluid'>
-    <div class='row justify-content-center'>
-        <div class='col-auto align-self-center'>
-            {% if not recentOrderList %}
+    {% if not recentOrderList %}
+        <div class='row justify-content-center'>
+            <div class='col-auto align-self-center'>
                 <h1> There are no orders in the list.</h1>
-            {% else %}
+            </div>
+        </div>
+    {% else %}
+        <div class='row justify-content-center'>
+            <div class='col-auto align-self-center'>
+                <h1>Current Active Orders</h1>
+            </div>
+        </div>
+        <div class='row justify-content-center'>
+            <div class='col-auto align-self-center'>
                 <div class="mdc-data-table">
                     <div class="mdc-data-table__table-container">
                         <table class="mdc-data-table__table" aria-label="Dessert calories">
