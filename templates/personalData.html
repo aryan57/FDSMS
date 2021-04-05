@@ -12,15 +12,101 @@
         <h1>Personal Data</h1>
       </div>
     </div>
-    {% for key, item in user.items() %}
-      <div class="row justify-content-center">
-          <div class="col-auto">
-              {{key}} :
-          </div>
-          <div class="col-auto">
-              {{item}}
-          </div>
+    <div class='row justify-content-center'>
+      <div class='col-auto justify-content-center align-self-center'>
+        <img src={{imagePath}}>
       </div>
-    {% endfor %}
+    </div>
+    <div class='row justify-content-center'>
+      <div class='col-auto justify-content-start'>
+        Name: 
+      </div>
+      <div class='col-auto justify-content-end align-self-center'>
+        {{user['name']}}
+      </div>
+    </div>
+    <div class='row justify-content-center'>
+      <div class='col-auto justify-content-start'>
+        Email: 
+      </div>
+      <div class='col-auto justify-content-end align-self-center'>
+        {{user['email']}}
+      </div>
+    </div>
+    <div class='row justify-content-center'>
+      <div class='col-auto justify-content-start align-self-center'>
+        Area: 
+      </div>
+      <div class='col-auto justify-content-end align-self-center'>
+        {{user['areaName']}}
+      </div>
+    </div>
+    <div class='row justify-content-center'>
+      <div class='col-auto justify-content-start align-self-center'>
+        Rating: 
+      </div>
+      <div class='col-auto justify-content-end align-self-center'>
+        {{user['ratingValue']}}
+      </div>
+    </div>
+    {% if user['userType'] == 'customer' %}
+    <div class='row justify-content-center'>
+      <div class='col-auto justify-content-start align-self-center'>
+        Address: 
+      </div>
+      <div class='col-auto justify-content-end align-self-center'>
+        {{user['address']}}
+      </div>
+    </div>
+    <div class='row justify-content-center'>
+      <div class='col-auto justify-content-start align-self-center'>
+        Gender: 
+      </div>
+      <div class='col-auto justify-content-end align-self-center'>
+        {{user['gender']}}
+      </div>
+    </div>
+    <div class='row justify-content-center'>
+      <div class='col-auto justify-content-start align-self-center'>
+        Date of Birth: 
+      </div>
+      <div class='col-auto justify-content-end align-self-center'>
+        {{user['dateOfBirth']}}
+      </div>
+    </div>
+    <div class='row justify-content-center'>
+      <div class='col-auto justify-content-start align-self-center'>
+        Mobile Number: 
+      </div>
+      <div class='col-auto justify-content-end align-self-center'>
+        {{user['mobileNumber']}}
+      </div>
+    </div>
+    {% elif user['userType'] == 'deliveryAgent' %}
+    <div class='row justify-content-center'>
+      <div class='col-auto justify-content-start align-self-center'>
+        Gender: 
+      </div>
+      <div class='col-auto justify-content-end align-self-center'>
+        {{user['gender']}}
+      </div>
+    </div>
+    <div class='row justify-content-center'>
+      <div class='col-auto justify-content-start align-self-center'>
+        Date of Birth: 
+      </div>
+      <div class='col-auto justify-content-end align-self-center'>
+        {{user['dateOfBirth']}}
+      </div>
+    </div>
+    <div class='row justify-content-center'>
+      <div class='col-auto justify-content-start align-self-center'>
+        Mobile Number: 
+      </div>
+      <div class='col-auto justify-content-end align-self-center'>
+        {{user['mobileNumber']}}
+      </div>
+    </div>
+    {% endif %}
   </div>
 {% endblock %}
