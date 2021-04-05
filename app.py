@@ -388,6 +388,8 @@ def adminDashboard():
 @check_token
 def personalData():
     user=session['sessionUser']
+    user['areaName']=db.collection('area').document(user['areaId']).get().to_dict()['name']
+    user['ratingValue']=db.collection('rating').document(user['ratingId']).get().to_dict()['rating']
     return render_template('personalData.html', user=user)
 
 @app.route('/logout')
