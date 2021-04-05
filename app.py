@@ -824,6 +824,7 @@ def moreDetailsOrder(orderId):
     currentOrder=db.collection('order').document(currentOrder).get().to_dict()
     customerName = db.collection('customer').document(currentOrder['customerId']).get().to_dict()['name']
     restaurantName = db.collection('restaurant').document(currentOrder['restaurantId']).get().to_dict()['name']
+    session['customerCurrentOrderChanging']=currentOrder
     orderList=currentOrder['orderList']
     discount=currentOrder['discountValue']
     print(currentOrder['offerId'])
@@ -1195,6 +1196,7 @@ def moreDetailsDeliveryRequest(status):
 
     if session['sessionUser']['userType']!='deliveryAgent':
         return redirect(url_for('logout'))
+    print(status)
     if status != "NoOrder":
         session['currentOrderDeliveryAgent'] = db.collection('order').document(session['currentOrderDeliveryAgent']['orderId']).get().to_dict()
     showButton=3
@@ -1279,7 +1281,14 @@ def updateStatus4():
 @app.route('/currentOrderDeliveryAgent')
 @check_token
 def currentOrderDeliveryAgent():
-    if session['currentOrderDeliveryAgent'] == None:
+    try:
+        if not 'currentOrderDeliveryAgent' in session.keys() :
+            return redirect(url_for('moreDetailsDeliveryRequest', status="NoOrder"))
+        elif session['curretnOrderDeliveryAgent']  == None:
+            return redirect(url_for('moreDetailsDeliveryRequest', status="NoOrder"))
+    except Exception as e:
+        print(e)
+        print('hello')
         return redirect(url_for('moreDetailsDeliveryRequest', status="NoOrder"))
     return redirect(url_for('moreDetailsDeliveryRequest', status = "Details")) 
 @app.route('/ratingDeliveryAgent')
@@ -1313,7 +1322,7 @@ def ratingCustomer():
         return redirect(url_for('logout'))
 
 
-    orderId=session['currentOrderCreating']['orderId']
+    orderId=session['customerCurrentOrderChanging']['orderId']
     deliveryAgentId = db.collection("order").document(orderId).get().to_dict()['deliveryAgentId']
     deliveryAgentRating=request.form['deliveryAgentRating']
     deliveryAgentRating=int(deliveryAgentRating)
@@ -1331,7 +1340,6 @@ def ratingCustomer():
 
 
     restaurantId = db.collection("order").document(orderId).get().to_dict()['restaurantId']
-    # restaurantId=session['currentOrderCreating']['restaurantId']
     restaurantRating=request.form['restaurantRating']
     restaurantRating=int(restaurantRating)
 
