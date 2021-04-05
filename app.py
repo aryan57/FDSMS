@@ -1029,6 +1029,8 @@ def recommendedRestaurant():
         temp_dict=doc.to_dict()
         temp_dict['userId']= doc.id
         temp_dict['pic'] = getImageURL(temp_dict['picSrc'])
+        temp_dict['areaName'] = db.collection('area').document(temp_dict['areaId']).get().to_dict()['name']
+        temp_dict['ratingValue'] = db.collection('rating').document(temp_dict['ratingId']).get().to_dict()['rating']
         tempRestaurantList.append(temp_dict)
     for restaurant in tempRestaurantList:
         if restaurant['isRecommended']:
