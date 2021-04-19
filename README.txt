@@ -1,1 +1,1 @@
-For documentation refer to this github repo https://github.com/Satvik-B/FDSMS
+For documentation go to https://github.com/aryan57/FDSMS/blob/main/Compliance%20Report-compressed.pdf
