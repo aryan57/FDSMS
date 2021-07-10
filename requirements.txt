@@ -1,5 +1,4 @@
-firebase_admin
-pyrebase
-Flask-Session
-flask
-datetime
+firebase_admin==5.0.1
+flask==2.0.1
+pyrebase==3.0.27
+Flask-Session==0.4.0

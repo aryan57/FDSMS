@@ -1,10 +1,10 @@
 {
-    "apiKey": "**REMOVED**",
-    "authDomain": "**REMOVED**",
-    "projectId": "**REMOVED**",
-    "storageBucket": "**REMOVED**",
-    "messagingSenderId": "**REMOVED**",
-    "appId": "**REMOVED**",
-    "measurementId": "**REMOVED**",
-    "databaseURL":"**REMOVED**"
-  }
+  "apiKey": "AIzaSyDsti6x2zMqCss2ucwiyJ40M75AyrANdYg",
+  "authDomain": "fdsms-d8en7w.firebaseapp.com",
+  "projectId": "fdsms-d8en7w",
+  "storageBucket": "fdsms-d8en7w.appspot.com",
+  "messagingSenderId": "1049416600758",
+  "appId": "1:1049416600758:web:dc507635651516b6a2ea17",
+  "measurementId": "G-4DCDN1D8GC",
+  "databaseURL": "https://fdsms-d8en7w.firebaseio.com"
+}
